@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790608768675"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790609392387"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -444,8 +444,9 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
   <div class="note">כל השחקנים יראו אותה כשהם לוחצים על הפרופיל שלך.</div>
   <h2 style="font-size:20px">בחר תמונה</h2>
   <div class="row"><button class="go" id="profPhoto">🖼️ תמונה מהגלריה</button><input type="file" id="profFile" accept="image/*" hidden></div>
-  <div class="note">תמונה מהגלריה נשמרת רק בטלפון שלך. חברים באונליין רואים רק את התמונות המוכנות.</div>
-  <div class="avgrid" id="avGrid"></div>
+  <div class="note">חברים באונליין רואים גם את התמונה מהגלריה (בגודל קטן).</div>
+  <button class="act" id="avOpen" type="button" aria-expanded="false" aria-controls="avGrid">🐆 תמונות אפשריות לפרופיל</button>
+  <div class="avgrid" id="avGrid" hidden></div>
 </section>
 
 <!-- טעינה -->
@@ -621,7 +622,7 @@ const EN_DICT = {
   "החדר מוכן!": "The room is ready!", "שלח לחבר את הקוד. הוא פותח את האפליקציה, בוחר \"אונליין\" ומקליד אותו.": "Send your friend the code. They open the app, choose \"Online\" and type it in.", "📤 שלח לחבר": "📤 Send to a friend", "ביטול": "Cancel",
   "או הזמן מי שמחובר עכשיו:": "Or invite someone who's online now:", "⚙️ הגדרות": "⚙️ Settings", "הגדרות": "Settings", "חזרה ←": "← Back", "🔑 התחברות לחשבון אחר": "🔑 Sign in to another account", "✏️ שינוי שם משתמש": "✏️ Change username", "שמור שם": "Save name",
   "🔒 שינוי סיסמה": "🔒 Change password", "שמור סיסמה": "Save password", "🔒 הסיסמה נשמרת מוצפנת. בכל זאת — תבחר סיסמה רק למשחק הזה.": "🔒 Your password is stored encrypted. Still, pick a password just for this game.",
-  "הפרופיל שלי": "My profile", "בחר תמונה": "Choose a picture", "🖼️ תמונה מהגלריה": "🖼️ Photo from gallery", "תמונה מהגלריה נשמרת רק בטלפון שלך. חברים באונליין רואים רק את התמונות המוכנות.": "Your gallery photo is shared with friends online in a small size.",
+  "הפרופיל שלי": "My profile", "בחר תמונה": "Choose a picture", "🖼️ תמונה מהגלריה": "🖼️ Photo from gallery", "חברים באונליין רואים גם את התמונה מהגלריה (בגודל קטן).": "Your gallery photo is shared with friends online in a small size.",
   "מביא תמונות…": "Loading pictures…", "יציאה": "Quit", "שלח": "Send", "⚖️ השופט": "⚖️ The judge", "תשפוט": "Judge", "סגור": "Close", "🐆 ברוך הבא לצ'יטה!": "🐆 Welcome to The Cheetah!", "✨ משתמש חדש": "✨ New player",
   "🔑 יש לי כבר חשבון": "🔑 I have an account", "איך אתה רוצה שיקראו לך? זה השם שחברים יראו באונליין.": "What should we call you? Friends will see this name online.", "בחר תמונה (אפשר לשנות אחר כך בפרופיל):": "Pick a picture (you can change it later in your profile):",
   "יאללה, מתחילים!": "Let's go!", "🔒 תבחר סיסמה רק למשחק הזה, לא את הסיסמה של הג'ימייל.": "🔒 Pick a password just for this game, not your Gmail password.", "🎮 הזמן לשחק": "🎮 Invite to play", "הבנתי": "Got it", "✓ הצטרף": "✓ Join",
@@ -664,6 +665,8 @@ const EN_DICT = {
   "📬 כתוב ליוצרי המשחק": "📬 Write to the game makers", "🐞 דיווח על באג": "🐞 Report a bug", "💡 רעיונות ליוצרים": "💡 Ideas for the makers", "💡 רעיון ליוצרים": "💡 An idea for the makers", "מה קרה? איפה במשחק? כמה שיותר פרטים 🙂": "What happened? Where in the game? As many details as you can 🙂", "יש לך רעיון לקטגוריה, למצב משחק או לכל דבר אחר? כתוב לנו!": "Got an idea for a category, a game mode or anything else? Tell us!", "כתוב כאן…": "Write here…", "ההודעה נשלחת ליוצרי המשחק עם שם המשתמש שלך.": "Your message is sent to the game makers with your username.", "📨 שלח": "📨 Send", "כתוב קצת יותר 🙂": "Write a bit more 🙂", "רגע, שלחת הודעה ממש עכשיו. נסה שוב עוד כמה שניות.": "You just sent a message. Try again in a few seconds.", "שולח…": "Sending…", "לא הצלחתי לשלוח. נסה שוב.": "Couldn't send. Try again.", "✓ נשלח! תודה 🙏": "✓ Sent! Thank you 🙏", "🛡️ היכנס כמנהל": "🛡️ Enter as manager", "⚪ לא מחובר": "⚪ Offline",
   // קטגוריה אהובה
   "❤️ הקטגוריה האהובה עליי": "❤️ My favorite category", "— עוד לא בחרתי —": "— Not chosen yet —", "כל השחקנים יראו אותה כשהם לוחצים על הפרופיל שלך.": "Everyone will see it when they tap your profile.", "❤️ הקטגוריה האהובה: ": "❤️ Favorite category: ",
+  "🐆 תמונות אפשריות לפרופיל": "🐆 Ready-made profile pictures",
+  " זו תשובה אחרת. התשובה: ": " is a different answer. The answer: ",
 };
 // משפטים עם מספרים/שמות בסדר אחר באנגלית
 const EN_RULES = [
@@ -964,6 +967,7 @@ function countdown(then) {
     if (n > 0) {
       const c = $("count"); c.textContent = n; c.classList.remove("tick"); void c.offsetWidth; c.classList.add("tick");
       sfx.tick(); n--; later(step, 1000);
+      if (n === 0) later(warmMic, 250); // המיקרופון נדלק שנייה לפני התמונה, כדי שיהיה מוכן כשמתחילים לדבר
     } else {
       $("count").textContent = ""; $("count").classList.remove("tick");
       $("stage").classList.remove("hide"); layoutPic(); sfx.go();
@@ -1009,6 +1013,7 @@ function nextRound() {
     if (n > 0) {
       const c = $("count"); c.textContent = n; c.classList.remove("tick"); void c.offsetWidth; c.classList.add("tick");
       sfx.tick(); n--; later(step, 1000);
+      if (n === 0) later(warmMic, 250); // המיקרופון נדלק שנייה לפני התמונה, כדי שיהיה מוכן כשמתחילים לדבר
     } else {
       $("count").textContent = ""; $("count").classList.remove("tick");
       openPicture();
@@ -1257,7 +1262,7 @@ function verdict(ok, reason) {
 // מקבל שגיאות כתיב קטנות, כתיב מלא/חסר (ו, י, א), אותיות סופיות, "ה" בהתחלה ומילים מיותרות כמו "זה".
 // אם אמרו רק חלק מהשם — אומר "אולי" ומסביר, כי רק מי שמבין יודע אם זה שם קצר מוכר או כללי מדי.
 const FINALS = { "ך": "כ", "ם": "מ", "ן": "נ", "ף": "פ", "ץ": "צ" };
-const FILLERS = new Set(["זה", "זאת", "זו", "של", "את", "זהו", "זוהי", "the"]);
+const FILLERS = new Set(["זה", "זאת", "זו", "של", "את", "זהו", "זוהי", "the", "a", "an", "it", "its", "is", "this", "thats", "that", "um", "uh", "er", "erm", "hmm", "i", "think", "maybe", "answer"]);
 const jWords = (s) => String(s || "").toLowerCase()
   .replace(/[\u0591-\u05C7]/g, "").replace(/[ךםןףץ]/g, (c) => FINALS[c])
   .replace(/[״"'׳`’\-–_.,!?():;]/g, " ").split(/\s+/)
@@ -1280,9 +1285,34 @@ const jPhon = (s) => {
     .replace(/(?!^)[אעה]/g, "*").replace(/./g, (c) => PH[c] || c).replace(/(.)\1+/g, "$1").replace(/\*$/, "");
   return p.length > 3 ? p.replace(/ס$/, "") : p;
 };
+// באנגלית: איך המילה נשמעת (Frans = France, Jermany = Germany, Wolfs = Wolves)
+const isLatin = (s) => /^[a-z0-9]+$/.test(s);
+const ePhon = (s) => {
+  let p = jFlat(s);
+  if (!isLatin(p)) return "";
+  p = p.replace(/^kn/, "n").replace(/^wr/, "r").replace(/ph/g, "f").replace(/gh/g, "g").replace(/ck/g, "k").replace(/dg/g, "j").replace(/th/g, "t").replace(/wh/g, "w")
+    .replace(/c(?=[eiy])/g, "s").replace(/[cq]/g, "k").replace(/x/g, "ks").replace(/z/g, "s").replace(/w/g, "v").replace(/j/g, "g");
+  p = p[0] + p.slice(1).replace(/[aeiouy]/g, "");
+  p = p.replace(/(.)\1+/g, "$1");
+  return p.length > 3 ? p.replace(/s$/, "") : p;
+};
+// כל התשובות האחרות בקטגוריה: אם אמרו בדיוק תשובה אחרת (איראן כשהתשובה עיראק) — זה לא "שגיאת כתיב"
+let othersCache = { deck: null, map: null };
+function otherAnswers() {
+  const d = (typeof NET !== "undefined" && NET.role === "host" && typeof O !== "undefined" && O.deck) || (typeof G !== "undefined" && G.deck);
+  if (!d) return null;
+  if (othersCache.deck !== d) {
+    const map = new Map();
+    for (const it of [...(d.items || []), ...(d.reserve || [])]) for (const c of candsOf(it)) { const k = jFlat(c); if (k.length >= 3 && !map.has(k)) map.set(k, ansOf(it)); }
+    othersCache = { deck: d, map };
+  }
+  return othersCache.map;
+}
 function localJudge(said, cands) {
   const A = jFlat(said), SA = jSkel(said), wa = jWords(said), PA = jPhon(said);
   if (!A) return null;
+  const others = otherAnswers();
+  if (others && others.has(A) && !cands.some((c) => jFlat(c) === A)) return { ok: false, reason: `"${others.get(A)}" זו תשובה אחרת. התשובה: "${(LANG === "en" && cands.find((c) => /^[ -~]+$/.test(c))) || cands[0]}".` };
   let maybe = null;
   for (const c of cands) {
     const B = jFlat(c), SB = jSkel(c), wb = jWords(c);
@@ -1292,6 +1322,8 @@ function localJudge(said, cands) {
     if (B.length >= 4 && SA === SB) return { ok: true, reason: `אותה מילה בכתיב קצת אחר. התשובה: "${c}".` };
     if (B.length >= 3 && A.includes(B)) return { ok: true, reason: `אמרתם את התשובה ("${c}") עם עוד כמה מילים.` };
     const PB = jPhon(c);
+    const EA = ePhon(said), EB = ePhon(c);
+    if (EA && EB && B.length >= 4 && (EA === EB || (EB.length >= 5 && lev(EA, EB) <= 1)) && lev(A, B) <= tol(B.length) + 2) return { ok: true, reason: `נשמע כמו התשובה (אולי המיקרופון שמע קצת אחרת). התשובה: "${c}".` };
     if (B.length >= 5 && PA === PB && lev(A, B) <= tol(B.length) + 1) return { ok: true, reason: `נשמע כמו התשובה (אולי המיקרופון שמע קצת אחרת). התשובה: "${c}".` };
     const part = (A.length >= 3 && B.includes(A)) || (wa.length && wa.every((w) => wb.some((x) => x === w || (w.length >= 4 && lev(w, x) <= 1))));
     if (part && !maybe) maybe = c;
@@ -1363,14 +1395,23 @@ $("jSaid").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preve
 
 // ---------- תשובה במיקרופון / בהקלדה ----------
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null, onAnswer = null, heard = [], liveItem = null, listenWanted = false, listenRestarts = 0;
+let rec = null, onAnswer = null, heard = [], liveItem = null, listenWanted = false, listenRestarts = 0, warmDirty = false;
+function warmMic() {
+  if (!SR || !IS_APP || rec || onAnswer || document.hidden || G.phase === "idle" || G.phase === "over") return;
+  listenWanted = true; listenRestarts = 0; warmDirty = false; startListening();
+}
 // item: אם נותנים — ברגע שהמיקרופון שומע את התשובה הנכונה, שולחים לבד (בלי ללחוץ "שלח")
 function askAnswer(cb, item, opts) {
   onAnswer = cb; heard = []; liveItem = item || null; listenRestarts = 0;
   $("ansIn").value = ""; $("ansBox").hidden = !!(opts && opts.micOnly);
   const canMic = SR && IS_APP; // בקישור של Claude אין גישה למיקרופון
   $("micBtn").hidden = !canMic;
-  if (canMic) { listenWanted = true; startListening(); } else setTimeout(() => $("ansIn").focus(), 50);
+  if (canMic) {
+    if (rec) $("micBtn").classList.add("on");
+    // המיקרופון כבר דלוק מלפני? אם הוא כבר שמע דיבור (מלפני שלחצו) — מתחילים נקי, כדי שלא ייחשב משהו שנאמר קודם
+    if (rec && warmDirty) { const r = rec; rec = null; try { r.abort(); } catch (e) {} }
+    listenWanted = true; startListening();
+  } else setTimeout(() => $("ansIn").focus(), 50);
 }
 function submitAnswer() {
   if (!onAnswer) return;
@@ -1384,8 +1425,9 @@ function startListening() {
   if (!SR || rec) return;
   try {
     const r0 = new SR(); rec = r0;
-    r0.lang = T("he-IL", "en-US"); r0.interimResults = true; r0.maxAlternatives = 4; r0.continuous = false;
+    r0.lang = T("he-IL", "en-US"); r0.interimResults = true; r0.maxAlternatives = 5; r0.continuous = false;
     r0.onresult = (e) => {
+      if (!onAnswer) { warmDirty = true; return; } // עוד לא הזמן לענות
       const r = e.results[e.results.length - 1];
       const texts = [...r].map((x) => x.transcript.trim()).filter(Boolean);
       if (!texts.length) return;
@@ -1398,9 +1440,9 @@ function startListening() {
       if (rec !== r0) return;
       rec = null; $("micBtn").classList.remove("on");
       // היה שקט? ממשיכים להקשיב עד שהזמן נגמר
-      if (onAnswer && listenWanted && !heard.length && listenRestarts++ < 8) setTimeout(() => { if (onAnswer && listenWanted) startListening(); }, 200);
+      if (onAnswer && listenWanted && !heard.length && listenRestarts++ < 12) setTimeout(() => { if (onAnswer && listenWanted) startListening(); }, 30);
     };
-    r0.start(); $("micBtn").classList.add("on");
+    r0.start(); if (onAnswer) $("micBtn").classList.add("on");
   } catch (e) { rec = null; }
 }
 function stopListening() { listenWanted = false; const r = rec; rec = null; try { r && r.abort(); } catch (e) {} $("micBtn").classList.remove("on"); }
@@ -1973,7 +2015,9 @@ function awardPoints(n) {
   }, 900);
 }
 $("lvlUpOk").onclick = () => { $("lvlUp").hidden = true; };
-$("profBtn").onclick = () => { show("profile"); paintProfPage(); };
+$("profBtn").onclick = () => { show("profile"); $("avGrid").hidden = true; $("avOpen").setAttribute("aria-expanded", "false"); paintProfPage(); };
+// התמונות המוכנות מופיעות רק אחרי לחיצה על הכפתור
+$("avOpen").onclick = () => { const open = $("avGrid").hidden; $("avGrid").hidden = !open; $("avOpen").setAttribute("aria-expanded", String(open)); };
 $("profBack").onclick = () => { show("home"); };
 $("profPhoto").onclick = () => $("profFile").click();
 $("profFile").addEventListener("change", () => {
