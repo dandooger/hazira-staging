@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790588701631"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790588973790"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -228,7 +228,9 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
 .hero .badge{position:absolute;top:14px;left:calc(50% - 48px);width:96px;height:96px;border-radius:24px;opacity:0;box-shadow:0 0 0 3px #FFC400,0 0 24px rgba(255,196,0,.6)}
 .hero .ttl{position:absolute;top:116px;inset-inline:0;margin:0;text-align:center;font-family:var(--display);font-weight:400;font-size:clamp(46px,14vw,64px);line-height:1;direction:rtl}
 .hero .ttl span{display:inline-block;color:transparent;-webkit-text-stroke:2px #1A1405;opacity:0;
-  background:radial-gradient(circle at 30% 35%,#1A1405 0 3px,transparent 4px) 0 0/24px 20px,radial-gradient(circle at 75% 70%,#1A1405 0 2.5px,transparent 3.5px) 0 0/17px 15px,linear-gradient(180deg,#FFE27A,#F5B400);
+  /* נקודות של צ'יטה בסדר קבוע (שורות מתחלפות), וכל המילה היא דוגמה אחת רציפה: JS מזיז כל אות לפי המקום שלה */
+  background:radial-gradient(3.4px 2.8px at 4px 3.5px,#1A1405 0 85%,transparent 100%),radial-gradient(3.4px 2.8px at 11px 10.5px,#1A1405 0 85%,transparent 100%),linear-gradient(180deg,#FFE27A,#F5B400);
+  background-size:14px 14px,14px 14px,100% 100%;background-position:var(--ox,0) var(--oy,0),var(--ox,0) var(--oy,0),0 0;
   -webkit-background-clip:text;background-clip:text}
 .hero .sub{position:absolute;top:190px;inset-inline:0;display:flex;justify-content:center;gap:8px;font-family:var(--display);font-size:20px;color:#FFE27A}
 .hero .sub span{opacity:0;display:inline-block}
@@ -1597,7 +1599,11 @@ function onNet(m) {
 
 // ---------- פתיחה: הצ'יטה מהלוגו (תמונה אמיתית, עם הברקים) רצה ~2.5 שניות, נכנסת ללוגו, ואז השם והמילים ----------
 const INTRO = { timers: [] };
+// הנקודות על "הצ'יטה" ממשיכות מאות לאות (כל אות מקבלת את החלק שלה מהדוגמה)
+function alignSpots() { $("ttl").querySelectorAll("span").forEach((s) => { s.style.setProperty("--ox", -s.offsetLeft + "px"); s.style.setProperty("--oy", -s.offsetTop + "px"); }); }
+addEventListener("resize", alignSpots);
 function playIntro() {
+  alignSpots();
   const hero = $("hero"), shot = $("shot"), img = shot.querySelector("img"), zap = $("zap"), badge = $("badge");
   INTRO.timers.forEach(clearTimeout); INTRO.timers = [];
   hero.querySelectorAll("*").forEach((el) => el.getAnimations().forEach((a) => a.cancel()));
