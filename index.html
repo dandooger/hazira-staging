@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790588030481"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790588701631"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -455,6 +455,14 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
   </div>
 </div>
 
+<!-- הודעה: השחקן השני יצא -->
+<div class="modal" id="leftMsg" hidden>
+  <div class="card" style="text-align:center;justify-items:center">
+    <h3 id="leftT">👋</h3>
+    <div class="row" style="justify-content:center"><button class="go" id="leftOk">הבנתי</button></div>
+  </div>
+</div>
+
 <!-- הזמנה למשחק -->
 <div class="modal" id="invite" hidden>
   <div class="card" role="dialog" aria-labelledby="invH" style="text-align:center;justify-items:center">
@@ -764,7 +772,7 @@ function flash(ok, text) {
 }
 
 function nextRound() {
-  clearTimers(); stopAnswerTimer();
+  clearTimers(); stopAnswerTimer(); stopListening(); onAnswer = null;
   $("judge").hidden = true;
   document.querySelectorAll(".answer,.flash").forEach((n) => n.remove());
   if (!G.queue.length) G.queue = deckOrder(G.deck.items, G.deck.reserve);
@@ -920,14 +928,24 @@ function buzz(p) {
   G.buzzer = p; G.phase = "answering";
   setSides(p);
   sfx.buzz(p); buzzVibrate();
-  acts(`<span><span class="${cls[p]}">${heb[p]}</span> ראשון! תגיד את התשובה.</span>
+  const mic = !!(SR && IS_APP);
+  acts(`<span><span class="${cls[p]}">${heb[p]}</span> ראשון! ${mic ? "תגיד את התשובה 🎤" : "תגיד את התשובה."}</span>
     <button class="act big" data-a="reveal">👀 תראו תשובה</button>`);
   startAnswerTimer(p);
+  // ביחד: המיקרופון מקשיב לבד. אמרו נכון — נקודה מיד. לא בטוח — פותחים את התשובה והשחקנים מחליטים
+  if (mic) askAnswer((typed, more) => {
+    if (G.phase !== "answering" || G.buzzer !== p) return;
+    const r = judgeAll([typed, ...(more || [])], G.item);
+    reveal();
+    if (r.ok === true) return score(true);
+    if (r.text) $("acts").insertAdjacentHTML("afterbegin", `<span style="flex-basis:100%">🎤 שמעתי: "${escapeHtml(r.text)}"</span>`);
+  }, G.item, { micOnly: true });
 }
 
 function reveal(timeUp) {
   if (G.phase !== "open" && G.phase !== "answering") return;
   stopAnswerTimer();
+  if (G.mode === "duo") { stopListening(); onAnswer = null; }
   revealFx();
   const a = document.createElement("div");
   a.className = "answer";
@@ -1127,9 +1145,9 @@ $("jSaid").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preve
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let rec = null, onAnswer = null, heard = [], liveItem = null, listenWanted = false, listenRestarts = 0;
 // item: אם נותנים — ברגע שהמיקרופון שומע את התשובה הנכונה, שולחים לבד (בלי ללחוץ "שלח")
-function askAnswer(cb, item) {
+function askAnswer(cb, item, opts) {
   onAnswer = cb; heard = []; liveItem = item || null; listenRestarts = 0;
-  $("ansIn").value = ""; $("ansBox").hidden = false;
+  $("ansIn").value = ""; $("ansBox").hidden = !!(opts && opts.micOnly);
   const canMic = SR && IS_APP; // בקישור של Claude אין גישה למיקרופון
   $("micBtn").hidden = !canMic;
   if (canMic) { listenWanted = true; startListening(); } else setTimeout(() => $("ansIn").focus(), 50);
@@ -1279,9 +1297,10 @@ function loadMqtt() {
     s.onload = ok; s.onerror = () => bad(new Error("no internet")); document.head.append(s);
   });
 }
-function netConnect(i) {
+function netConnect(i, topic) {
   return new Promise((ok, bad) => {
-    const c = window.mqtt.connect(BROKERS[i], { connectTimeout: 7000, reconnectPeriod: 2000, clean: true });
+    const c = window.mqtt.connect(BROKERS[i], { connectTimeout: 7000, reconnectPeriod: 2000, clean: true, keepalive: 15,
+      will: topic ? { topic, payload: JSON.stringify({ type: "bye", from: NET.me, name: prof.name }), qos: 1 } : undefined });
     const t = setTimeout(() => { c.end(true); bad(new Error("timeout")); }, 8000);
     c.on("connect", () => { clearTimeout(t); ok(c); });
     c.on("error", () => {});
@@ -1289,8 +1308,8 @@ function netConnect(i) {
 }
 async function netOpen(code, brokerIdx) {
   await loadMqtt();
-  NET.client = await netConnect(brokerIdx);
   NET.code = code; NET.topic = "hazira-dg/stg/" + code;
+  NET.client = await netConnect(brokerIdx, NET.topic);
   NET.client.subscribe(NET.topic, { qos: 1 });
   NET.client.on("message", (topic, payload) => {
     let m; try { m = JSON.parse(payload.toString()); } catch (e) { return; }
@@ -1299,7 +1318,18 @@ async function netOpen(code, brokerIdx) {
   });
 }
 function send(type, data) { if (NET.client) NET.client.publish(NET.topic, JSON.stringify({ type, from: NET.me, ...data }), { qos: 1 }); }
-function netLeave() { try { send("bye", {}); NET.client && NET.client.end(true); } catch (e) {} NET.client = null; NET.role = null; clearTimers(); }
+function netLeave() { try { send("bye", { name: prof.name }); NET.client && NET.client.end(true); } catch (e) {} NET.client = null; NET.role = null; clearTimers(); }
+// השחקן השני יצא: יוצאים גם מהמשחק וחוזרים למסך הבית עם הודעה
+function otherLeft(name) {
+  const inGame = !$("game").hidden || !$("over").hidden;
+  clearTimers(); stopAnswerTimer(); stopListening(); onAnswer = null; G.phase = "idle";
+  try { NET.client && NET.client.end(true); } catch (e) {} NET.client = null; NET.role = null;
+  show("home");
+  if (!inGame) return;
+  $("leftT").textContent = "👋 השחקן " + (name || O.themName || "השני") + " יצא מהמשחק";
+  $("leftMsg").hidden = false;
+}
+$("leftOk").onclick = () => { $("leftMsg").hidden = true; };
 
 async function hostRoom(c) {
   $("loadMsg").textContent = "יוצר חדר…"; show("loading");
@@ -1544,7 +1574,7 @@ function onlineOver(w) {
   show("over"); if (iWon) { sfx.win(); confetti(myColor()); }
 }
 function onNet(m) {
-  if (m.type === "bye") { if (NET.role && !$("game").hidden) { clearTimers(); acts("החבר יצא מהמשחק 👋"); } return; }
+  if (m.type === "bye") { if (NET.role && (!$("game").hidden || !$("over").hidden)) otherLeft(m.name); return; }
   if (NET.role === "host") {
     if (m.type === "join" && !O.joined) { O.joined = true; O.themName = m.name || ""; hostStart(); }
     else if (m.type === "buzz") hostGotBuzz("guest", m.rt, m.n);
