@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790589743500"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790591693814"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -230,8 +230,8 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
 .hero .ttl{position:absolute;top:116px;inset-inline:0;margin:0;text-align:center;font-family:var(--display);font-weight:400;font-size:clamp(46px,14vw,64px);line-height:1;direction:rtl}
 .hero .ttl span{display:inline-block;color:transparent;-webkit-text-stroke:2px #1A1405;opacity:0;
   /* נקודות של צ'יטה בסדר קבוע (שורות מתחלפות), וכל המילה היא דוגמה אחת רציפה: JS מזיז כל אות לפי המקום שלה */
-  background:radial-gradient(3.4px 2.8px at 4px 3.5px,#1A1405 0 85%,transparent 100%),radial-gradient(3.4px 2.8px at 11px 10.5px,#1A1405 0 85%,transparent 100%),linear-gradient(180deg,#FFE27A,#F5B400);
-  background-size:14px 14px,14px 14px,100% 100%;background-position:var(--ox,0) var(--oy,0),var(--ox,0) var(--oy,0),0 0;
+  background:radial-gradient(2.4px 2px at 3px 2.75px,#1A1405 0 85%,transparent 100%),radial-gradient(2.4px 2px at 8.5px 8.25px,#1A1405 0 85%,transparent 100%),linear-gradient(180deg,#FFE27A,#F5B400);
+  background-size:11px 11px,11px 11px,100% 100%;background-position:var(--ox,0) var(--oy,0),var(--ox,0) var(--oy,0),0 0;
   -webkit-background-clip:text;background-clip:text}
 .hero .sub{position:absolute;top:190px;inset-inline:0;display:flex;justify-content:center;gap:8px;font-family:var(--display);font-size:20px;color:#FFE27A}
 .hero .sub span{opacity:0;display:inline-block}
@@ -247,7 +247,10 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
 .profcorner{position:absolute;top:32px;inset-inline-start:28px;z-index:3;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;padding:0}
 .psearch{font:inherit;font-size:17px;padding:9px 12px;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--ink)}
 .pitem{cursor:pointer}
+.hero.intro .gearbtn,.hero.intro .profcorner{opacity:0;pointer-events:none}
 .gearbtn{position:absolute;top:32px;inset-inline-end:28px;z-index:3;width:42px;height:42px;border-radius:50%;border:2px solid #1A1405;background:#FFC400;font-size:22px;display:grid;place-items:center;padding:0}
+.setform{display:grid;gap:8px}
+.setform input{font:inherit;font-size:18px;padding:10px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink)}
 .act[aria-pressed="true"]{border-color:var(--ink);background:#FFE27A}
 #wForm input{font:inherit;font-size:19px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink)}
 .ptsdot{background:#FFC400;color:#1A1405;border:2px solid #1A1405;border-radius:999px;padding:2px 9px;font-family:var(--display);font-size:14px;white-space:nowrap}
@@ -291,7 +294,7 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
 
   <div class="how">
     <div><b>1. לוחצים ראשונים.</b> כשהתמונה עולה, <span class="bl">הכחול</span> לוחץ על הכפתור הכחול ו<span class="rd">האדום</span> על האדום. מי שלחץ ראשון עונה בקול, ויש לו 10 שניות.</div>
-    <div><b>2. השני שופט.</b> לוחצים "תראו תשובה" (או מחכים שהזמן ייגמר). לא בטוחים אם זה נחשב? שואלים את השופט.</div>
+    <div><b>2. האפליקציה שופטת.</b> מי שלחץ ראשון אומר (או כותב) את התשובה, והאפליקציה בודקת. אי אפשר לסמן לעצמך "נכון" 😉</div>
     <div><b>3. נקודות.</b> נכון = נקודה למי שענה. טעות = נקודה ליריב. אף אחד לא יודע? עוברים לתמונה הבאה. הראשון שמגיע ליעד מנצח.</div>
   </div>
 
@@ -363,10 +366,20 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
     <div class="lvlbar"><b id="setWho"></b><span class="note" id="setAcct"></span></div>
     <button class="go" id="setLogin">🔑 התחברות לחשבון אחר</button>
     <div class="lvlbar">
+      <b>✏️ שינוי שם משתמש</b>
+      <form id="nameForm" class="setform" autocomplete="on">
+        <input id="newName" name="username" autocomplete="username" maxlength="14" placeholder="שם משתמש חדש">
+        <input id="nameCurPass" type="password" autocomplete="current-password" placeholder="הסיסמה הנוכחית שלך">
+        <button class="act" type="submit">שמור שם</button>
+        <div class="note" id="nameMsg" hidden></div>
+      </form>
+    </div>
+    <div class="lvlbar">
       <b>🔒 שינוי סיסמה</b>
-      <form id="passForm" style="display:grid;gap:8px" autocomplete="on">
+      <form id="passForm" class="setform" autocomplete="on">
         <input name="username" autocomplete="username" id="passUser" hidden>
-        <input id="newPass" type="password" autocomplete="new-password" placeholder="סיסמה חדשה (לפחות 4)" style="font:inherit;font-size:18px;padding:10px;border-radius:10px;border:1px solid var(--line);background:#fff">
+        <input id="curPass" type="password" autocomplete="current-password" placeholder="הסיסמה הנוכחית">
+        <input id="newPass" type="password" autocomplete="new-password" placeholder="סיסמה חדשה (לפחות 4)">
         <button class="act" type="submit">שמור סיסמה</button>
         <div class="note" id="passMsg" hidden></div>
       </form>
@@ -377,7 +390,7 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
 
 <section id="profile" class="screen" hidden>
   <div class="row" style="justify-content:space-between"><h2>הפרופיל שלי</h2><button class="ghost" id="profBack">חזרה ←</button></div>
-  <div class="profhead"><span class="ringwrap" id="profBig"></span><input id="profName" maxlength="14" autocomplete="off" aria-label="שם משתמש"></div>
+  <div class="profhead"><span class="ringwrap" id="profBig"></span><input id="profName" maxlength="14" autocomplete="off" aria-label="שם משתמש" readonly title="את השם משנים בהגדרות ⚙️"></div>
   <div class="err" id="profNameErr" hidden></div>
   <div class="lvlbar"><b id="profLvl"></b><div class="bar"><i id="profBar"></i></div><span class="note" id="profNext"></span></div>
   <h2 style="font-size:20px">בחר תמונה</h2>
@@ -932,17 +945,19 @@ function buzz(p) {
   setSides(p);
   sfx.buzz(p); buzzVibrate();
   const mic = !!(SR && IS_APP);
-  acts(`<span><span class="${cls[p]}">${heb[p]}</span> ראשון! ${mic ? "תגיד את התשובה 🎤" : "תגיד את התשובה."}</span>
-    <button class="act big" data-a="reveal">👀 תראו תשובה</button>`);
-  startAnswerTimer(p);
-  // ביחד: המיקרופון מקשיב לבד. אמרו נכון — נקודה מיד. לא בטוח — פותחים את התשובה והשחקנים מחליטים
-  if (mic) askAnswer((typed, more) => {
+  acts(`<span><span class="${cls[p]}">${heb[p]}</span> ראשון! ${mic ? "תגיד או תכתוב את התשובה 🎤" : "תכתוב את התשובה."}</span>`);
+  // ביחד: האפליקציה שופטת (אי אפשר לסמן לעצמך "נכון"). נכון = נקודה. טעות או שנגמר הזמן = טעות
+  startAnswerTimer(p, ANSWER_SECONDS, () => { if (onAnswer) submitAnswer(); else duoJudged(p, { ok: false, text: "" }); });
+  askAnswer((typed, more) => {
     if (G.phase !== "answering" || G.buzzer !== p) return;
-    const r = judgeAll([typed, ...(more || [])], G.item);
-    reveal();
-    if (r.ok === true) return score(true);
-    if (r.text) $("acts").insertAdjacentHTML("afterbegin", `<span style="flex-basis:100%">🎤 שמעתי: "${escapeHtml(r.text)}"</span>`);
-  }, G.item, { micOnly: true });
+    duoJudged(p, judgeAll([typed, ...(more || [])], G.item));
+  }, G.item);
+}
+function duoJudged(p, r) {
+  if (G.phase !== "answering" || G.buzzer !== p) return;
+  reveal();
+  score(r.ok === true);
+  if (r.ok !== true) $("acts").insertAdjacentHTML("afterbegin", `<span style="flex-basis:100%">${r.text ? "אמרת: \"" + escapeHtml(r.text) + "\"" : "⏰ לא הספקת לענות"}</span>`);
 }
 
 function reveal(timeUp) {
@@ -955,6 +970,7 @@ function reveal(timeUp) {
   a.textContent = G.item.a;
   if (G.item.alt && G.item.alt.length) { const s = document.createElement("small"); s.textContent = "נחשב גם: " + G.item.alt.join(" · "); a.append(s); }
   $("stage").append(a);
+  if (G.buzzer && G.mode === "duo") { G.phase = "revealed"; return; }
   if (G.buzzer) {
     G.phase = "revealed";
     acts(`${timeUp === true ? `<span style="flex-basis:100%">⏰ נגמר הזמן! <span class="${cls[G.buzzer]}">${heb[G.buzzer]}</span> הספיק לענות נכון?</span>` : ""}
@@ -1007,10 +1023,7 @@ document.addEventListener("keydown", (e) => {
   if ($("game").hidden || e.repeat || G.mode !== "duo") return;
   const k = { KeyS: "blue", Semicolon: "red" }[e.code] || { "ד": "blue", "ף": "red" }[e.key];
   if (k) { e.preventDefault(); return buzz(k); }
-  if (e.code === "Space" || e.key === " ") { e.preventDefault(); return G.phase === "nobody" ? nextRound() : reveal(); }
-  if (e.code === "KeyB" || e.key === "נ") return score(true);
-  if (e.code === "KeyY" || e.key === "ט") return score(false);
-  if (e.code === "KeyJ" || e.key === "ח") return openJudge();
+  if (e.code === "Space" || e.key === " ") { if (G.phase === "nobody") { e.preventDefault(); nextRound(); } else if (G.phase === "open") { e.preventDefault(); reveal(); } }
 });
 
 // ---------- שופט (Claude) ----------
@@ -1603,10 +1616,19 @@ const INTRO = { timers: [] };
 // הנקודות על "הצ'יטה" ממשיכות מאות לאות (כל אות מקבלת את החלק שלה מהדוגמה)
 function alignSpots() { $("ttl").querySelectorAll("span").forEach((s) => { s.style.setProperty("--ox", -s.offsetLeft + "px"); s.style.setProperty("--oy", -s.offsetTop + "px"); }); }
 addEventListener("resize", alignSpots);
+const cornerBtns = () => [$("gearBtn"), $("profBtn")];
 function playIntro() {
-  alignSpots();
-  const hero = $("hero"), shot = $("shot"), img = shot.querySelector("img"), zap = $("zap"), badge = $("badge");
   INTRO.timers.forEach(clearTimeout); INTRO.timers = [];
+  alignSpots();
+  cornerBtns().forEach((b) => { b.getAnimations().forEach((a) => a.cancel()); b.style.opacity = "0"; b.style.pointerEvents = "none"; });
+  const showBtns = () => cornerBtns().forEach((b, i) => {
+    b.style.pointerEvents = "";
+    b.animate([{ opacity: 0, transform: "scale(.3) rotate(-25deg)" }, { opacity: 1, transform: "scale(1.15) rotate(6deg)", offset: 0.65 }, { opacity: 1, transform: "none" }],
+      { duration: 480, delay: i * 140, easing: "cubic-bezier(.3,1.5,.5,1)", fill: "forwards" }).onfinish = () => { b.style.opacity = "1"; };
+  });
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { cornerBtns().forEach((b) => { b.style.opacity = "1"; b.style.pointerEvents = ""; }); }
+  else INTRO.timers.push(setTimeout(showBtns, 5250));
+  const hero = $("hero"), shot = $("shot"), img = shot.querySelector("img"), zap = $("zap"), badge = $("badge");
   hero.querySelectorAll("*").forEach((el) => el.getAnimations().forEach((a) => a.cancel()));
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const at = (ms, fn) => INTRO.timers.push(setTimeout(fn, ms));
@@ -1837,14 +1859,31 @@ function paintSettings() {
   $("passUser").value = prof.name; $("passMsg").hidden = true;
 }
 $("setLogin").onclick = () => { W.canCancel = true; $("wName").value = ""; $("wPass").value = ""; show("home"); askName("", "login"); };
+const curOk = async (p) => !prof.hash || (await hashPass(p, prof.salt)) === prof.hash;
 $("passForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const p = $("newPass").value, msg = $("passMsg");
   msg.hidden = false;
-  if (p.length < 4) { msg.textContent = "הסיסמה צריכה להיות לפחות 4 אותיות או מספרים."; return; }
+  if (!(await curOk($("curPass").value))) { msg.textContent = "הסיסמה הנוכחית לא נכונה 🙁"; return; }
+  if (p.length < 4) { msg.textContent = "הסיסמה החדשה צריכה להיות לפחות 4 אותיות או מספרים."; return; }
   const c = await presenceConnect(); if (!c) { msg.textContent = "אין חיבור לאינטרנט. נסה שוב."; return; }
+  $("curPass").value = "";
   prof.salt = newSalt(); prof.hash = await hashPass(p, prof.salt); saveProf(); acctPut(); storeCred(prof.name, p);
   $("newPass").value = ""; msg.textContent = "✓ הסיסמה נשמרה!";
+});
+$("nameForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const v = $("newName").value.trim(), old = prof.name, msg = $("nameMsg");
+  msg.hidden = false;
+  if (!v || v === old) { msg.textContent = "כתוב שם משתמש חדש."; return; }
+  if (!(await curOk($("nameCurPass").value))) { msg.textContent = "הסיסמה הנוכחית לא נכונה 🙁"; return; }
+  const c = await presenceConnect(); if (!c) { msg.textContent = "אין חיבור לאינטרנט. נסה שוב."; return; }
+  const owner = await nameOwner(v);
+  if (owner && owner !== prof.id) { msg.textContent = "שם המשתמש \"" + v + "\" כבר קיים 🙁 בחר שם אחר."; return; }
+  claimName(v, old);
+  if (prof.hash) PRES.client.publish(PRES_ROOT + "acct/" + nameKey(old), "", { retain: true, qos: 1 });
+  prof.name = v; saveProf(); paintProf(); presenceSay(); acctPut();
+  $("newName").value = ""; $("nameCurPass").value = ""; msg.textContent = "✓ השם השתנה ל" + v + "!"; paintSettings();
 });
 paintProf();
 if (!prof.name) askName("", "new");
