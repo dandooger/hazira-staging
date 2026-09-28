@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790605764717"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790606631025"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -240,9 +240,9 @@ html[lang="en"] body{direction:ltr}
 html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{direction:ltr}
 .langrow{display:flex;gap:8px;flex-wrap:wrap}
 /* ---------- פרופיל, נקודות ודרגות ---------- */
-.av{border-radius:50%;display:grid;place-items:center;overflow:hidden;flex:none;line-height:1;background:var(--avbg,#FFE27A)}
-.av img{width:100%;height:100%;object-fit:cover}
-.ringwrap{position:relative;display:grid;place-items:center}
+.av{border-radius:50%;aspect-ratio:1;display:grid;place-items:center;overflow:hidden;flex:none;line-height:1;background:var(--avbg,#FFE27A)}
+.av img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
+.ringwrap{position:relative;display:grid;place-items:center;flex:none;aspect-ratio:1}
 .ringwrap svg{position:absolute;inset:0;transform:rotate(-90deg)}
 .ringwrap .track{stroke:rgba(26,20,5,.18)}
 .ringwrap .prog{stroke:var(--blue);stroke-linecap:round;transition:stroke-dashoffset .8s ease}
@@ -1899,9 +1899,12 @@ $("profFile").addEventListener("change", () => {
   img.onload = () => {
     const s = 256, cv = document.createElement("canvas"); cv.width = cv.height = s;
     const k = Math.max(s / img.width, s / img.height), w = img.width * k, h = img.height * k;
-    cv.getContext("2d").drawImage(img, (s - w) / 2, (s - h) / 2, w, h);
+    const cx = cv.getContext("2d");
+    cx.fillStyle = "#FFE27A"; cx.fillRect(0, 0, s, s); // תמונה שקופה (PNG) הייתה יוצאת שחורה בלי רקע
+    cx.drawImage(img, (s - w) / 2, (s - h) / 2, w, h);
     prof.photo = cv.toDataURL("image/jpeg", 0.82); saveProf(); paintProf(); photoSay(); URL.revokeObjectURL(img.src);
   };
+  img.onerror = () => { URL.revokeObjectURL(img.src); alert(T("אי אפשר לפתוח את התמונה הזאת. נסה תמונה אחרת.", "This picture can't be opened. Try another one.")); };
   img.src = URL.createObjectURL(f); $("profFile").value = "";
 });
 // ---------- חשבון: שם משתמש + סיסמה ----------
@@ -2060,7 +2063,7 @@ let myThumb = null;
 function makeThumb(done) {
   if (!prof.photo) { myThumb = null; return done(); }
   const img = new Image();
-  img.onload = () => { const cv = document.createElement("canvas"); cv.width = cv.height = 96; cv.getContext("2d").drawImage(img, 0, 0, 96, 96); myThumb = cv.toDataURL("image/jpeg", 0.7); done(); };
+  img.onload = () => { const cv = document.createElement("canvas"); cv.width = cv.height = 96; const cx = cv.getContext("2d"); cx.fillStyle = "#FFE27A"; cx.fillRect(0, 0, 96, 96); cx.drawImage(img, 0, 0, 96, 96); myThumb = cv.toDataURL("image/jpeg", 0.7); done(); };
   img.onerror = () => { myThumb = null; done(); };
   img.src = prof.photo;
 }
