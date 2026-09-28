@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790591693814"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790603458992"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -236,6 +236,9 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
 .hero .sub{position:absolute;top:190px;inset-inline:0;display:flex;justify-content:center;gap:8px;font-family:var(--display);font-size:20px;color:#FFE27A}
 .hero .sub span{opacity:0;display:inline-block}
 @media (prefers-reduced-motion:reduce){.hero .badge,.hero .ttl span,.hero .sub span{opacity:1!important}.hero .shot,.hero .zap{display:none}}
+html[lang="en"] body{direction:ltr}
+html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{direction:ltr}
+.langrow{display:flex;gap:8px;flex-wrap:wrap}
 /* ---------- פרופיל, נקודות ודרגות ---------- */
 .av{border-radius:50%;display:grid;place-items:center;overflow:hidden;flex:none;line-height:1;background:var(--avbg,#FFE27A)}
 .av img{width:100%;height:100%;object-fit:cover}
@@ -363,6 +366,7 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
 <section id="settings" class="screen" hidden>
   <div style="max-width:640px;margin:0 auto;padding-block:18px 40px;display:flex;flex-direction:column;gap:16px">
     <div class="row" style="justify-content:space-between"><h2>⚙️ הגדרות</h2><button class="ghost" id="setBack">חזרה ←</button></div>
+    <div class="lvlbar notr"><b>🌐 שפה · Language</b><div class="langrow"><button class="act" id="langHe" type="button">עברית</button><button class="act" id="langEn" type="button">English</button></div></div>
     <div class="lvlbar"><b id="setWho"></b><span class="note" id="setAcct"></span></div>
     <button class="go" id="setLogin">🔑 התחברות לחשבון אחר</button>
     <div class="lvlbar">
@@ -446,6 +450,7 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
 <!-- כניסה ראשונה: איך קוראים לך -->
 <div class="modal" id="welcome" hidden>
   <div class="card" role="dialog" aria-labelledby="wH">
+    <div class="row notr" style="justify-content:flex-end"><button class="ghost" id="wLang" type="button"></button></div>
     <h3 id="wH">🐆 ברוך הבא לצ'יטה!</h3>
     <div class="row" id="wTabs" style="gap:8px"><button class="act" id="wTabNew" type="button">✨ משתמש חדש</button><button class="act" id="wTabLogin" type="button">🔑 יש לי כבר חשבון</button></div>
     <form id="wForm" style="display:grid;gap:10px" autocomplete="on">
@@ -465,7 +470,7 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
 <div class="modal" id="pview" hidden>
   <div class="card" role="dialog" aria-labelledby="pvName" style="text-align:center;justify-items:center">
     <span class="ringwrap" id="pvAv"></span>
-    <h3 id="pvName"></h3>
+    <h3 id="pvName" class="notr"></h3>
     <div class="lvlbar" style="width:100%"><b id="pvLvl"></b><div class="bar"><i id="pvBar"></i></div><span class="note" id="pvSt"></span></div>
     <div class="row" style="justify-content:center"><button class="go" id="pvInvite" hidden>🎮 הזמן לשחק</button><button class="ghost" id="pvClose">סגור</button></div>
   </div>
@@ -518,6 +523,116 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
 </section>
 
 <script>
+// I18N-START
+// ---------- שפה: עברית / English ----------
+// כל הטקסט שבמסך מתורגם כאן. משפט שלם -> תרגום שלם; משפט שמורכב מחלקים -> כל חלק מתורגם.
+// build-i18n.js מכניס את הקובץ הזה לתוך index.html (בין הסימנים I18N-START / I18N-END).
+const LANG_KEY = "hazira-lang";
+const LANG = (() => {
+  try {
+    const v = localStorage.getItem(LANG_KEY); if (v === "he" || v === "en") return v;
+    // מי שכבר משחק (יש לו פרופיל) נשאר בעברית. רק שחקן חדש מקבל את השפה של הטלפון שלו
+    if (localStorage.getItem("hazira-stg-profile-v1") || localStorage.getItem("hazira-stg-profile-v1")) return "he";
+  } catch (e) {}
+  return /^he|^iw/i.test(navigator.language || "he") ? "he" : "en";
+})();
+const T = (he, en) => (LANG === "en" ? en : he);
+const EN_DICT = {
+  "הצ'יטה": "The Cheetah", "ראש בראש": "Head to head", "זריזות": "Speed", "מחשבה": "Brains",
+  "📲 התקן אפליקציה": "📲 Install app", "פותח את האפליקציה באתר שלה. שם לוחצים שוב \"התקן אפליקציה\", והיא תופיע כאייקון בטלפון.": "Opens the app's website. Tap \"Install app\" again there, and it will appear as an icon on your phone.",
+  "האפליקציה תופיע כאייקון בטלפון ותיפתח במסך מלא.": "The app will appear as an icon on your phone and open full screen.",
+  "1. לוחצים ראשונים.": "1. Be the fastest.", "כשהתמונה עולה,": "When the picture appears,", "הכחול": "Blue", "האדום": "Red", "לוחץ על הכפתור הכחול ו": "presses the blue button and ",
+  "על האדום. מי שלחץ ראשון עונה בקול, ויש לו 10 שניות.": "presses the red one. Whoever pressed first answers out loud and has 10 seconds.",
+  "2. האפליקציה שופטת.": "2. The app is the judge.", "מי שלחץ ראשון אומר (או כותב) את התשובה, והאפליקציה בודקת. אי אפשר לסמן לעצמך \"נכון\" 😉": "Whoever pressed first says (or types) the answer and the app checks it. You can't mark yourself \"correct\" 😉",
+  "3. נקודות.": "3. Points.", "נכון = נקודה למי שענה. טעות = נקודה ליריב. אף אחד לא יודע? עוברים לתמונה הבאה. הראשון שמגיע ליעד מנצח.": "Correct = a point for the answerer. Wrong = a point for the opponent. Nobody knows? Next picture. First to reach the target wins.",
+  "מצב": "Mode", "👥 ביחד": "👥 Together", "2 עד 6 על טלפון אחד": "2 to 6 on one phone", "🙋 לבד": "🙋 Solo", "נגד השעון": "Against the clock", "🌐 אונליין": "🌐 Online", "כל אחד מהטלפון שלו": "Each on their own phone",
+  "כמה שחקנים": "Players", "יש לך קוד מחבר? הצטרף:": "Got a code from a friend? Join:", "הצטרף": "Join", "או בחר קטגוריה למטה כדי": "or pick a category below to", "ליצור חדר": "create a room", "ולשלוח קוד לחבר.": "and send a friend the code.",
+  "🟢 מחוברים עכשיו:": "🟢 Online now:", "משחקים עד": "Play to", "נקודות": "points", "רמה": "Level", "קל": "Easy", "כולם יודעים, גם ילד בן 10": "Everyone knows, even a 10-year-old", "בינוני": "Medium", "ידע כללי": "General knowledge",
+  "קשה": "Hard", "למביני עניין": "For experts", "בחרו קטגוריה": "Pick a category", "קטגוריה משלכם": "Your own category", "(שClaude ממציא) עובדת רק בגרסה של המחשב, כי שם אפשר להביא תמונות מהאינטרנט.": "(made up by Claude) only works on the computer version, because it can fetch pictures from the internet there.",
+  "החדר מוכן!": "The room is ready!", "שלח לחבר את הקוד. הוא פותח את האפליקציה, בוחר \"אונליין\" ומקליד אותו.": "Send your friend the code. They open the app, choose \"Online\" and type it in.", "📤 שלח לחבר": "📤 Send to a friend", "ביטול": "Cancel",
+  "או הזמן מי שמחובר עכשיו:": "Or invite someone who's online now:", "⚙️ הגדרות": "⚙️ Settings", "הגדרות": "Settings", "חזרה ←": "← Back", "🔑 התחברות לחשבון אחר": "🔑 Sign in to another account", "✏️ שינוי שם משתמש": "✏️ Change username", "שמור שם": "Save name",
+  "🔒 שינוי סיסמה": "🔒 Change password", "שמור סיסמה": "Save password", "🔒 הסיסמה נשמרת מוצפנת. בכל זאת — תבחר סיסמה רק למשחק הזה.": "🔒 Your password is stored encrypted. Still, pick a password just for this game.",
+  "הפרופיל שלי": "My profile", "בחר תמונה": "Choose a picture", "🖼️ תמונה מהגלריה": "🖼️ Photo from gallery", "תמונה מהגלריה נשמרת רק בטלפון שלך. חברים באונליין רואים רק את התמונות המוכנות.": "Your gallery photo is shared with friends online in a small size.",
+  "מביא תמונות…": "Loading pictures…", "יציאה": "Quit", "שלח": "Send", "⚖️ השופט": "⚖️ The judge", "תשפוט": "Judge", "סגור": "Close", "🐆 ברוך הבא לצ'יטה!": "🐆 Welcome to The Cheetah!", "✨ משתמש חדש": "✨ New player",
+  "🔑 יש לי כבר חשבון": "🔑 I have an account", "איך אתה רוצה שיקראו לך? זה השם שחברים יראו באונליין.": "What should we call you? Friends will see this name online.", "בחר תמונה (אפשר לשנות אחר כך בפרופיל):": "Pick a picture (you can change it later in your profile):",
+  "יאללה, מתחילים!": "Let's go!", "🔒 תבחר סיסמה רק למשחק הזה, לא את הסיסמה של הג'ימייל.": "🔒 Pick a password just for this game, not your Gmail password.", "🎮 הזמן לשחק": "🎮 Invite to play", "הבנתי": "Got it", "✓ הצטרף": "✓ Join",
+  "לא עכשיו": "Not now", "איזה כיף! 🎉": "Awesome! 🎉", "📲 איך מתקינים": "📲 How to install", "עוד משחק": "Play again", "קטגוריה אחרת": "Another category", "פחות": "Less", "יותר": "More", "🔍 חיפוש לפי שם": "🔍 Search by name",
+  "🔍 חפש שחקן לפי שם": "🔍 Search for a player", "שם משתמש חדש": "New username", "הסיסמה הנוכחית שלך": "Your current password", "הסיסמה הנוכחית": "Current password", "סיסמה חדשה (לפחות 4)": "New password (at least 4)", "שם משתמש": "Username",
+  "את השם משנים בהגדרות ⚙️": "Change your name in Settings ⚙️", "מיקרופון": "Microphone", "אמור או כתוב את התשובה": "Say or type the answer", "מה הוא אמר בדיוק?": "What exactly did they say?", "סיסמה (לפחות 4 אותיות או מספרים)": "Password (at least 4 letters or numbers)",
+  "לא הצלחתי לטעון את הקטגוריות. נסו לרענן את הדף.": "Couldn't load the categories. Try refreshing.", "כל אחד משחק מהטלפון שלו. מי שלוחץ ראשון עונה במיקרופון 🎤 או בהקלדה, והשופט בודק.": "Everyone plays on their own phone. Whoever presses first answers by microphone 🎤 or typing, and the judge checks.",
+  "מצב אונליין עובד רק באפליקציה (לחצו \"התקן אפליקציה\" למעלה).": "Online mode only works in the app (tap \"Install app\" above).", "כמה נכונות צריך": "Correct answers needed", "תשובות נכונות": "correct answers", "לא הצלחתי לטעון את התמונות. נסו שוב.": "Couldn't load the pictures. Try again.",
+  "✓ נכון!": "✓ Correct!", "✗ טעות": "✗ Wrong", "מתכוננים… אצבעות על הכפתורים 👇": "Get ready… fingers on the buttons 👇", "⏰ לא הספקת לענות": "⏰ Out of time", "🤔 אולי": "🤔 Maybe", "✓ נחשב": "✓ Counts", "✗ לא נחשב": "✗ Doesn't count",
+  "השופט חושב…": "The judge is thinking…", "לא נאמרה תשובה.": "No answer was given.", "מתכוננים…": "Get ready…", "⏰ לא ענית": "⏰ No answer", "יפה! ✓": "Nice! ✓", "ניצחת! 🏆": "You won! 🏆", "נפסלת 😅": "You're out 😅", "יוצר חדר…": "Creating a room…",
+  "לא הצלחתי ליצור חדר. בדקו שיש אינטרנט ונסו שוב.": "Couldn't create a room. Check your internet and try again.", "הקוד הועתק! הדבק אותו בוואטסאפ לחבר.": "Code copied! Paste it to your friend.", "הקוד צריך להיות 5 ספרות.": "The code has 5 digits.", "מתחבר לחדר…": "Joining the room…",
+  "לא מצאתי חדר עם הקוד הזה. בדקו אותו ונסו שוב.": "No room with that code. Check it and try again.", "לא הצלחתי להתחבר. בדקו שיש אינטרנט.": "Couldn't connect. Check your internet.", "החבר": "Your friend", "אני": "Me", "לחצת! מחכים…": "You pressed! Waiting…",
+  "אתה ראשון! תגיד את התשובה 🎤": "You're first! Say the answer 🎤", "שניכם לא ידעתם 🤷 אין נקודה.": "Neither of you knew 🤷 No point.", "אף אחד לא לחץ. אין נקודה.": "Nobody pressed. No point.", "✓ צדקת!": "✓ You got it!", "⏰ נגמר הזמן": "⏰ Time's up",
+  "✓ אני מוכן (לחץ לביטול)": "✓ I'm ready (tap to cancel)", "✋ מוכן": "✋ Ready", "מוכן ✓": "ready ✓", "עוד לא מוכן…": "not ready yet…", "החבר ניצח 😅": "Your friend won 😅", "🔑 כניסה לחשבון": "🔑 Sign in", "🔒 בחר סיסמה לחשבון": "🔒 Choose a password",
+  "כתוב את שם המשתמש והסיסמה שלך.": "Enter your username and password.", "עכשיו יש סיסמאות! בחר סיסמה, וככה תוכל להיכנס לחשבון שלך (עם הנקודות והדרגה) גם מטלפון אחר.": "Accounts have passwords now! Choose one, and you can sign in to your account (with your points and level) on another phone too.",
+  "כניסה": "Sign in", "צריך לכתוב שם משתמש 🙂": "Please enter a username 🙂", "הסיסמה צריכה להיות לפחות 4 אותיות או מספרים.": "The password needs at least 4 letters or numbers.", "בודק…": "Checking…", "אין חיבור לאינטרנט. נסה שוב.": "No internet connection. Try again.",
+  "הסיסמה לא נכונה 🙁": "Wrong password 🙁", "הסיסמה של החשבון שונתה בטלפון אחר. תיכנס שוב עם הסיסמה החדשה.": "The password was changed on another phone. Sign in again with the new password.", "החשבון שמור. אפשר להיכנס אליו מכל טלפון עם השם והסיסמה.": "Your account is saved. You can sign in on any phone with your name and password.",
+  "לחשבון עוד אין סיסמה.": "Your account has no password yet.", "חשבונות וסיסמאות עובדים רק באפליקציה.": "Accounts and passwords only work in the app.", "הסיסמה הנוכחית לא נכונה 🙁": "The current password is wrong 🙁",
+  "הסיסמה החדשה צריכה להיות לפחות 4 אותיות או מספרים.": "The new password needs at least 4 letters or numbers.", "✓ הסיסמה נשמרה!": "✓ Password saved!", "כתוב שם משתמש חדש.": "Enter a new username.", "במסך הבית": "on the home screen", "בחדר, מחכה לחבר": "in a room, waiting",
+  "באמצע משחק": "in a game", "הוזמן ✓": "Invited ✓", "הזמן": "Invite", "לא מצאתי שחקן בשם הזה.": "No player with that name.", "אף אחד עוד לא מחובר עכשיו.": "Nobody's online right now.", "אין עכשיו עוד מישהו מחובר. שלח לחבר את הקוד 👆": "Nobody else is online now. Send a friend the code 👆",
+  "לחץ!": "Press!", "אף אחד לא יודע": "Nobody knows", "מי יודע? לוחצים על הכפתור שלכם!": "Who knows? Press your button!", "אף אחד לא ידע, אין נקודה.": "Nobody knew, no point.", "לתמונה הבאה ←": "Next picture →", "מה זה?": "What is it?",
+  "🙈 לא יודע": "🙈 Don't know", "מי יודע? לחץ על הכפתור!": "Who knows? Press the button!", "🙈 סימנת שאתה לא יודע. מחכים לחבר…": "🙈 You said you don't know. Waiting for your friend…", "(נזכרת? לחץ על הכפתור!)": "(Remembered? Press the button!)",
+  "(החבר לא יודע 🤷)": "(Your friend doesn't know 🤷)", "מה אתה אומר?": "What do you say?", "השופט לא בטוח — החבר מחליט…": "The judge isn't sure. Your friend decides…", "✓ נכון": "✓ Correct", "⚖️ שופט": "⚖️ Judge",
+  "👀 תראו תשובה": "👀 Show answer", "נכונות": "correct", "טעויות": "mistakes", "מותר עד": "allowed up to", "תכתוב את התשובה.": "Type the answer.", "תגיד או תכתוב את התשובה 🎤": "Say or type the answer 🎤",
+  "📶 שפה": "🌐 Language", "🌐 שפה · Language": "🌐 Language · שפה",
+  // חלקים של משפטים (מחוברים לשמות ומספרים)
+  "מביא תמונות של ": "Loading pictures of ", "נחשב גם: ": "Also counts: ", "רמז: ": "Hint: ", "אמרת: ": "You said: ", "דרגה ": "Level ", " נקודות ⭐": " points ⭐",  
+  " (כל תשובה נכונה = ": " (each correct answer = ", "עלית לדרגה ": "You reached level ", "מחובר כ: ": "Signed in as: ", "✓ השם השתנה ל": "✓ Your name is now ", "ההזמנה נשלחה ל": "Invite sent to ", "הזמנה מ": "Invite from ",
+  " באמצע משחק. ההזמנה תחכה עד שהמשחק ייגמר.": " is in a game. The invite will wait until the game ends.", " בחדר אחר עכשיו. ההזמנה תחכה עד שיחזור למסך הבית.": " is in another room. The invite will wait until they're back.",
+  ": לא עכשיו 🙁": ": not now 🙁", " · דרגה ": " · level ", "👋 השחקן ": "👋 ", " יצא מהמשחק": " left the game", " · נקודה ": " · point for ", "לך! 🎉": "you! 🎉", "לחבר": "your friend", "ענית": "You answered", "החבר ענה": "Your friend answered",
+  " עונה… ⏳": " is answering… ⏳", " · לבד": " · solo", " · עד ": " · to ", "נכונות מתוך ": "correct of ", "טעויות · מותר עד ": "mistakes · allowed up to ", " מתוך ": " of ", "תמונה ": "Picture ", "יורדת נקודה.": "loses a point.",
+  "לא מצאתי משתמש בשם ": "No player named ", "שם המשתמש ": "The username ", " כבר קיים 🙁 בחר שם אחר, או לחץ ": " already exists 🙁 Choose another, or tap ", " כבר קיים 🙁 בחר שם אחר.": " already exists 🙁 Choose another.", "השם ": "The name ",
+  " כבר תפוס אצל מישהו אחר 🙁 בחר שם חדש.": " is taken by someone else 🙁 Choose a new one.", " ראשון!": " is first!", "נקודה ": "Point for ", "אין נקודה ": "No point for ", " ניצח! 🏆": " wins! 🏆", "יש לי כבר חשבון": "I have an account",
+  "תחליטו ביחד, ואז סגרו ולחצו נכון או טעות": "Decide together, then close and tap correct or wrong", "סגרו ולחצו ": "Close and tap ", "נכון": "correct", "טעות": "wrong",
+  "השופט לא מופעל בטלפון הזה. תחליטו לבד הפעם 🙂": "The judge isn't available here. Decide yourselves this time 🙂", "השופט עמוס כרגע. נסו שוב עוד מעט, או תחליטו לבד.": "The judge is busy. Try again soon, or decide yourselves.", "השופט לא ענה. נסו שוב, או תחליטו לבד 🙂": "The judge didn't answer. Try again, or decide yourselves 🙂",
+  "זה בדיוק אחד מהשמות שנחשבים נכון.": "That's exactly one of the accepted names.", "זה לא דומה לתשובה או לשמות שנחשבים. אם אתם בטוחים שזה שם אחר של אותו דבר — תחליטו ביחד.": "That's not like the answer or accepted names. If you're sure it's another name for the same thing, decide together.",
+  "רק שגיאת כתיב קטנה. התשובה: ": "Just a small typo. The answer: ", "אותה מילה בכתיב קצת אחר. התשובה: ": "Same word, slightly different spelling. The answer: ", "נשמע כמו התשובה (אולי המיקרופון שמע קצת אחרת). התשובה: ": "Sounds like the answer (the microphone may have heard it a bit differently). The answer: ",
+  "אמרתם את התשובה (": "You said the answer (", ") עם עוד כמה מילים.": ") with a few extra words.", "אמרתם רק חלק מהשם ": "You only said part of the name ",
+};
+// משפטים עם מספרים/שמות בסדר אחר באנגלית
+const EN_RULES = [
+  [/^תמונה (\d+) מתוך (\d+)$/, "Picture $1 of $2"], [/^תמונה (\d+)$/, "Picture $1"],
+  [/^עוד (\d+) נקודות לדרגה (\d+) \(כל תשובה נכונה = (\d+)\)$/, "$1 more points to level $2 (each correct answer = $3)"],
+  [/^עלית לדרגה (\d+)! 🎉$/, "You reached level $1! 🎉"],
+  [/^שימו את הטלפון באמצע השולחן: (\d+) מצד אחד ו-(\d+) מהצד השני\. יש שתי תמונות, אחת הפוכה בשביל מי שיושב ממול\.( נכון = נקודה למי שענה\. טעות = יורדת לו נקודה\.)?$/,
+    (m, a, b, c) => `Put the phone in the middle of the table: ${a} on one side and ${b} on the other. There are two pictures, one upside down for whoever sits opposite.` + (c ? " Correct = a point. Wrong = they lose a point." : "")],
+  [/^משחק לבד: צריך (\d+) נכונות\. מותר לטעות עד חצי \((\d+)\), והטעות ה-(\d+) פוסלת! עונים במיקרופון 🎤 או בהקלדה\.$/, "Solo: you need $1 correct. You may make up to half that in mistakes ($2); mistake number $3 knocks you out! Answer by microphone 🎤 or typing."],
+];
+const HE_CH = /[֐-׿]/;
+const FRAGS = Object.keys(EN_DICT).filter((k) => k.length >= 6 || /^s|s$|: $/.test(k)).sort((a, b) => b.length - a.length);
+function trText(s) {
+  if (!HE_CH.test(s)) return s;
+  const lead = s.match(/^\s*/)[0], trail = s.match(/\s*$/)[0], core = s.trim();
+  if (EN_DICT[core] !== undefined) return lead + EN_DICT[core] + trail;
+  for (const [re, rep] of EN_RULES) if (re.test(core)) return lead + core.replace(re, rep) + trail;
+  let out = s;
+  for (const k of FRAGS) if (out.includes(k)) out = out.split(k).join(EN_DICT[k]);
+  return out;
+}
+function trNode(root) {
+  if (LANG !== "en") return;
+  const walk = (n) => {
+    if (n.nodeType === 3) { const t = trText(n.nodeValue); if (t !== n.nodeValue) n.nodeValue = t; return; }
+    if (n.nodeType !== 1 || n.tagName === "SCRIPT" || n.tagName === "STYLE" || n.classList.contains("notr")) return;
+    for (const a of ["placeholder", "aria-label", "title"]) { const v = n.getAttribute(a); if (v && HE_CH.test(v)) n.setAttribute(a, trText(v)); }
+    for (const c of n.childNodes) walk(c);
+  };
+  walk(root);
+}
+if (LANG === "en") {
+  document.documentElement.lang = "en"; document.documentElement.dir = "ltr";
+  document.title = "The Cheetah";
+}
+function startI18n() {
+  if (LANG !== "en") return;
+  trNode(document.body);
+  new MutationObserver((ms) => { for (const m of ms) { if (m.type === "characterData") trNode(m.target); else m.addedNodes.forEach(trNode); } })
+    .observe(document.body, { childList: true, subtree: true, characterData: true });
+}
+// I18N-END
 const $ = (id) => document.getElementById(id);
 const show = (id) => { for (const s of ["home", "loading", "lobby", "game", "over", "profile", "settings"]) $(s).hidden = s !== id; if ((id === "home" || id === "over") && window.nextInvite) setTimeout(nextInvite, 400); };
 
@@ -551,7 +666,14 @@ document.addEventListener("visibilitychange", () => {
 
 // ---------- בית ----------
 let target = 10, level = "medium";
-const LEVEL_NAME = { easy: "קל", medium: "בינוני", hard: "קשה" };
+const LEVEL_NAME = { easy: T("קל", "Easy"), medium: T("בינוני", "Medium"), hard: T("קשה", "Hard") };
+// שם וחוקים של קטגוריה, ותשובה — בשפה שנבחרה
+const catName = (c) => (LANG === "en" && c.nameEn) || c.name;
+const catRules = (c) => (LANG === "en" && c.rulesEn) || c.rules;
+const ansOf = (it) => (LANG === "en" && it.en) || it.a;
+const altsOf = (it) => (LANG === "en" && it.en ? it.enAlt || [] : it.alt || []);
+// השופט מקבל תשובה נכונה בעברית וגם באנגלית (שחקנים בשתי השפות יכולים לשחק ביחד)
+const candsOf = (it) => [it.a, ...(it.alt || []), ...(it.en ? [it.en] : []), ...(it.enAlt || [])];
 const setTarget = (v) => { target = Math.max(3, Math.min(30, v)); $("tVal").value = target; $("tVal").textContent = target; paintMode(); };
 $("tMinus").onclick = () => setTarget(target - 1);
 $("tPlus").onclick = () => setTarget(target + 1);
@@ -567,12 +689,13 @@ $("levels").addEventListener("click", (e) => {
 
 fetch("data/index.json").then((r) => r.json()).then((cats) => {
   for (const c of cats) {
+    if (LANG === "en" && c.id === "idioms") continue; // ביטויים בעברית — רק בעברית
     const b = document.createElement("button");
     b.className = "cat";
     b.innerHTML = `<span class="ic"></span><span class="nm"></span><span class="ru"></span>`;
     b.querySelector(".ic").textContent = c.icon;
-    b.querySelector(".nm").textContent = c.name;
-    b.querySelector(".ru").textContent = c.rules;
+    b.querySelector(".nm").textContent = catName(c);
+    b.querySelector(".ru").textContent = catRules(c);
     b.onclick = () => loadCategory(c);
     $("cats").append(b);
   }
@@ -624,19 +747,19 @@ async function loadRiddle(c) {
   const ids = shuffleArr([...c.sources]).slice(0, 4);
   const cats = await Promise.all(ids.map(getCat));
   const pick = (lv) => shuffleArr(cats.flatMap((d) => (d.levels[lv] || []).map((it, i) => [it, i]).filter(([it]) => it.img)
-    .map(([it, i]) => ({ ...it, fx: c.riddle, fxLevel: lv, hint: d.icon + " " + d.name, ref: { c: d.id, lv, i, fx: c.riddle, fxLevel: lv, hint: d.icon + " " + d.name } }))));
-  return { name: c.name, icon: c.icon, rules: c.rules, levelName: LEVEL_NAME[level], items: pick(level), reserve: NEAR[level].flatMap(pick) };
+    .map(([it, i]) => ({ ...it, fx: c.riddle, fxLevel: lv, hint: d.icon + " " + catName(d), ref: { c: d.id, lv, i, fx: c.riddle, fxLevel: lv, hint: d.icon + " " + catName(d) } }))));
+  return { name: catName(c), icon: c.icon, rules: catRules(c), levelName: LEVEL_NAME[level], items: pick(level), reserve: NEAR[level].flatMap(pick) };
 }
 async function buildDeck(c) {
   if (c.riddle) return loadRiddle(c);
   const d = await getCat(c.id);
   const withRef = (lv) => (d.levels[lv] || []).map((it, i) => ({ ...it, ref: { c: d.id, lv, i } }));
-  return { name: d.name, icon: d.icon, rules: d.rules, levelName: LEVEL_NAME[level], items: withRef(level), reserve: NEAR[level].flatMap(withRef) };
+  return { name: catName(d), icon: d.icon, rules: catRules(d), levelName: LEVEL_NAME[level], items: withRef(level), reserve: NEAR[level].flatMap(withRef) };
 }
 async function loadCategory(c) {
   beep(1, .01, "sine", .001); // מעיר את הצלילים בלחיצה הראשונה
   if (mode === "online") { if (IS_APP) hostRoom(c); else { $("hErr").textContent = MODE_NOTE.online; $("hErr").hidden = false; } return; }
-  $("loadMsg").textContent = "מביא תמונות של " + c.name + " (" + LEVEL_NAME[level] + ")…";
+  $("loadMsg").textContent = T("מביא תמונות של ", "Loading pictures of ") + catName(c) + " (" + LEVEL_NAME[level] + ")…";
   show("loading");
   try {
     const deck = await buildDeck(c);
@@ -650,12 +773,12 @@ async function loadCategory(c) {
 // ---------- משחק ----------
 const G = { deck: null, queue: [], reserve: [], item: null, score: { blue: 0, red: 0 }, players: ["blue", "red"], round: 0, phase: "idle", buzzer: null, timers: [] };
 const PLAYERS = [
-  { k: "blue", name: "כחול", heb: "הכחול", cls: "bl" },
-  { k: "red", name: "אדום", heb: "האדום", cls: "rd" },
-  { k: "green", name: "ירוק", heb: "הירוק", cls: "gr" },
-  { k: "yellow", name: "צהוב", heb: "הצהוב", cls: "yl" },
-  { k: "purple", name: "סגול", heb: "הסגול", cls: "pu" },
-  { k: "pink", name: "ורוד", heb: "הוורוד", cls: "pk" },
+  { k: "blue", name: T("כחול", "Blue"), heb: T("הכחול", "Blue"), cls: "bl" },
+  { k: "red", name: T("אדום", "Red"), heb: T("האדום", "Red"), cls: "rd" },
+  { k: "green", name: T("ירוק", "Green"), heb: T("הירוק", "Green"), cls: "gr" },
+  { k: "yellow", name: T("צהוב", "Yellow"), heb: T("הצהוב", "Yellow"), cls: "yl" },
+  { k: "purple", name: T("סגול", "Purple"), heb: T("הסגול", "Purple"), cls: "pu" },
+  { k: "pink", name: T("ורוד", "Pink"), heb: T("הוורוד", "Pink"), cls: "pk" },
 ];
 const other = (p) => (p === "blue" ? "red" : "blue");
 const heb = Object.fromEntries(PLAYERS.map((p) => [p.k, p.heb]));
@@ -680,7 +803,7 @@ function buildBuzzers(keys) {
     const b = document.createElement("button");
     b.className = "buzz " + k; b.id = "b" + C; b.setAttribute("aria-label", p.name + " לוחץ");
     b.innerHTML = `<span class="who">${p.name}</span><span class="score" id="sc${C}">0</span><span class="bar"><i id="bar${C}"></i></span><span class="vs" hidden></span><span class="tap">לחץ!</span>`;
-    if (k === "blue" && G.mode === "duo" && prof.name) b.querySelector(".who").textContent = "🔵 " + prof.name; // הכחול זה אני (מקבל נקודות)
+    if (k === "blue" && G.mode === "duo" && prof.name) { b.querySelector(".who").textContent = "🔵 " + prof.name; b.querySelector(".who").classList.add("notr"); } // הכחול זה אני (מקבל נקודות)
     b.addEventListener("pointerdown", (e) => { e.preventDefault(); if (G.mode === "online") onlineBuzz(); else buzz(k); });
     return b;
   };
@@ -775,8 +898,8 @@ function showAnswerOnStage() {
   revealFx();
   const a = document.createElement("div");
   a.className = "answer";
-  a.textContent = G.item.a;
-  if (G.item.alt && G.item.alt.length) { const s = document.createElement("small"); s.textContent = "נחשב גם: " + G.item.alt.join(" · "); a.append(s); }
+  a.textContent = ansOf(G.item); a.classList.add("notr");
+  const alts = altsOf(G.item); if (alts.length) { const s = document.createElement("small"); s.textContent = T("נחשב גם: ", "Also counts: ") + alts.join(" · "); a.append(s); }
   $("stage").append(a);
 }
 function flash(ok, text) {
@@ -967,8 +1090,8 @@ function reveal(timeUp) {
   revealFx();
   const a = document.createElement("div");
   a.className = "answer";
-  a.textContent = G.item.a;
-  if (G.item.alt && G.item.alt.length) { const s = document.createElement("small"); s.textContent = "נחשב גם: " + G.item.alt.join(" · "); a.append(s); }
+  a.textContent = ansOf(G.item); a.classList.add("notr");
+  const alts = altsOf(G.item); if (alts.length) { const s = document.createElement("small"); s.textContent = T("נחשב גם: ", "Also counts: ") + alts.join(" · "); a.append(s); }
   $("stage").append(a);
   if (G.buzzer && G.mode === "duo") { G.phase = "revealed"; return; }
   if (G.buzzer) {
@@ -996,8 +1119,9 @@ function score(correct) {
   const side = btn(winner || loser);
   side.classList.remove("pop"); void side.offsetWidth; side.classList.add("pop");
   flash(correct);
-  acts(winner ? `נקודה <span class="${cls[winner]}">ל${pname[winner]}</span>!`
-    : lost ? `<span class="${cls[loser]}">ל${pname[loser]}</span> יורדת נקודה.` : `אין נקודה <span class="${cls[loser]}">ל${pname[loser]}</span>.`);
+  const L_ = T("ל", "");
+  acts(winner ? `נקודה <span class="${cls[winner]}">${L_}${pname[winner]}</span>!`
+    : lost ? `<span class="${cls[loser]}">${L_}${pname[loser]}</span> יורדת נקודה.` : `אין נקודה <span class="${cls[loser]}">${L_}${pname[loser]}</span>.`);
   if (winner && G.score[winner] >= target) later(() => gameOver(winner), 1300);
   else later(nextRound, 1500);
 }
@@ -1101,7 +1225,7 @@ async function runJudge() {
   const said = $("jSaid").value.trim();
   if (!said) return $("jSaid").focus();
   const res = $("jRes");
-  const local = localJudge(said, [G.item.a, ...(G.item.alt || [])]);
+  const local = localJudge(said, candsOf(G.item));
   if (!local) return $("jSaid").focus();
   // בטוח שנחשב, או שאין Claude (באפליקציה) — השופט החכם מחליט לבד
   if (local.ok === true || !sampleFn) return verdict(local.ok, local.reason);
@@ -1150,8 +1274,10 @@ $("jSaid").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preve
     e.preventDefault();
     if (deferred) { deferred.prompt(); try { await deferred.userChoice; } catch (x) {} deferred = null; return; }
     $("installSteps").innerHTML = ios
-      ? "<div>1. פותחים את הדף הזה ב-<b>Safari</b>.</div><div>2. לוחצים על כפתור השיתוף <b>⬆️</b> (ריבוע עם חץ למעלה).</div><div>3. בוחרים <b>\"הוסף למסך הבית\"</b> ולוחצים <b>\"הוסף\"</b>.</div><div>זהו! האייקון של הצ'יטה יופיע במסך הבית 🎉</div>"
-      : "<div>1. פותחים את הדף הזה ב-<b>Chrome</b>.</div><div>2. לוחצים על <b>⋮</b> (שלוש הנקודות למעלה).</div><div>3. בוחרים <b>\"התקן אפליקציה\"</b> או <b>\"הוסף למסך הבית\"</b>.</div><div>זהו! האייקון של הצ'יטה יופיע במסך הבית 🎉</div>";
+      ? T("<div>1. פותחים את הדף הזה ב-<b>Safari</b>.</div><div>2. לוחצים על כפתור השיתוף <b>⬆️</b> (ריבוע עם חץ למעלה).</div><div>3. בוחרים <b>\"הוסף למסך הבית\"</b> ולוחצים <b>\"הוסף\"</b>.</div><div>זהו! האייקון של הצ'יטה יופיע במסך הבית 🎉</div>",
+          "<div>1. Open this page in <b>Safari</b>.</div><div>2. Tap the Share button <b>⬆️</b> (a square with an arrow).</div><div>3. Choose <b>\"Add to Home Screen\"</b> and tap <b>\"Add\"</b>.</div><div>That's it! The Cheetah icon will appear on your home screen 🎉</div>")
+      : T("<div>1. פותחים את הדף הזה ב-<b>Chrome</b>.</div><div>2. לוחצים על <b>⋮</b> (שלוש הנקודות למעלה).</div><div>3. בוחרים <b>\"התקן אפליקציה\"</b> או <b>\"הוסף למסך הבית\"</b>.</div><div>זהו! האייקון של הצ'יטה יופיע במסך הבית 🎉</div>",
+          "<div>1. Open this page in <b>Chrome</b>.</div><div>2. Tap <b>⋮</b> (the three dots at the top).</div><div>3. Choose <b>\"Install app\"</b> or <b>\"Add to Home screen\"</b>.</div><div>That's it! The Cheetah icon will appear on your home screen 🎉</div>");
     $("installHelp").hidden = false;
   });
   $("installClose").onclick = () => { $("installHelp").hidden = true; };
@@ -1175,12 +1301,12 @@ function submitAnswer() {
   stopListening(); $("ansBox").hidden = true;
   cb(typed, heard.filter((x) => x && x !== typed));
 }
-const saidRight = (texts) => !!liveItem && texts.some((t) => { const j = localJudge(t, [liveItem.a, ...(liveItem.alt || [])]); return j && j.ok === true; });
+const saidRight = (texts) => !!liveItem && texts.some((t) => { const j = localJudge(t, candsOf(liveItem)); return j && j.ok === true; });
 function startListening() {
   if (!SR || rec) return;
   try {
     const r0 = new SR(); rec = r0;
-    r0.lang = "he-IL"; r0.interimResults = true; r0.maxAlternatives = 4; r0.continuous = false;
+    r0.lang = T("he-IL", "en-US"); r0.interimResults = true; r0.maxAlternatives = 4; r0.continuous = false;
     r0.onresult = (e) => {
       const r = e.results[e.results.length - 1];
       const texts = [...r].map((x) => x.transcript.trim()).filter(Boolean);
@@ -1205,7 +1331,7 @@ $("ansGo").onclick = submitAnswer;
 $("ansIn").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); submitAnswer(); } });
 // בודק כמה ניסוחים (המיקרופון לפעמים שומע כמה אפשרויות) ובוחר את הכי טוב
 function judgeAll(texts, item) {
-  const cands = [item.a, ...(item.alt || [])];
+  const cands = candsOf(item);
   let best = null;
   for (const t of texts.filter(Boolean)) {
     const r = localJudge(t, cands); if (!r) continue;
@@ -1362,7 +1488,7 @@ async function hostRoom(c) {
     NET.role = "host";
     Object.assign(O, { cat: c, level, target, deck: await buildDeck(c), joined: false });
     $("lobbyCode").textContent = code;
-    $("lobbyTitle").textContent = c.icon + " " + c.name + " · " + LEVEL_NAME[level] + " · עד " + target;
+    $("lobbyTitle").textContent = c.icon + " " + catName(c) + " · " + LEVEL_NAME[level] + T(" · עד ", " · to ") + target;
     show("lobby");
   } catch (e) {
     show("home"); $("hErr").textContent = "לא הצלחתי ליצור חדר. בדקו שיש אינטרנט ונסו שוב."; $("hErr").hidden = false;
@@ -1370,7 +1496,7 @@ async function hostRoom(c) {
 }
 $("lobbyCancel").onclick = () => { netLeave(); show("home"); };
 $("shareCode").onclick = async () => {
-  const text = "בוא לשחק איתי בצ'יטה! 🐆 🔵🆚🔴 הקוד: " + NET.code + "\nhttps://dandooger.github.io/hazira-staging/";
+  const text = T("בוא לשחק איתי בצ'יטה! 🐆 🔵🆚🔴 הקוד: ", "Come play The Cheetah with me! 🐆 🔵🆚🔴 Code: ") + NET.code + "\nhttps://dandooger.github.io/hazira-staging/";
   try { if (navigator.share) await navigator.share({ text }); else { await navigator.clipboard.writeText(text); $("lobbyNote").textContent = "הקוד הועתק! הדבק אותו בוואטסאפ לחבר."; } } catch (e) {}
 };
 $("joinGo").onclick = () => joinRoom($("joinCode").value.replace(/\D/g, ""));
@@ -1401,7 +1527,7 @@ function paintOnline() {
 function startOnlineScreen() {
   setPanels("online", [myColor()]);
   const mine = btn(myColor());
-  mine.querySelector(".who").textContent = prof.name || "אני"; mine.querySelector(".vs").hidden = false;
+  mine.querySelector(".who").textContent = prof.name || T("אני", "Me"); mine.querySelector(".who").classList.add("notr"); mine.querySelector(".vs").hidden = false;
   $("gTitle").textContent = O.title;
   paintOnline(); show("game"); keepAwake();
 }
@@ -1613,6 +1739,7 @@ function onNet(m) {
 
 // ---------- פתיחה: הצ'יטה מהלוגו (תמונה אמיתית, עם הברקים) רצה ~2.5 שניות, נכנסת ללוגו, ואז השם והמילים ----------
 const INTRO = { timers: [] };
+if (LANG === "en") { $("ttl").innerHTML = [..."CHEETAH"].map((c) => "<span>" + c + "</span>").join(""); $("ttl").classList.add("notr"); }
 // הנקודות על "הצ'יטה" ממשיכות מאות לאות (כל אות מקבלת את החלק שלה מהדוגמה)
 function alignSpots() { $("ttl").querySelectorAll("span").forEach((s) => { s.style.setProperty("--ox", -s.offsetLeft + "px"); s.style.setProperty("--oy", -s.offsetTop + "px"); }); }
 addEventListener("resize", alignSpots);
@@ -1666,6 +1793,13 @@ function playIntro() {
 $("hero").addEventListener("click", playIntro);
 $("hero").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); playIntro(); } });
 playIntro();
+
+// ---------- החלפת שפה ----------
+function setLang(l) { try { localStorage.setItem(LANG_KEY, l); } catch (e) {} location.reload(); }
+$("langHe").onclick = () => setLang("he"); $("langEn").onclick = () => setLang("en");
+$("langHe").setAttribute("aria-pressed", String(LANG === "he")); $("langEn").setAttribute("aria-pressed", String(LANG === "en"));
+$("wLang").textContent = LANG === "en" ? "🌐 עברית" : "🌐 English"; $("wLang").onclick = () => setLang(LANG === "en" ? "he" : "en");
+startI18n();
 
 // ---------- פרופיל: שם, תמונה, נקודות ודרגות ----------
 // כל תשובה נכונה = נקודה אחת. מדרגה 1 ל-2 צריך 100, מ-2 ל-3 עוד 200, מ-3 ל-4 עוד 300, וכן הלאה
@@ -2019,7 +2153,7 @@ function sendInvite(p) {
 function playerRow(p, size, withInvite) {
   const row = document.createElement("div"); row.className = "pitem";
   row.append(avEl(p.av, size, photoOf(p.id)));
-  const t = document.createElement("span"); t.className = "nm"; t.textContent = p.name + " ";
+  const t = document.createElement("span"); t.className = "nm"; const nm = document.createElement("b"); nm.className = "notr"; nm.textContent = p.name + " "; t.append(nm);
   const st = document.createElement("span"); st.className = "st"; st.textContent = stText(p) + " · דרגה " + (p.lvl || 1);
   t.append(document.createElement("br"), st); row.append(t);
   row.onclick = () => openPlayer(p);
