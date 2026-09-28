@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790609392387"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790609980661"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -86,6 +86,8 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
 #lobby .code{font-family:var(--display);font-size:clamp(56px,20vw,110px);letter-spacing:.12em;color:var(--gold);direction:ltr;line-height:1}
 .ansbox{display:flex;gap:8px;align-items:center;width:100%}
 .ansbox input{flex:1;min-width:0;font:inherit;font-size:19px;color:var(--ink);background:var(--ground);border:2px solid var(--gold);border-radius:12px;padding:10px 12px}
+.ansbox input.miss{border-color:var(--bad);animation:miss .35s}
+@keyframes miss{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .ansbox button{border:0;border-radius:12px;min-width:52px;height:50px;font-size:22px;background:var(--panel);border:2px solid var(--line)}
 .ansbox .mic.on{background:var(--bad);border-color:var(--bad);animation:pulseMic 1s ease-in-out infinite alternate}
 @keyframes pulseMic{to{transform:scale(1.08)}}
@@ -1403,7 +1405,7 @@ function warmMic() {
 // item: אם נותנים — ברגע שהמיקרופון שומע את התשובה הנכונה, שולחים לבד (בלי ללחוץ "שלח")
 function askAnswer(cb, item, opts) {
   onAnswer = cb; heard = []; liveItem = item || null; listenRestarts = 0;
-  $("ansIn").value = ""; $("ansBox").hidden = !!(opts && opts.micOnly);
+  $("ansIn").value = ""; $("ansIn").classList.remove("miss"); $("ansBox").hidden = !!(opts && opts.micOnly);
   const canMic = SR && IS_APP; // בקישור של Claude אין גישה למיקרופון
   $("micBtn").hidden = !canMic;
   if (canMic) {
@@ -1432,15 +1434,20 @@ function startListening() {
       const texts = [...r].map((x) => x.transcript.trim()).filter(Boolean);
       if (!texts.length) return;
       $("ansIn").value = texts[0];
-      if (saidRight(texts)) { heard = texts; return submitAnswer(); }
-      if (r.isFinal) { heard = texts; setTimeout(submitAnswer, 350); }
+      if (saidRight(texts)) { heard = heard.concat(texts); return submitAnswer(); }
+      if (r.isFinal) {
+        heard = heard.concat(texts);
+        // אפשר לנסות כמה פעמים: טעות לא עוצרת. ממשיכים להקשיב עד שצודקים או שהזמן נגמר
+        if (!liveItem) setTimeout(submitAnswer, 350);
+        else { const i = $("ansIn"); i.classList.remove("miss"); void i.offsetWidth; i.classList.add("miss"); }
+      }
     };
     r0.onerror = (e) => { if (e.error === "not-allowed" || e.error === "service-not-allowed") { listenWanted = false; $("ansIn").focus(); } };
     r0.onend = () => {
       if (rec !== r0) return;
       rec = null; $("micBtn").classList.remove("on");
       // היה שקט? ממשיכים להקשיב עד שהזמן נגמר
-      if (onAnswer && listenWanted && !heard.length && listenRestarts++ < 12) setTimeout(() => { if (onAnswer && listenWanted) startListening(); }, 30);
+      if (onAnswer && listenWanted && listenRestarts++ < 40) setTimeout(() => { if (onAnswer && listenWanted) startListening(); }, 30);
     };
     r0.start(); if (onAnswer) $("micBtn").classList.add("on");
   } catch (e) { rec = null; }
