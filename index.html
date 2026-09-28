@@ -1,0 +1,2083 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFC400">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="צ'יטה בדיקה">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon-cheetah3.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790588030481"; window.HAZIRA_ENV = "staging";</script>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<div style="position:sticky;top:0;z-index:50;background:#6B21A8;color:#fff;text-align:center;font:700 14px Arial;padding:4px">🧪 גרסת בדיקה (staging) — לא האפליקציה האמיתית</div>
+<title>הצ'יטה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Assistant:wght@400;600;800&display=swap">
+<style>
+/* הצ'יטה: עיצוב צהוב אחד בכוונה (הצבע של הצ'יטה), כחול מול אדום. כל הצבעים מוגדרים כאן. */
+:root{
+  --ground:#FFC400; --stage:#FFF1B8; --panel:#FFE27A; --line:#D19E00;
+  --ink:#1A1405; --muted:#6B5410;
+  --blue:#1E6BFF; --blue-deep:#0F3A8F; --red:#F0283A; --red-deep:#8C1520;
+  --gold:#1A1405; --good:#0E9446; --bad:#D7263D;
+  --green:#1FB45A; --green-deep:#0B5229; --yellow:#E8A800; --yellow-deep:#6E4F00; --purple:#9B5CFF; --purple-deep:#44198C; --pink:#FF4FA3; --pink-deep:#8C1A55;
+  --display:"Secular One","Arial Hebrew",Arial,sans-serif;
+  --body:"Assistant","Segoe UI",Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--ground);background-image:radial-gradient(ellipse at 50% -10%,#FFE878 0%,var(--ground) 60%);
+  color:var(--ink);font-family:var(--body);font-size:17px;overflow-x:hidden;touch-action:manipulation;direction:rtl}
+button{font-family:inherit;cursor:pointer;color:inherit}
+button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+kbd{font-family:var(--display);display:inline-grid;place-items:center;min-width:1.8em;height:1.8em;padding:0 .3em;border-radius:.35em;
+  background:var(--ink);color:var(--ground);box-shadow:0 3px 0 var(--muted);font-size:.9em;line-height:1}
+.screen{min-height:100%;padding-inline:16px}
+h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
+.note{color:var(--muted);font-size:15px;line-height:1.5}
+.err{color:var(--bad);font-weight:600}
+.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* ---------- בית ---------- */
+#home{position:relative;max-width:900px;margin:0 auto;padding-block:22px 40px;display:flex;flex-direction:column;gap:22px}
+.logo{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.logo h1{font-family:var(--display);font-size:clamp(48px,14vw,84px);margin:0;line-height:.9;filter:drop-shadow(0 3px 0 rgba(26,20,5,.55));
+  background:linear-gradient(90deg,var(--blue) 0 48%,var(--red) 52% 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo span{font-family:var(--display);font-size:22px;color:var(--gold)}
+.how{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.how div{background:var(--stage);border:1px solid var(--line);border-radius:12px;padding:12px 14px;line-height:1.5;color:var(--muted);font-size:15px}
+.how b{color:var(--ink)}
+.bl{color:var(--blue);font-weight:800}.rd{color:var(--red);font-weight:800}
+.gr{color:var(--green);font-weight:800}.yl{color:var(--yellow);font-weight:800}.pu{color:var(--purple);font-weight:800}.pk{color:var(--pink);font-weight:800}
+.target{display:flex;align-items:center;gap:10px;background:var(--stage);border:1px solid var(--line);border-radius:999px;padding:5px 7px}
+.target button{width:40px;height:40px;border-radius:50%;border:0;background:var(--panel);font-size:22px}
+.target output{font-family:var(--display);font-size:26px;min-width:2ch;text-align:center;color:var(--gold)}
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.lv{all:unset;cursor:pointer;background:var(--stage);border:2px solid var(--line);border-radius:12px;padding:10px 10px;display:grid;gap:2px;text-align:center}
+.lv b{font-family:var(--display);font-weight:400;font-size:22px}
+.lv span{color:var(--muted);font-size:13px;line-height:1.3}
+.lv[aria-pressed="true"]{border-color:var(--gold);background:var(--panel)}
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.cat{all:unset;cursor:pointer;background:var(--stage);border:2px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.cat:active{border-color:var(--gold);transform:scale(.98)}
+.cat .ic{font-size:34px;line-height:1}
+.cat .nm{font-family:var(--display);font-size:21px}
+.cat .ru{color:var(--muted);font-size:13px;line-height:1.4}
+.install{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.install .go{text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.steps{display:grid;gap:10px;line-height:1.55;font-size:17px}
+.steps b{color:var(--gold)}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.mode{all:unset;cursor:pointer;background:var(--stage);border:2px solid var(--line);border-radius:12px;padding:10px 8px;display:grid;gap:2px;text-align:center}
+.mode b{font-family:var(--display);font-weight:400;font-size:20px}
+.mode span{color:var(--muted);font-size:12.5px;line-height:1.3}
+.mode[aria-pressed="true"]{border-color:var(--gold);background:var(--panel)}
+.joinbox{color:#fff;background:linear-gradient(135deg,var(--blue-deep),var(--red-deep));border-radius:14px;padding:14px;display:grid;gap:10px}
+.joinbox input{font:inherit;font-size:24px;letter-spacing:.2em;text-align:center;color:#fff;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:8px;width:9em;direction:ltr}
+#lobby{display:grid;place-items:center;text-align:center;min-height:100%;padding-block:24px}
+#lobby .code{font-family:var(--display);font-size:clamp(56px,20vw,110px);letter-spacing:.12em;color:var(--gold);direction:ltr;line-height:1}
+.ansbox{display:flex;gap:8px;align-items:center;width:100%}
+.ansbox input{flex:1;min-width:0;font:inherit;font-size:19px;color:var(--ink);background:var(--ground);border:2px solid var(--gold);border-radius:12px;padding:10px 12px}
+.ansbox button{border:0;border-radius:12px;min-width:52px;height:50px;font-size:22px;background:var(--panel);border:2px solid var(--line)}
+.ansbox .mic.on{background:var(--bad);border-color:var(--bad);animation:pulseMic 1s ease-in-out infinite alternate}
+@keyframes pulseMic{to{transform:scale(1.08)}}
+.ansbox .send{background:var(--gold);color:var(--ground);font-family:var(--display);font-size:18px;padding:0 14px}
+.soloBar{display:grid;grid-template-columns:1fr 1fr;gap:10px;height:clamp(96px,16vh,150px)}
+.soloBar div{color:#fff;border-radius:18px;display:grid;place-items:center;align-content:center;gap:2px;font-family:var(--display)}
+.soloBar .ok{background:linear-gradient(180deg,#1f8f55,#0d4a2b)}
+.soloBar .no{background:linear-gradient(180deg,#b3263a,#4a0d17)}
+.soloBar b{font-size:clamp(38px,11vw,64px);font-weight:400;line-height:1;font-variant-numeric:tabular-nums}
+.soloBar span{font-family:var(--body);font-size:14px;opacity:.85}
+.buzz.dim{pointer-events:none}
+.pc-only{border:1px dashed var(--line);border-radius:14px;padding:12px 14px}
+
+/* ---------- טעינה ---------- */
+#loading{display:grid;place-items:center;text-align:center;min-height:100%}
+.spinner{width:60px;height:60px;border-radius:50%;border:6px solid var(--line);border-top-color:var(--blue);border-right-color:var(--red);animation:spin 1s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- משחק (טלפון לאורך) ---------- */
+#game{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;gap:10px;padding-block:10px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.topbar .title{font-family:var(--display);font-size:19px;line-height:1.2}
+.topbar .title small{display:block;font-family:var(--body);color:var(--muted);font-size:13px}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:8px 12px;font-size:15px}
+.stage{background:var(--stage);border:1px solid var(--line);border-radius:18px;position:relative;overflow:hidden;display:grid;place-items:center;min-height:0}
+/* רקע בהיר מאחורי התמונה, כדי שסמלים שקופים ושחורים (כמו של יובנטוס) ייראו */
+.pic{position:relative;overflow:hidden;border-radius:10px;background:#F2F4FF;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.pic img{position:absolute;max-width:none}
+.pic .tiles{position:absolute;inset:0;display:grid}
+.pic .tiles i{background-repeat:no-repeat;outline:1px solid rgba(10,15,36,.6)}
+.hintchip{position:absolute;top:10px;inset-inline-start:10px;background:rgba(26,20,5,.85);border:1px solid var(--line);border-radius:999px;padding:5px 10px;font-size:13px;color:#fff;z-index:2}
+.pic .emo{position:absolute;inset:0;display:grid;place-items:center;line-height:1;direction:ltr;white-space:nowrap;
+  font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.stage.hide .pic{visibility:hidden}
+.stage:not(.hide) .pic{animation:picIn .3s ease-out}
+@keyframes picIn{from{opacity:0;transform:scale(.92)}}
+.count{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-size:clamp(110px,34vw,220px);color:var(--gold);
+  text-shadow:0 0 40px rgba(255,255,255,.8);pointer-events:none}
+.count.tick{animation:tick 1s ease-out}
+@keyframes tick{0%{transform:scale(1.6);opacity:0}25%{opacity:1}100%{transform:scale(.8);opacity:.2}}
+.timer{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:var(--display);font-size:32px;line-height:1;
+  background:rgba(26,20,5,.88);color:#fff;border:3px solid var(--tc,#FFC400);border-radius:999px;padding:7px 20px;min-width:3em;text-align:center;font-variant-numeric:tabular-nums}
+.timer.low{color:var(--bad);border-color:var(--bad);animation:pulse .5s ease-in-out infinite alternate}
+@keyframes pulse{to{transform:translateX(-50%) scale(1.12)}}
+.answer{position:absolute;inset-inline:0;bottom:0;padding:12px 14px;background:linear-gradient(0deg,rgba(0,0,0,.92),rgba(0,0,0,.6));color:#fff;text-align:center;
+  font-family:var(--display);font-size:clamp(26px,8vw,44px);animation:up .3s ease-out}
+.answer small{display:block;font-family:var(--body);font-size:14px;color:#D8D2BE;margin-top:2px}
+@keyframes up{from{transform:translateY(100%)}}
+.flash{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-size:clamp(46px,14vw,90px);pointer-events:none;animation:fl 1.1s forwards}
+.flash.good{color:var(--good);background:rgba(43,214,123,.15)}
+.flash.bad{color:var(--bad);background:rgba(255,90,90,.15)}
+@keyframes fl{0%{opacity:0;transform:scale(.6)}20%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0}}
+
+/* פס הפעולות: מה עושים עכשיו */
+.acts{min-height:56px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;text-align:center;font-size:17px;line-height:1.35}
+.act{border:2px solid var(--line);background:var(--panel);border-radius:12px;padding:10px 14px;font-size:17px;font-weight:600;min-height:48px}
+.act.good{border-color:var(--good);background:rgba(43,214,123,.12)}
+.act.bad{border-color:var(--bad);background:rgba(255,90,90,.12)}
+.act.judge{border-color:var(--gold)}
+.act.big{flex:1 1 40%}
+
+/* כפתורי הלחיצה הגדולים (2 עד 6 שחקנים, חצי מכל צד של הטלפון; באונליין — כפתור אחד על כל הרוחב) */
+.buzzers{direction:ltr;display:grid;grid-template-columns:repeat(var(--n,2),1fr);gap:10px;height:clamp(130px,24vh,210px)}
+.buzzers.top{transform:rotate(180deg)}
+.stage.mirror{transform:rotate(180deg)}
+#game.multi .buzz .score{font-size:clamp(34px,10vw,60px)}
+#game.multi .buzz .who{font-size:17px}
+#game.two-sides .buzzers{height:clamp(84px,13vh,130px)}
+#game.two-sides .buzz .score{font-size:clamp(28px,8vw,46px)}
+#game.two-sides .buzz .tap{display:none}
+#game.two-sides{grid-template-rows:auto auto minmax(0,1fr) auto minmax(0,1fr) auto;grid-template-areas:"tb" "bt" "s2" "ac" "s1" "bb"}
+#game.two-sides .topbar{grid-area:tb}#game.two-sides #buzzersTop{grid-area:bt}#game.two-sides #stage2{grid-area:s2}
+#game.two-sides .acts{grid-area:ac}#game.two-sides #stage{grid-area:s1}#game.two-sides #buzzers{grid-area:bb}
+.buzz .vs{font-family:var(--display);font-size:19px;opacity:.9}
+.buzz{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);border:3px solid transparent;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;direction:rtl;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation;transition:box-shadow .15s,transform .1s,opacity .2s;padding:8px}
+.buzz.blue{background:linear-gradient(180deg,var(--blue),var(--blue-deep))}
+.buzz.red{background:linear-gradient(180deg,var(--red),var(--red-deep))}
+.buzz.green{background:linear-gradient(180deg,var(--green),var(--green-deep));--pc:var(--green)}
+.buzz.yellow{background:linear-gradient(180deg,var(--yellow),var(--yellow-deep));--pc:var(--yellow)}
+.buzz.purple{background:linear-gradient(180deg,var(--purple),var(--purple-deep));--pc:var(--purple)}
+.buzz.pink{background:linear-gradient(180deg,var(--pink),var(--pink-deep));--pc:var(--pink)}
+.buzz:active{transform:scale(.97)}
+.buzz .who{font-family:var(--display);font-size:20px}
+.buzz .score{font-family:var(--display);font-size:clamp(48px,15vw,84px);line-height:1;font-variant-numeric:tabular-nums}
+.buzz .bar{width:70%;height:8px;border-radius:4px;background:rgba(255,255,255,.2);overflow:hidden}
+.buzz .bar i{display:block;height:100%;width:0;background:#fff;transition:width .4s}
+.buzz .tap{font-size:13px;opacity:.85}
+.buzz.on{border-color:#fff;box-shadow:0 0 40px var(--pc,currentColor)}
+.buzz.on.blue{color:#fff;box-shadow:0 0 40px var(--blue)}
+.buzz.on.red{color:#fff;box-shadow:0 0 40px var(--red)}
+.buzz.off{opacity:.5;filter:grayscale(.85)}
+.buzz.pop .score{animation:pop .6s}
+@keyframes pop{40%{transform:scale(1.35);color:var(--gold)}}
+
+/* טלפון לרוחב / טאבלט / מחשב: הכפתורים בצדדים, התמונה באמצע */
+@media (orientation:landscape) and (min-width:560px){
+  #game:not(.multi){grid-template-rows:auto minmax(0,1fr) auto;grid-template-columns:minmax(120px,1fr) minmax(0,3fr) minmax(120px,1fr);gap:10px}
+  #game:not(.multi) .topbar{grid-column:1/-1}
+  #game:not(.multi) .stage{grid-column:2;grid-row:2}
+  #game:not(.multi) .acts{grid-column:1/-1;grid-row:3}
+  #game:not(.multi) .buzzers{display:contents}
+  #game:not(.multi) .buzz.blue{grid-column:1;grid-row:2}
+  #game:not(.multi) .ansbox,#game:not(.multi) .soloBar{grid-column:1/-1}
+  #game:not(.multi) .buzz.red{grid-column:3;grid-row:2}
+  #game.one:not(.multi){grid-template-columns:minmax(0,3fr) minmax(160px,1.3fr)}
+  #game.one:not(.multi) .stage{grid-column:1}
+  #game.one:not(.multi) .buzz{grid-column:2!important;grid-row:2}
+}
+
+/* ---------- שופט ---------- */
+.modal{position:fixed;inset:0;background:rgba(26,20,5,.7);display:grid;place-items:center;padding:16px;z-index:10}
+.card{background:var(--stage);border:2px solid var(--gold);border-radius:18px;padding:18px;width:min(520px,100%);display:grid;gap:12px}
+.card h3{font-family:var(--display);font-weight:400;font-size:28px;margin:0}
+.card input{font:inherit;font-size:20px;color:var(--ink);background:var(--ground);border:1px solid var(--line);border-radius:10px;padding:12px;width:100%}
+.go{font-family:var(--display);font-size:20px;border:0;border-radius:12px;padding:12px 22px;background:var(--gold);color:var(--ground)}
+.go:disabled{opacity:.5}
+.verdict{border-radius:12px;padding:12px 14px;font-size:18px;line-height:1.5}
+.verdict b{font-family:var(--display);font-weight:400;font-size:26px;display:block}
+.verdict.good{background:rgba(43,214,123,.15);border:1px solid var(--good)}
+.verdict.maybe{background:rgba(255,196,0,.25);border:1px solid var(--gold)}
+.verdict.bad{background:rgba(255,90,90,.15);border:1px solid var(--bad)}
+
+/* ---------- ניצחון ---------- */
+#over{display:grid;place-items:center;text-align:center;min-height:100%;position:relative;overflow:hidden}
+#over h2{font-size:clamp(44px,13vw,100px)}
+#over .final{font-family:var(--display);font-size:38px;direction:ltr;margin:8px 0 22px}
+#over .final .b{color:var(--blue)}#over .final .r{color:var(--red)}
+#confetti{position:absolute;inset:0;pointer-events:none}
+/* ---------- פתיחה (למעלה במסך הבית) ---------- */
+.hero{position:relative;height:238px;border-radius:22px;overflow:hidden;cursor:pointer;user-select:none;-webkit-user-select:none;
+  background:radial-gradient(ellipse at 30% 30%,#6B4A00 0%,#2A1C02 55%,#0D0802 100%);box-shadow:0 6px 18px rgba(26,20,5,.35)}
+.hero .speed{position:absolute;inset:0;pointer-events:none}
+.hero .speed i{position:absolute;height:3px;border-radius:2px;background:linear-gradient(90deg,transparent,#FFD24D);opacity:0}
+.hero .speed i:nth-child(1){top:22%;width:30%}.hero .speed i:nth-child(2){top:34%;width:44%}.hero .speed i:nth-child(3){top:46%;width:26%}
+.hero .speed i:nth-child(4){top:58%;width:38%}.hero .speed i:nth-child(5){top:28%;width:18%}.hero .speed i:nth-child(6){top:52%;width:22%}
+.hero .shot{position:absolute;inset:0;overflow:hidden;opacity:0;will-change:transform,filter}
+.hero .shot img{position:absolute;left:-8%;top:-18%;width:116%;height:auto;min-height:136%;object-fit:cover}
+.hero .zap{position:absolute;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 80% 35%,rgba(255,244,190,.95),rgba(255,200,0,.35) 40%,transparent 70%)}
+.hero .badge{position:absolute;top:14px;left:calc(50% - 48px);width:96px;height:96px;border-radius:24px;opacity:0;box-shadow:0 0 0 3px #FFC400,0 0 24px rgba(255,196,0,.6)}
+.hero .ttl{position:absolute;top:116px;inset-inline:0;margin:0;text-align:center;font-family:var(--display);font-weight:400;font-size:clamp(46px,14vw,64px);line-height:1;direction:rtl}
+.hero .ttl span{display:inline-block;color:transparent;-webkit-text-stroke:2px #1A1405;opacity:0;
+  background:radial-gradient(circle at 30% 35%,#1A1405 0 3px,transparent 4px) 0 0/24px 20px,radial-gradient(circle at 75% 70%,#1A1405 0 2.5px,transparent 3.5px) 0 0/17px 15px,linear-gradient(180deg,#FFE27A,#F5B400);
+  -webkit-background-clip:text;background-clip:text}
+.hero .sub{position:absolute;top:190px;inset-inline:0;display:flex;justify-content:center;gap:8px;font-family:var(--display);font-size:20px;color:#FFE27A}
+.hero .sub span{opacity:0;display:inline-block}
+@media (prefers-reduced-motion:reduce){.hero .badge,.hero .ttl span,.hero .sub span{opacity:1!important}.hero .shot,.hero .zap{display:none}}
+/* ---------- פרופיל, נקודות ודרגות ---------- */
+.av{border-radius:50%;display:grid;place-items:center;overflow:hidden;flex:none;line-height:1;background:var(--avbg,#FFE27A)}
+.av img{width:100%;height:100%;object-fit:cover}
+.ringwrap{position:relative;display:grid;place-items:center}
+.ringwrap svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.ringwrap .track{stroke:rgba(26,20,5,.18)}
+.ringwrap .prog{stroke:var(--blue);stroke-linecap:round;transition:stroke-dashoffset .8s ease}
+.lvl{position:absolute;bottom:-4px;inset-inline-start:-4px;background:var(--ink);color:#FFC400;font-family:var(--display);border-radius:999px;min-width:26px;height:26px;padding:0 6px;display:grid;place-items:center;font-size:15px;border:2px solid var(--ground)}
+.profcorner{position:absolute;top:32px;inset-inline-start:28px;z-index:3;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;padding:0}
+.psearch{font:inherit;font-size:17px;padding:9px 12px;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--ink)}
+.pitem{cursor:pointer}
+.gearbtn{position:absolute;top:32px;inset-inline-end:28px;z-index:3;width:42px;height:42px;border-radius:50%;border:2px solid #1A1405;background:#FFC400;font-size:22px;display:grid;place-items:center;padding:0}
+.act[aria-pressed="true"]{border-color:var(--ink);background:#FFE27A}
+#wForm input{font:inherit;font-size:19px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink)}
+.ptsdot{background:#FFC400;color:#1A1405;border:2px solid #1A1405;border-radius:999px;padding:2px 9px;font-family:var(--display);font-size:14px;white-space:nowrap}
+#profile{max-width:640px;margin:0 auto;padding-block:18px 40px;display:flex;flex-direction:column;gap:16px}
+.profhead{display:flex;gap:16px;align-items:center}
+.profhead input{font:inherit;font-family:var(--display);font-size:24px;background:var(--stage);border:2px solid var(--line);border-radius:12px;padding:6px 10px;width:100%;color:var(--ink)}
+.lvlbar{background:var(--stage);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:6px}
+.lvlbar .bar{height:12px;border-radius:6px;background:rgba(26,20,5,.12);overflow:hidden}
+.lvlbar .bar i{display:block;height:100%;background:var(--blue);width:0;transition:width .8s}
+.avgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:8px}
+.avgrid button{all:unset;cursor:pointer;display:grid;place-items:center;border-radius:50%;border:3px solid transparent}
+.avgrid button[aria-pressed="true"]{border-color:var(--ink)}
+.plist{display:grid;gap:8px;width:min(420px,100%)}
+.pitem{display:flex;align-items:center;gap:10px;background:var(--stage);border:2px solid var(--line);border-radius:14px;padding:8px 10px;text-align:start;font-size:17px}
+.pitem .nm{flex:1;font-weight:700}
+.pitem .st{font-size:13px;color:var(--muted)}
+.pitem button{border:0;border-radius:10px;padding:8px 12px;font-family:var(--display);font-size:16px;background:var(--ink);color:#FFC400}
+.pitem button:disabled{opacity:.55}
+.plus{position:fixed;left:50%;top:18%;transform:translateX(-50%);font-family:var(--display);font-size:34px;color:var(--ink);background:#FFE27A;border:3px solid var(--ink);border-radius:999px;padding:4px 18px;z-index:20;pointer-events:none;animation:plusUp 1.3s ease-out forwards}
+@keyframes plusUp{0%{opacity:0;transform:translate(-50%,20px) scale(.7)}20%{opacity:1;transform:translate(-50%,0) scale(1.1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-40px)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<!-- בית -->
+<section id="home" class="screen">
+  <button class="gearbtn" id="gearBtn" aria-label="הגדרות">⚙️</button>
+  <button class="profcorner" id="profBtn" aria-label="הפרופיל שלי"><span class="ringwrap" id="profRing"></span><span class="ptsdot" id="ptsDot">0 ⭐</span></button>
+  <!-- פתיחה: הצ'יטה רצה עם ברקים, קופצת לתוך הלוגו, ואז השם מופיע. לחיצה = מההתחלה -->
+  <div class="hero" id="hero" role="button" tabindex="0" aria-label="הצ'יטה · ראש בראש · זריזות · מחשבה (לחצו כדי לראות שוב)">
+    <div class="speed" id="speed" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="shot" id="shot" aria-hidden="true"><img src="data:image/webp;base64,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" alt=""></div>
+    <div class="zap" id="zap" aria-hidden="true"></div>
+    <img class="badge" id="badge" alt="" src="data:image/webp;base64,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">
+    <h1 class="ttl" id="ttl"><span>ה</span><span>צ</span><span>'</span><span>י</span><span>ט</span><span>ה</span></h1>
+    <div class="sub" id="sub"><span>ראש בראש</span><span>·</span><span>זריזות</span><span>·</span><span>מחשבה</span></div>
+  </div>
+  <div class="install" id="installBox">
+    <a class="go" id="installBtn" href="https://dandooger.github.io/hazira-staging/" target="_blank" rel="noopener">📲 התקן אפליקציה</a>
+    <span class="note" id="installNote">פותח את האפליקציה באתר שלה. שם לוחצים שוב "התקן אפליקציה", והיא תופיע כאייקון בטלפון.</span>
+  </div>
+
+  <div class="how">
+    <div><b>1. לוחצים ראשונים.</b> כשהתמונה עולה, <span class="bl">הכחול</span> לוחץ על הכפתור הכחול ו<span class="rd">האדום</span> על האדום. מי שלחץ ראשון עונה בקול, ויש לו 10 שניות.</div>
+    <div><b>2. השני שופט.</b> לוחצים "תראו תשובה" (או מחכים שהזמן ייגמר). לא בטוחים אם זה נחשב? שואלים את השופט.</div>
+    <div><b>3. נקודות.</b> נכון = נקודה למי שענה. טעות = נקודה ליריב. אף אחד לא יודע? עוברים לתמונה הבאה. הראשון שמגיע ליעד מנצח.</div>
+  </div>
+
+  <div class="row">
+    <h2>מצב</h2>
+    <div class="modes" id="modes">
+      <button class="mode" data-m="duo" aria-pressed="true"><b>👥 ביחד</b><span>2 עד 6 על טלפון אחד</span></button>
+      <button class="mode" data-m="solo" aria-pressed="false"><b>🙋 לבד</b><span>נגד השעון</span></button>
+      <button class="mode" data-m="online" aria-pressed="false" id="modeOnline"><b>🌐 אונליין</b><span>כל אחד מהטלפון שלו</span></button>
+    </div>
+  </div>
+  <div class="row" id="playersRow">
+    <h2>כמה שחקנים</h2>
+    <div class="target"><button id="pMinus" aria-label="פחות">−</button><output id="pVal">2</output><button id="pPlus" aria-label="יותר">+</button></div>
+  </div>
+  <div class="note" id="modeNote"></div>
+  <div class="joinbox" id="joinBox" hidden>
+    <b>יש לך קוד מחבר? הצטרף:</b>
+    <div class="row"><input id="joinCode" inputmode="numeric" maxlength="5" placeholder="12345" autocomplete="off"><button class="go" id="joinGo">הצטרף</button></div>
+    <span class="note">או בחר קטגוריה למטה כדי <b>ליצור חדר</b> ולשלוח קוד לחבר.</span>
+    <div class="err" id="joinErr" hidden></div>
+    <b>🟢 מחוברים עכשיו:</b>
+    <input class="psearch" id="homeSearch" type="search" placeholder="🔍 חיפוש לפי שם" autocomplete="off">
+    <div class="plist" id="homeList" style="width:100%"></div>
+  </div>
+
+  <div class="row">
+    <h2 id="tLbl">משחקים עד</h2>
+    <div class="target"><button id="tMinus" aria-label="פחות">−</button><output id="tVal">10</output><button id="tPlus" aria-label="יותר">+</button></div>
+    <span class="note" id="tUnit">נקודות</span>
+  </div>
+
+  <div class="row">
+    <h2>רמה</h2>
+    <div class="levels" id="levels">
+      <button class="lv" data-lv="easy" aria-pressed="false"><b>קל</b><span>כולם יודעים, גם ילד בן 10</span></button>
+      <button class="lv" data-lv="medium" aria-pressed="true"><b>בינוני</b><span>ידע כללי</span></button>
+      <button class="lv" data-lv="hard" aria-pressed="false"><b>קשה</b><span>למביני עניין</span></button>
+    </div>
+  </div>
+
+  <h2>בחרו קטגוריה</h2>
+  <div class="err" id="hErr" hidden></div>
+  <div class="cats" id="cats"></div>
+
+  <div class="pc-only note">✨ <b>קטגוריה משלכם</b> (שClaude ממציא) עובדת רק בגרסה של המחשב, כי שם אפשר להביא תמונות מהאינטרנט.</div>
+</section>
+
+<!-- חדר אונליין -->
+<section id="lobby" class="screen" hidden>
+  <div style="display:grid;gap:16px;justify-items:center">
+    <h2 id="lobbyTitle">החדר מוכן!</h2>
+    <div class="code" id="lobbyCode">·····</div>
+    <div class="note" id="lobbyNote">שלח לחבר את הקוד. הוא פותח את האפליקציה, בוחר "אונליין" ומקליד אותו.</div>
+    <div class="row" style="justify-content:center"><button class="go" id="shareCode">📤 שלח לחבר</button><button class="ghost" id="lobbyCancel">ביטול</button></div>
+    <div class="spinner" style="width:40px;height:40px;border-width:5px"></div>
+    <h2 style="font-size:20px">או הזמן מי שמחובר עכשיו:</h2>
+    <input class="psearch" id="lobbySearch" type="search" placeholder="🔍 חפש שחקן לפי שם" autocomplete="off" style="width:min(420px,100%)">
+    <div class="plist" id="onlineList"></div>
+    <div class="note" id="inviteNote" hidden></div>
+  </div>
+</section>
+
+<!-- פרופיל -->
+<!-- הגדרות -->
+<section id="settings" class="screen" hidden>
+  <div style="max-width:640px;margin:0 auto;padding-block:18px 40px;display:flex;flex-direction:column;gap:16px">
+    <div class="row" style="justify-content:space-between"><h2>⚙️ הגדרות</h2><button class="ghost" id="setBack">חזרה ←</button></div>
+    <div class="lvlbar"><b id="setWho"></b><span class="note" id="setAcct"></span></div>
+    <button class="go" id="setLogin">🔑 התחברות לחשבון אחר</button>
+    <div class="lvlbar">
+      <b>🔒 שינוי סיסמה</b>
+      <form id="passForm" style="display:grid;gap:8px" autocomplete="on">
+        <input name="username" autocomplete="username" id="passUser" hidden>
+        <input id="newPass" type="password" autocomplete="new-password" placeholder="סיסמה חדשה (לפחות 4)" style="font:inherit;font-size:18px;padding:10px;border-radius:10px;border:1px solid var(--line);background:#fff">
+        <button class="act" type="submit">שמור סיסמה</button>
+        <div class="note" id="passMsg" hidden></div>
+      </form>
+    </div>
+    <div class="note">🔒 הסיסמה נשמרת מוצפנת. בכל זאת — תבחר סיסמה רק למשחק הזה.</div>
+  </div>
+</section>
+
+<section id="profile" class="screen" hidden>
+  <div class="row" style="justify-content:space-between"><h2>הפרופיל שלי</h2><button class="ghost" id="profBack">חזרה ←</button></div>
+  <div class="profhead"><span class="ringwrap" id="profBig"></span><input id="profName" maxlength="14" autocomplete="off" aria-label="שם משתמש"></div>
+  <div class="err" id="profNameErr" hidden></div>
+  <div class="lvlbar"><b id="profLvl"></b><div class="bar"><i id="profBar"></i></div><span class="note" id="profNext"></span></div>
+  <h2 style="font-size:20px">בחר תמונה</h2>
+  <div class="row"><button class="go" id="profPhoto">🖼️ תמונה מהגלריה</button><input type="file" id="profFile" accept="image/*" hidden></div>
+  <div class="note">תמונה מהגלריה נשמרת רק בטלפון שלך. חברים באונליין רואים רק את התמונות המוכנות.</div>
+  <div class="avgrid" id="avGrid"></div>
+</section>
+
+<!-- טעינה -->
+<section id="loading" class="screen" hidden>
+  <div><div class="spinner"></div><h2 id="loadMsg">מביא תמונות…</h2></div>
+</section>
+
+<!-- משחק -->
+<section id="game" class="screen" hidden>
+  <div class="topbar">
+    <div class="title"><span id="gTitle"></span><small id="gRound"></small></div>
+    <button class="ghost" id="quit">יציאה</button>
+  </div>
+  <!-- 4-5 שחקנים: שורת כפתורים ותמונה הפוכות, בשביל מי שיושב מול הטלפון -->
+  <div class="buzzers top" id="buzzersTop" hidden></div>
+  <div class="stage mirror" id="stage2" hidden aria-hidden="true"></div>
+  <div class="stage hide" id="stage">
+    <div class="pic" id="picWrap"><img id="pic" alt=""><div class="emo" id="emo" hidden></div></div>
+    <div class="timer" id="timer" hidden></div>
+    <div class="hintchip" id="hintchip" hidden></div>
+    <div class="count" id="count"></div>
+  </div>
+  <div class="acts" id="acts"></div>
+  <div class="ansbox" id="ansBox" hidden>
+    <button class="mic" id="micBtn" aria-label="מיקרופון">🎤</button>
+    <input id="ansIn" placeholder="אמור או כתוב את התשובה" autocomplete="off" enterkeyhint="send">
+    <button class="send" id="ansGo">שלח</button>
+  </div>
+  <div class="soloBar" id="soloBar" hidden>
+    <div class="ok"><b id="soloOk">0</b><span id="soloOkLbl">נכונות מתוך 10</span></div>
+    <div class="no"><b id="soloNo">0</b><span id="soloNoLbl">טעויות · מותר עד 5</span></div>
+  </div>
+  <div class="buzzers" id="buzzers"></div>
+</section>
+
+<!-- שופט -->
+<div class="modal" id="judge" hidden>
+  <div class="card" role="dialog" aria-labelledby="jH">
+    <h3 id="jH">⚖️ השופט</h3>
+    <div class="note" id="jCtx"></div>
+    <input id="jSaid" placeholder="מה הוא אמר בדיוק?" autocomplete="off">
+    <div class="row"><button class="go" id="jGo">תשפוט</button><button class="ghost" id="jClose">סגור</button></div>
+    <div class="verdict" id="jRes" hidden></div>
+  </div>
+</div>
+
+<!-- כניסה ראשונה: איך קוראים לך -->
+<div class="modal" id="welcome" hidden>
+  <div class="card" role="dialog" aria-labelledby="wH">
+    <h3 id="wH">🐆 ברוך הבא לצ'יטה!</h3>
+    <div class="row" id="wTabs" style="gap:8px"><button class="act" id="wTabNew" type="button">✨ משתמש חדש</button><button class="act" id="wTabLogin" type="button">🔑 יש לי כבר חשבון</button></div>
+    <form id="wForm" style="display:grid;gap:10px" autocomplete="on">
+      <div class="note" id="wNote">איך אתה רוצה שיקראו לך? זה השם שחברים יראו באונליין.</div>
+      <input id="wName" name="username" maxlength="14" placeholder="שם משתמש" autocomplete="username">
+      <input id="wPass" name="password" type="password" placeholder="סיסמה (לפחות 4 אותיות או מספרים)" autocomplete="new-password">
+      <div id="wAvBox"><div class="note">בחר תמונה (אפשר לשנות אחר כך בפרופיל):</div>
+      <div class="avgrid" id="wGrid" style="max-height:150px;overflow:auto"></div></div>
+      <div class="err" id="wErr" hidden></div>
+      <div class="row"><button class="go" id="wGo" type="submit">יאללה, מתחילים!</button><button class="ghost" id="wCancel" type="button" hidden>ביטול</button></div>
+      <div class="note" id="wSafe" style="font-size:13px">🔒 תבחר סיסמה רק למשחק הזה, לא את הסיסמה של הג'ימייל.</div>
+    </form>
+  </div>
+</div>
+
+<!-- הפרופיל של שחקן אחר -->
+<div class="modal" id="pview" hidden>
+  <div class="card" role="dialog" aria-labelledby="pvName" style="text-align:center;justify-items:center">
+    <span class="ringwrap" id="pvAv"></span>
+    <h3 id="pvName"></h3>
+    <div class="lvlbar" style="width:100%"><b id="pvLvl"></b><div class="bar"><i id="pvBar"></i></div><span class="note" id="pvSt"></span></div>
+    <div class="row" style="justify-content:center"><button class="go" id="pvInvite" hidden>🎮 הזמן לשחק</button><button class="ghost" id="pvClose">סגור</button></div>
+  </div>
+</div>
+
+<!-- הזמנה למשחק -->
+<div class="modal" id="invite" hidden>
+  <div class="card" role="dialog" aria-labelledby="invH" style="text-align:center;justify-items:center">
+    <span id="invAv"></span>
+    <h3 id="invH"></h3>
+    <div class="note" id="invWhat"></div>
+    <div class="row" style="justify-content:center"><button class="go" id="invYes">✓ הצטרף</button><button class="ghost" id="invNo">לא עכשיו</button></div>
+  </div>
+</div>
+
+<!-- עלית דרגה -->
+<div class="modal" id="lvlUp" hidden>
+  <div class="card" style="text-align:center;justify-items:center">
+    <span id="lvlUpAv"></span>
+    <h3 id="lvlUpT"></h3>
+    <div class="row" style="justify-content:center"><button class="go" id="lvlUpOk">איזה כיף! 🎉</button></div>
+  </div>
+</div>
+
+<!-- איך מתקינים -->
+<div class="modal" id="installHelp" hidden>
+  <div class="card" role="dialog" aria-labelledby="iH">
+    <h3 id="iH">📲 איך מתקינים</h3>
+    <div class="steps" id="installSteps"></div>
+    <div class="row"><button class="go" id="installClose">הבנתי</button></div>
+  </div>
+</div>
+
+<!-- ניצחון -->
+<section id="over" class="screen" hidden>
+  <canvas id="confetti"></canvas>
+  <div style="position:relative">
+    <h2 id="winTxt"></h2>
+    <div class="final" id="final"></div>
+    <div class="row" style="justify-content:center"><button class="go" id="again">עוד משחק</button><button class="ghost" id="toMenu">קטגוריה אחרת</button></div>
+  </div>
+</section>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const show = (id) => { for (const s of ["home", "loading", "lobby", "game", "over", "profile", "settings"]) $(s).hidden = s !== id; if ((id === "home" || id === "over") && window.nextInvite) setTimeout(nextInvite, 400); };
+
+// ---------- צלילים ----------
+let ac;
+function beep(freq, dur = .15, type = "sine", vol = .25, when = 0) {
+  if (document.hidden) return; // האפליקציה ברקע או שהמסך כבוי — שקט
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    if (ac.state === "suspended") ac.resume();
+    const t = ac.currentTime + when, o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+    o.connect(g).connect(ac.destination); o.start(t); o.stop(t + dur);
+  } catch (e) {}
+}
+const sfx = {
+  tick: () => beep(660, .12, "square", .12),
+  go: () => beep(990, .3, "square", .15),
+  buzz: (k) => { const f = { blue: 330, red: 262, green: 392, yellow: 294, purple: 440, pink: 494 }[k] || 330; beep(f, .35, "sawtooth", .2); beep(f * 1.33, .35, "sawtooth", .12, .05); },
+  good: () => { beep(660, .12, "triangle", .3); beep(880, .12, "triangle", .3, .12); beep(1320, .25, "triangle", .3, .24); },
+  bad: () => beep(200, .45, "sawtooth", .22),
+  win: () => [523, 659, 784, 1047].forEach((f, i) => beep(f, .35, "triangle", .3, i * .15)),
+};
+const buzzVibrate = () => { try { navigator.vibrate && navigator.vibrate(60); } catch (e) {} };
+// יוצאים מהאפליקציה או מכבים מסך — הצלילים והמיקרופון נעצרים. חוזרים — המיקרופון חוזר אם באמצע תשובה
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) { try { ac && ac.suspend(); } catch (e) {} stopListening(); }
+  else if (onAnswer && SR && IS_APP) { listenWanted = true; listenRestarts = 0; startListening(); }
+});
+
+// ---------- בית ----------
+let target = 10, level = "medium";
+const LEVEL_NAME = { easy: "קל", medium: "בינוני", hard: "קשה" };
+const setTarget = (v) => { target = Math.max(3, Math.min(30, v)); $("tVal").value = target; $("tVal").textContent = target; paintMode(); };
+$("tMinus").onclick = () => setTarget(target - 1);
+$("tPlus").onclick = () => setTarget(target + 1);
+let players = 2;
+const setPlayers = (v) => { players = Math.max(2, Math.min(6, v)); $("pVal").value = players; $("pVal").textContent = players; paintMode(); };
+$("pMinus").onclick = () => setPlayers(players - 1);
+$("pPlus").onclick = () => setPlayers(players + 1);
+$("levels").addEventListener("click", (e) => {
+  const b = e.target.closest(".lv"); if (!b) return;
+  level = b.dataset.lv;
+  document.querySelectorAll(".lv").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+});
+
+fetch("data/index.json").then((r) => r.json()).then((cats) => {
+  for (const c of cats) {
+    const b = document.createElement("button");
+    b.className = "cat";
+    b.innerHTML = `<span class="ic"></span><span class="nm"></span><span class="ru"></span>`;
+    b.querySelector(".ic").textContent = c.icon;
+    b.querySelector(".nm").textContent = c.name;
+    b.querySelector(".ru").textContent = c.rules;
+    b.onclick = () => loadCategory(c);
+    $("cats").append(b);
+  }
+}).catch(() => { $("hErr").textContent = "לא הצלחתי לטעון את הקטגוריות. נסו לרענן את הדף."; $("hErr").hidden = false; });
+
+// ---------- מצבי משחק ----------
+let mode = "duo";
+const IS_APP = !!window.HAZIRA_IS_APP;
+// לבד: מותר לטעות עד חצי ממספר הנכונות. טעות אחת מעבר לחצי — נפסלים (14 → 7 מותר, 8 פוסל)
+const soloOut = (t) => Math.floor(t / 2) + 1;
+const MODE_NOTE = {
+  duo: () => `שימו את הטלפון באמצע השולחן: ${Math.ceil(players / 2)} מצד אחד ו-${Math.floor(players / 2)} מהצד השני. יש שתי תמונות, אחת הפוכה בשביל מי שיושב ממול.`
+    + (players === 2 ? "" : " נכון = נקודה למי שענה. טעות = יורדת לו נקודה."),
+  solo: () => `משחק לבד: צריך ${target} נכונות. מותר לטעות עד חצי (${soloOut(target) - 1}), והטעות ה-${soloOut(target)} פוסלת! עונים במיקרופון 🎤 או בהקלדה.`,
+  online: IS_APP ? "כל אחד משחק מהטלפון שלו. מי שלוחץ ראשון עונה במיקרופון 🎤 או בהקלדה, והשופט בודק." : "מצב אונליין עובד רק באפליקציה (לחצו \"התקן אפליקציה\" למעלה).",
+};
+function paintMode() {
+  document.querySelectorAll(".mode").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.m === mode)));
+  const n = MODE_NOTE[mode]; $("modeNote").textContent = typeof n === "function" ? n() : n; $("modeNote").hidden = !$("modeNote").textContent;
+  $("joinBox").hidden = !(mode === "online" && IS_APP);
+  $("playersRow").hidden = mode !== "duo";
+  $("tLbl").textContent = mode === "solo" ? "כמה נכונות צריך" : "משחקים עד";
+  $("tUnit").textContent = mode === "solo" ? "תשובות נכונות" : "נקודות";
+}
+$("modes").addEventListener("click", (e) => { const b = e.target.closest(".mode"); if (!b) return; mode = b.dataset.m; paintMode(); });
+paintMode();
+
+// ---------- זיכרון: אילו תמונות כבר ראית (כדי שכל משחק יהיה שונה) ----------
+const SEEN_KEY = "hazira-stg-seen-v1";
+let seen = {};
+try { seen = JSON.parse(localStorage.getItem(SEEN_KEY) || "{}"); } catch (e) { seen = {}; }
+const seenKey = (it) => (it.w || it.emoji || it.a) + "|" + (it.fx || "");
+function markSeen(it) { const k = seenKey(it); seen[k] = (seen[k] || 0) + 1; try { localStorage.setItem(SEEN_KEY, JSON.stringify(seen)); } catch (e) {} }
+// הסדר של כל משחק: קודם מה שראית הכי מעט. כשכל התמונות של הרמה כבר נראו,
+// תמונה חדשה מרמה קרובה באה לפני תמונה שכבר ראית — ככה כל משחק שונה
+function deckOrder(items, reserve) {
+  const all = [...items.map((it) => [it, 0]), ...reserve.map((it) => [it, 1])];
+  return shuffleArr(all).map(([it, r], i) => [it, seen[seenKey(it)] || 0, r, i])
+    .sort((a, b) => a[1] - b[1] || a[2] - b[2] || a[3] - b[3]).map((x) => x[0]);
+}
+
+// רזרבה: אם התמונות של הרמה נגמרות, ממשיכים עם הרמה הכי קרובה
+const NEAR = { easy: ["medium"], medium: ["easy", "hard"], hard: ["medium"] };
+const catCache = {};
+const getCat = async (id) => catCache[id] || (catCache[id] = await (await fetch("data/" + id + ".json")).json());
+const shuffleArr = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+async function loadRiddle(c) {
+  // כדי שלא ייקח הרבה זמן להוריד, לוקחים תמונות מ-4 קטגוריות אקראיות מהרשימה
+  const ids = shuffleArr([...c.sources]).slice(0, 4);
+  const cats = await Promise.all(ids.map(getCat));
+  const pick = (lv) => shuffleArr(cats.flatMap((d) => (d.levels[lv] || []).map((it, i) => [it, i]).filter(([it]) => it.img)
+    .map(([it, i]) => ({ ...it, fx: c.riddle, fxLevel: lv, hint: d.icon + " " + d.name, ref: { c: d.id, lv, i, fx: c.riddle, fxLevel: lv, hint: d.icon + " " + d.name } }))));
+  return { name: c.name, icon: c.icon, rules: c.rules, levelName: LEVEL_NAME[level], items: pick(level), reserve: NEAR[level].flatMap(pick) };
+}
+async function buildDeck(c) {
+  if (c.riddle) return loadRiddle(c);
+  const d = await getCat(c.id);
+  const withRef = (lv) => (d.levels[lv] || []).map((it, i) => ({ ...it, ref: { c: d.id, lv, i } }));
+  return { name: d.name, icon: d.icon, rules: d.rules, levelName: LEVEL_NAME[level], items: withRef(level), reserve: NEAR[level].flatMap(withRef) };
+}
+async function loadCategory(c) {
+  beep(1, .01, "sine", .001); // מעיר את הצלילים בלחיצה הראשונה
+  if (mode === "online") { if (IS_APP) hostRoom(c); else { $("hErr").textContent = MODE_NOTE.online; $("hErr").hidden = false; } return; }
+  $("loadMsg").textContent = "מביא תמונות של " + c.name + " (" + LEVEL_NAME[level] + ")…";
+  show("loading");
+  try {
+    const deck = await buildDeck(c);
+    if (mode === "solo") startSolo(deck); else startGame(deck);
+  } catch (e) {
+    show("home");
+    $("hErr").textContent = "לא הצלחתי לטעון את התמונות. נסו שוב."; $("hErr").hidden = false;
+  }
+}
+
+// ---------- משחק ----------
+const G = { deck: null, queue: [], reserve: [], item: null, score: { blue: 0, red: 0 }, players: ["blue", "red"], round: 0, phase: "idle", buzzer: null, timers: [] };
+const PLAYERS = [
+  { k: "blue", name: "כחול", heb: "הכחול", cls: "bl" },
+  { k: "red", name: "אדום", heb: "האדום", cls: "rd" },
+  { k: "green", name: "ירוק", heb: "הירוק", cls: "gr" },
+  { k: "yellow", name: "צהוב", heb: "הצהוב", cls: "yl" },
+  { k: "purple", name: "סגול", heb: "הסגול", cls: "pu" },
+  { k: "pink", name: "ורוד", heb: "הוורוד", cls: "pk" },
+];
+const other = (p) => (p === "blue" ? "red" : "blue");
+const heb = Object.fromEntries(PLAYERS.map((p) => [p.k, p.heb]));
+const cls = Object.fromEntries(PLAYERS.map((p) => [p.k, p.cls]));
+const pname = Object.fromEntries(PLAYERS.map((p) => [p.k, p.name]));
+const cap = (k) => k[0].toUpperCase() + k.slice(1);
+const btn = (k) => $("b" + cap(k));
+const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const later = (fn, ms) => G.timers.push(setTimeout(fn, ms));
+const clearTimers = () => { G.timers.forEach(clearTimeout); G.timers = []; };
+
+let wakeLock = null;
+async function keepAwake() { try { wakeLock = await navigator.wakeLock.request("screen"); } catch (e) {} }
+document.addEventListener("visibilitychange", () => { if (!document.hidden && !$("game").hidden) keepAwake(); });
+
+// בונה כפתור לכל שחקן. על טלפון אחד: חצי מהכפתורים למעלה והפוכים, ותמונה שנייה הפוכה
+function buildBuzzers(keys) {
+  const two = G.mode === "duo" && keys.length >= 2; // על טלפון אחד: חצי מהשחקנים מכל צד
+  const bottom = two ? keys.slice(0, Math.ceil(keys.length / 2)) : keys, top = two ? keys.slice(bottom.length) : [];
+  const make = (k) => {
+    const p = PLAYERS.find((x) => x.k === k), C = cap(k);
+    const b = document.createElement("button");
+    b.className = "buzz " + k; b.id = "b" + C; b.setAttribute("aria-label", p.name + " לוחץ");
+    b.innerHTML = `<span class="who">${p.name}</span><span class="score" id="sc${C}">0</span><span class="bar"><i id="bar${C}"></i></span><span class="vs" hidden></span><span class="tap">לחץ!</span>`;
+    if (k === "blue" && G.mode === "duo" && prof.name) b.querySelector(".who").textContent = "🔵 " + prof.name; // הכחול זה אני (מקבל נקודות)
+    b.addEventListener("pointerdown", (e) => { e.preventDefault(); if (G.mode === "online") onlineBuzz(); else buzz(k); });
+    return b;
+  };
+  $("buzzers").replaceChildren(...bottom.map(make)); $("buzzers").style.setProperty("--n", Math.max(1, bottom.length));
+  $("buzzersTop").replaceChildren(...top.map(make)); $("buzzersTop").style.setProperty("--n", Math.max(1, top.length));
+  $("buzzersTop").hidden = $("stage2").hidden = !two;
+  $("game").classList.toggle("multi", keys.length > 2 || two);
+  $("game").classList.toggle("two-sides", two);
+  $("game").classList.toggle("one", keys.length === 1);
+  syncMirror();
+}
+function setPanels(m, keys) {
+  G.mode = m; G.players = keys || [];
+  buildBuzzers(G.players);
+  $("buzzers").hidden = m === "solo"; $("soloBar").hidden = m !== "solo"; $("ansBox").hidden = true;
+}
+
+// התמונה ההפוכה: עותק של הבמה שמתעדכן לבד. מעתיקים רק מה שהשתנה, כדי שאנימציות לא יתחילו מחדש
+let mirrorHtml = [];
+function syncMirror() {
+  const m = $("stage2");
+  if (m.hidden) { if (mirrorHtml.length) { m.replaceChildren(); mirrorHtml = []; } return; }
+  m.className = $("stage").className + " mirror";
+  const src = [...$("stage").children].map((n) => n.outerHTML.replace(/\sid="[^"]*"/g, ""));
+  const kids = [...m.children];
+  src.forEach((h, i) => {
+    if (mirrorHtml[i] === h && kids[i]) return;
+    const t = document.createElement("template"); t.innerHTML = h;
+    if (kids[i]) kids[i].replaceWith(t.content.firstChild); else m.append(t.content.firstChild);
+  });
+  kids.slice(src.length).forEach((n) => n.remove());
+  mirrorHtml = src;
+}
+new MutationObserver(() => syncMirror())
+  .observe($("stage"), { subtree: true, childList: true, attributes: true, characterData: true });
+
+function startGame(deck) {
+  const keys = PLAYERS.slice(0, players).map((p) => p.k);
+  setPanels("duo", keys);
+  G.deck = deck; G.queue = deckOrder(deck.items, deck.reserve); G.reserve = [];
+  G.score = Object.fromEntries(keys.map((k) => [k, 0])); G.round = 0;
+  $("gTitle").textContent = deck.icon + " " + deck.name + " · " + deck.levelName;
+  paintScore();
+  show("game");
+  keepAwake();
+  nextRound();
+}
+
+function paintScore() {
+  for (const k of G.players) {
+    $("sc" + cap(k)).textContent = G.score[k];
+    $("bar" + cap(k)).style.width = Math.min(100, G.score[k] / target * 100) + "%";
+  }
+}
+function setSides(on) {
+  for (const p of G.players) {
+    const el = btn(p); if (!el) continue;
+    el.classList.toggle("on", on === p);
+    el.classList.toggle("off", !!on && on !== p);
+  }
+}
+function acts(html) { $("acts").innerHTML = html; }
+
+// מכין תמונה על הבמה (מוסתרת עד סוף הספירה)
+function prepPicture(item) {
+  clearTimers(); stopAnswerTimer(); stopListening();
+  $("judge").hidden = true; $("ansBox").hidden = true;
+  document.querySelectorAll(".answer,.flash").forEach((n) => n.remove());
+  G.item = item; markSeen(item);
+  $("stage").classList.add("hide");
+  const wrap = $("picWrap"); wrap.style.width = wrap.style.height = "0px";
+  $("emo").hidden = !G.item.emoji; $("pic").hidden = !!G.item.emoji;
+  if (G.item.emoji) { G.fx = null; G.fxOn = false; $("hintchip").hidden = true; $("pic").style.filter = ""; $("emo").textContent = G.item.emoji; layoutPic(); }
+  else { setupFx(); $("pic").onload = () => { checkSilhouette(); layoutPic(); }; $("pic").src = G.item.img; }
+}
+// ספירה 3-2-1 ואז פותחים את התמונה
+function countdown(then) {
+  let n = 3;
+  const step = () => {
+    if (n > 0) {
+      const c = $("count"); c.textContent = n; c.classList.remove("tick"); void c.offsetWidth; c.classList.add("tick");
+      sfx.tick(); n--; later(step, 1000);
+    } else {
+      $("count").textContent = ""; $("count").classList.remove("tick");
+      $("stage").classList.remove("hide"); layoutPic(); sfx.go();
+      then();
+    }
+  };
+  step();
+}
+function showAnswerOnStage() {
+  revealFx();
+  const a = document.createElement("div");
+  a.className = "answer";
+  a.textContent = G.item.a;
+  if (G.item.alt && G.item.alt.length) { const s = document.createElement("small"); s.textContent = "נחשב גם: " + G.item.alt.join(" · "); a.append(s); }
+  $("stage").append(a);
+}
+function flash(ok, text) {
+  const f = document.createElement("div");
+  f.className = "flash " + (ok ? "good" : "bad");
+  f.textContent = text || (ok ? "✓ נכון!" : "✗ טעות");
+  $("stage").append(f);
+  (ok ? sfx.good : sfx.bad)();
+}
+
+function nextRound() {
+  clearTimers(); stopAnswerTimer();
+  $("judge").hidden = true;
+  document.querySelectorAll(".answer,.flash").forEach((n) => n.remove());
+  if (!G.queue.length) G.queue = deckOrder(G.deck.items, G.deck.reserve);
+  G.item = G.queue.shift(); G.round++; G.buzzer = null; markSeen(G.item);
+  $("gRound").textContent = "תמונה " + G.round;
+  setSides(null);
+  $("stage").classList.add("hide");
+  const wrap = $("picWrap"); wrap.style.width = wrap.style.height = "0px";
+  // אימוג'ים או תמונה
+  $("emo").hidden = !G.item.emoji; $("pic").hidden = !!G.item.emoji;
+  if (G.item.emoji) { G.fx = null; G.fxOn = false; $("hintchip").hidden = true; $("pic").style.filter = ""; $("emo").textContent = G.item.emoji; layoutPic(); }
+  else { setupFx(); $("pic").onload = () => { checkSilhouette(); layoutPic(); }; $("pic").src = G.item.img; }
+  G.phase = "countdown";
+  acts("מתכוננים… אצבעות על הכפתורים 👇");
+  let n = 3;
+  const step = () => {
+    if (n > 0) {
+      const c = $("count"); c.textContent = n; c.classList.remove("tick"); void c.offsetWidth; c.classList.add("tick");
+      sfx.tick(); n--; later(step, 1000);
+    } else {
+      $("count").textContent = ""; $("count").classList.remove("tick");
+      openPicture();
+    }
+  };
+  step();
+}
+
+// התמונה בגודל שמתאים לבמה; אם יש "חיתוך" (למשל שם שכתוב על סמל) מראים רק את החלק הנבחר
+const graphemes = (s) => { try { return [...new Intl.Segmenter().segment(s)].length; } catch (e) { return [...s].length; } };
+function layoutPic() {
+  const img = $("pic"), wrap = $("picWrap");
+  if (G.item && G.item.emoji) {
+    const box = $("stage").getBoundingClientRect();
+    const w = box.width * 0.9, hh = box.height * 0.6;
+    wrap.style.width = w + "px"; wrap.style.height = hh + "px";
+    const emo = $("emo");
+    let size = Math.min(hh * 0.62, w * 0.68 / graphemes(G.item.emoji));
+    emo.style.fontSize = size + "px";
+    // אם המכשיר מצייר אימוג'י מסוים כשני חלקים, מקטינים עד שהכל נכנס
+    while (emo.scrollWidth > emo.clientWidth && size > 12) { size *= 0.9; emo.style.fontSize = size + "px"; }
+    return;
+  }
+  if (!img.naturalWidth || !G.item) return;
+  let [t, r, b, l] = G.item.crop || [0, 0, 0, 0];
+  if (G.fx === "zoom" && G.zoom) {
+    // רואים רק חלון קטן בתוך התמונה
+    const bw = 1 - l - r, bh = 1 - t - b, z = G.zoom;
+    l = l + bw * z.x; t = t + bh * z.y; r = 1 - (l + bw * z.s); b = 1 - (t + bh * z.s);
+  }
+  const W = img.naturalWidth, H = img.naturalHeight;
+  const cw = W * (1 - l - r), ch = H * (1 - t - b);
+  const box = $("stage").getBoundingClientRect();
+  const s = Math.min(box.width * 0.92 / cw, box.height * 0.9 / ch);
+  wrap.style.width = cw * s + "px"; wrap.style.height = ch * s + "px";
+  img.style.width = W * s + "px"; img.style.height = H * s + "px";
+  img.style.left = -l * W * s + "px"; img.style.top = -t * H * s + "px";
+  applyFx();
+}
+
+// ---------- חידות על תמונות ----------
+const FX_STRENGTH = { zoom: { easy: 0.5, medium: 0.32, hard: 0.2 }, blur: { easy: 5, medium: 9, hard: 14 }, tiles: { easy: 2, medium: 3, hard: 4 } };
+function setupFx() {
+  G.fx = G.item.fx || null; G.fxOn = !!G.fx; G.zoom = G.item.zoomSeed || null; G.tileOrder = G.item.tileSeed || null;
+  if (G.fx === "zoom" && !G.zoom) {
+    const s = FX_STRENGTH.zoom[G.item.fxLevel] || 0.32;
+    const pad = Math.min(0.12, (1 - s) / 2);
+    G.zoom = { s, x: pad + Math.random() * (1 - s - 2 * pad), y: pad + Math.random() * (1 - s - 2 * pad) };
+  }
+  $("hintchip").hidden = !(G.item.hint && G.item.fxLevel === "easy");
+  $("hintchip").textContent = "רמז: " + (G.item.hint || "");
+  document.querySelectorAll(".tiles").forEach((n) => n.remove());
+}
+// צל עובד רק לתמונה עם רקע שקוף. אם הרקע לא שקוף — מטשטשים במקום
+function checkSilhouette() {
+  if (G.fx !== "silhouette") return;
+  try {
+    const img = $("pic"), cv = document.createElement("canvas");
+    cv.width = 40; cv.height = 40;
+    const ctx = cv.getContext("2d"); ctx.drawImage(img, 0, 0, 40, 40);
+    const d = ctx.getImageData(0, 0, 40, 40).data;
+    let clear = 0; for (let i = 3; i < d.length; i += 4) if (d[i] < 20) clear++;
+    if (clear < 40 * 40 * 0.08) G.fx = "blur";
+  } catch (e) { G.fx = "blur"; }
+}
+function applyFx() {
+  const img = $("pic"), wrap = $("picWrap");
+  const on = G.fxOn && !!G.fx;
+  const lvl = (G.item && G.item.fxLevel) || "medium";
+  img.style.filter = !on ? "" : G.fx === "blur" ? "blur(" + FX_STRENGTH.blur[lvl] + "px)" : G.fx === "silhouette" ? "brightness(0)" : "";
+  wrap.querySelectorAll(".tiles").forEach((n) => n.remove());
+  if (on && G.fx === "tiles" && img.naturalWidth) {
+    const n = FX_STRENGTH.tiles[lvl] || 3, W = wrap.clientWidth, H = wrap.clientHeight;
+    const grid = document.createElement("div"); grid.className = "tiles";
+    grid.style.gridTemplateColumns = "repeat(" + n + ",1fr)"; grid.style.gridTemplateRows = "repeat(" + n + ",1fr)";
+    if (!G.tileOrder || G.tileOrder.length !== n * n) {
+      const order = [...Array(n * n).keys()];
+      do { shuffleArr(order); } while (order.every((v, i) => v === i));
+      G.tileOrder = order;
+    }
+    G.tileOrder.forEach((k) => {
+      const cell = document.createElement("i");
+      cell.style.backgroundImage = "url(" + JSON.stringify(img.src) + ")";
+      cell.style.backgroundSize = img.style.width + " " + img.style.height;
+      const cx = (k % n) * W / n, cy = Math.floor(k / n) * H / n;
+      cell.style.backgroundPosition = (parseFloat(img.style.left) - cx) + "px " + (parseFloat(img.style.top) - cy) + "px";
+      grid.append(cell);
+    });
+    wrap.append(grid);
+    img.style.visibility = "hidden";
+  } else img.style.visibility = "";
+}
+// כשמראים את התשובה — מראים גם את התמונה האמיתית
+function revealFx() {
+  if (!G.fxOn) return;
+  G.fxOn = false; G.zoom = null; G.tileOrder = null;
+  $("hintchip").hidden = true;
+  layoutPic();
+}
+addEventListener("resize", () => setTimeout(layoutPic, 50));
+
+function openPicture() {
+  G.phase = "open";
+  $("stage").classList.remove("hide");
+  layoutPic();
+  sfx.go();
+  acts(`מי יודע? לוחצים על הכפתור שלכם! <button class="act" data-a="reveal">אף אחד לא יודע</button>`);
+}
+
+// 10 שניות לענות. אם לא לחצו "תראו תשובה" עד אז — התשובה נפתחת לבד
+const ANSWER_SECONDS = 10;
+let answerTimer = null;
+function startAnswerTimer(p, seconds, onUp) {
+  stopAnswerTimer();
+  let left = seconds || ANSWER_SECONDS;
+  const el = $("timer");
+  el.style.setProperty("--tc", p === "blue" ? "var(--blue)" : p === "red" ? "var(--red)" : "var(--gold)");
+  const paint = () => { el.textContent = "⏱ " + left; el.classList.toggle("low", left <= 3); };
+  paint(); el.hidden = false;
+  answerTimer = setInterval(() => {
+    left--;
+    if (left <= 0) { stopAnswerTimer(); sfx.bad(); if (onUp) onUp(); else reveal(true); return; }
+    if (left <= 3) sfx.tick();
+    paint();
+  }, 1000);
+}
+function stopAnswerTimer() {
+  clearInterval(answerTimer); answerTimer = null;
+  $("timer").hidden = true; $("timer").classList.remove("low");
+}
+
+function buzz(p) {
+  if (G.phase !== "open" || !G.players.includes(p)) return;
+  G.buzzer = p; G.phase = "answering";
+  setSides(p);
+  sfx.buzz(p); buzzVibrate();
+  acts(`<span><span class="${cls[p]}">${heb[p]}</span> ראשון! תגיד את התשובה.</span>
+    <button class="act big" data-a="reveal">👀 תראו תשובה</button>`);
+  startAnswerTimer(p);
+}
+
+function reveal(timeUp) {
+  if (G.phase !== "open" && G.phase !== "answering") return;
+  stopAnswerTimer();
+  revealFx();
+  const a = document.createElement("div");
+  a.className = "answer";
+  a.textContent = G.item.a;
+  if (G.item.alt && G.item.alt.length) { const s = document.createElement("small"); s.textContent = "נחשב גם: " + G.item.alt.join(" · "); a.append(s); }
+  $("stage").append(a);
+  if (G.buzzer) {
+    G.phase = "revealed";
+    acts(`${timeUp === true ? `<span style="flex-basis:100%">⏰ נגמר הזמן! <span class="${cls[G.buzzer]}">${heb[G.buzzer]}</span> הספיק לענות נכון?</span>` : ""}
+      <button class="act good big" data-a="good">✓ נכון</button>
+      <button class="act bad big" data-a="bad">✗ טעות</button>
+      <button class="act judge" data-a="judge">⚖️ שופט</button>`);
+  } else {
+    G.phase = "nobody";
+    acts(`אף אחד לא ידע, אין נקודה. <button class="act big" data-a="next">לתמונה הבאה ←</button>`);
+  }
+}
+
+function score(correct) {
+  if (G.phase !== "revealed") return;
+  G.phase = "scored";
+  // שניים: טעות = נקודה ליריב. 3 ומעלה: טעות = יורדת נקודה למי שענה
+  const two = G.players.length === 2;
+  const winner = correct ? G.buzzer : two ? other(G.buzzer) : null, loser = winner ? null : G.buzzer;
+  const lost = loser && G.score[loser] > 0;
+  if (winner) G.score[winner]++; else if (lost) G.score[loser]--;
+  if (correct && G.buzzer === "blue") awardPoints(POINTS_PER_CORRECT); // הכחול זה אני
+  paintScore();
+  const side = btn(winner || loser);
+  side.classList.remove("pop"); void side.offsetWidth; side.classList.add("pop");
+  flash(correct);
+  acts(winner ? `נקודה <span class="${cls[winner]}">ל${pname[winner]}</span>!`
+    : lost ? `<span class="${cls[loser]}">ל${pname[loser]}</span> יורדת נקודה.` : `אין נקודה <span class="${cls[loser]}">ל${pname[loser]}</span>.`);
+  if (winner && G.score[winner] >= target) later(() => gameOver(winner), 1300);
+  else later(nextRound, 1500);
+}
+
+// כפתורי הלחיצה נבנים ב-buildBuzzers (עם pointerdown, כדי שזה יהיה הכי מהר שאפשר)
+$("acts").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-a]"); if (!b) return;
+  const a = b.dataset.a;
+  if (a === "soloSkip") return soloAnswer("");
+  if (a === "dunno") return onlineDunno();
+  if (a === "ready") return onlineReady();
+  if (a === "decideYes") return onlineDecide(true);
+  if (a === "decideNo") return onlineDecide(false);
+  if (a === "reveal") reveal();
+  else if (a === "good") score(true);
+  else if (a === "bad") score(false);
+  else if (a === "judge") openJudge();
+  else if (a === "next") nextRound();
+});
+// גם מקלדת עובדת (טאבלט עם מקלדת / מחשב): ד=S, ף=;, רווח, נ=B, ט=Y, ח=J
+document.addEventListener("keydown", (e) => {
+  if (!$("judge").hidden) { if (e.key === "Escape") closeJudge(); return; }
+  if ($("game").hidden || e.repeat || G.mode !== "duo") return;
+  const k = { KeyS: "blue", Semicolon: "red" }[e.code] || { "ד": "blue", "ף": "red" }[e.key];
+  if (k) { e.preventDefault(); return buzz(k); }
+  if (e.code === "Space" || e.key === " ") { e.preventDefault(); return G.phase === "nobody" ? nextRound() : reveal(); }
+  if (e.code === "KeyB" || e.key === "נ") return score(true);
+  if (e.code === "KeyY" || e.key === "ט") return score(false);
+  if (e.code === "KeyJ" || e.key === "ח") return openJudge();
+});
+
+// ---------- שופט (Claude) ----------
+let sampleFn = null;
+(async () => { try { sampleFn = window.claude ? await window.claude.use("sample") : null; } catch (e) { sampleFn = null; } })();
+
+const norm = (s) => String(s || "").toLowerCase().replace(/[״"'׳`’\-–_.,!?()]/g, "").replace(/\s+/g, "").replace(/^ה(?=.{3,})/, "");
+function openJudge() {
+  if (G.phase !== "revealed") return;
+  G.phase = "judging";
+  $("jCtx").textContent = `התשובה: ${G.item.a}. כתבו מה ${heb[G.buzzer]} אמר, והשופט יחליט אם זה נחשב.`;
+  $("jSaid").value = ""; $("jRes").hidden = true;
+  $("judge").hidden = false;
+  setTimeout(() => $("jSaid").focus(), 30);
+}
+function closeJudge() { $("judge").hidden = true; if (G.phase === "judging") G.phase = "revealed"; }
+function verdict(ok, reason) {
+  const res = $("jRes");
+  const maybe = ok === "maybe";
+  res.hidden = false;
+  res.className = "verdict " + (maybe ? "maybe" : ok ? "good" : "bad");
+  res.innerHTML = `<b></b><span></span><div class="note" style="margin-top:6px"></div>`;
+  res.querySelector("b").textContent = maybe ? "🤔 אולי" : ok ? "✓ נחשב" : "✗ לא נחשב";
+  res.querySelector("span").textContent = reason;
+  res.querySelector(".note").textContent = maybe ? "תחליטו ביחד, ואז סגרו ולחצו נכון או טעות" : "סגרו ולחצו " + (ok ? "נכון" : "טעות");
+}
+
+// ---------- שופט חכם בלי Claude ----------
+// מקבל שגיאות כתיב קטנות, כתיב מלא/חסר (ו, י, א), אותיות סופיות, "ה" בהתחלה ומילים מיותרות כמו "זה".
+// אם אמרו רק חלק מהשם — אומר "אולי" ומסביר, כי רק מי שמבין יודע אם זה שם קצר מוכר או כללי מדי.
+const FINALS = { "ך": "כ", "ם": "מ", "ן": "נ", "ף": "פ", "ץ": "צ" };
+const FILLERS = new Set(["זה", "זאת", "זו", "של", "את", "זהו", "זוהי", "the"]);
+const jWords = (s) => String(s || "").toLowerCase()
+  .replace(/[\u0591-\u05C7]/g, "").replace(/[ךםןףץ]/g, (c) => FINALS[c])
+  .replace(/[״"'׳`’\-–_.,!?():;]/g, " ").split(/\s+/)
+  .filter((w) => w && !FILLERS.has(w)).map((w) => w.replace(/^ה(?=.{3,})/, ""));
+const jFlat = (s) => jWords(s).join("");
+const jSkel = (s) => jFlat(s).replace(/(?!^)[אויע]/g, "").replace(/(.)\1+/g, "$1");
+function lev(a, b) {
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return d[a.length][b.length];
+}
+const tol = (n) => (n <= 3 ? 0 : n <= 6 ? 1 : 2);
+// איך המילה נשמעת: אותיות עם צליל דומה נחשבות אותו דבר (ב/פ/וו, כ/ק/ח, ט/ת, ס/ש/ז/צ),
+// אותיות תנועה (א ו י ע ה) נחשבות "תנועה" אחת, ו-ס בסוף (כמו "וולבס") לא חובה. ככה "וולף" = "וולבס"
+const PH = { "פ": "ב", "ק": "כ", "ח": "כ", "ט": "ת", "ש": "ס", "ז": "ס", "צ": "ס" };
+const jPhon = (s) => {
+  const p = jFlat(s).replace(/וו/g, "ב").replace(/^ו/, "ב").replace(/ה$/, "")
+    .replace(/(?!^)[אעה]/g, "*").replace(/./g, (c) => PH[c] || c).replace(/(.)\1+/g, "$1").replace(/\*$/, "");
+  return p.length > 3 ? p.replace(/ס$/, "") : p;
+};
+function localJudge(said, cands) {
+  const A = jFlat(said), SA = jSkel(said), wa = jWords(said), PA = jPhon(said);
+  if (!A) return null;
+  let maybe = null;
+  for (const c of cands) {
+    const B = jFlat(c), SB = jSkel(c), wb = jWords(c);
+    if (!B) continue;
+    if (A === B) return { ok: true, reason: "זה בדיוק אחד מהשמות שנחשבים נכון." };
+    if (lev(A, B) <= tol(B.length)) return { ok: true, reason: `רק שגיאת כתיב קטנה. התשובה: "${c}".` };
+    if (B.length >= 4 && SA === SB) return { ok: true, reason: `אותה מילה בכתיב קצת אחר. התשובה: "${c}".` };
+    if (B.length >= 3 && A.includes(B)) return { ok: true, reason: `אמרתם את התשובה ("${c}") עם עוד כמה מילים.` };
+    const PB = jPhon(c);
+    if (B.length >= 5 && PA === PB && lev(A, B) <= tol(B.length) + 1) return { ok: true, reason: `נשמע כמו התשובה (אולי המיקרופון שמע קצת אחרת). התשובה: "${c}".` };
+    const part = (A.length >= 3 && B.includes(A)) || (wa.length && wa.every((w) => wb.some((x) => x === w || (w.length >= 4 && lev(w, x) <= 1))));
+    if (part && !maybe) maybe = c;
+  }
+  if (maybe) return { ok: "maybe", reason: `אמרתם רק חלק מהשם "${maybe}". אם זה שם קצר שכולם משתמשים בו ומתאים רק לזה (כמו "מילאן") — נחשב. אם זה כללי מדי (כמו "סלט" במקום "סלט יווני") — לא נחשב.` };
+  return { ok: false, reason: "זה לא דומה לתשובה או לשמות שנחשבים. אם אתם בטוחים שזה שם אחר של אותו דבר — תחליטו ביחד." };
+}
+async function runJudge() {
+  const said = $("jSaid").value.trim();
+  if (!said) return $("jSaid").focus();
+  const res = $("jRes");
+  const local = localJudge(said, [G.item.a, ...(G.item.alt || [])]);
+  if (!local) return $("jSaid").focus();
+  // בטוח שנחשב, או שאין Claude (באפליקציה) — השופט החכם מחליט לבד
+  if (local.ok === true || !sampleFn) return verdict(local.ok, local.reason);
+  res.className = "verdict"; res.hidden = false; res.textContent = "השופט חושב…";
+  $("jGo").disabled = true;
+  try {
+    const r = await sampleFn.json(`אתה השופט במשחק חידון תמונות "ראש בראש" בעברית בין שני אחים.
+קטגוריה: ${G.deck.name}
+חוקי הקטגוריה: ${G.deck.rules}
+התשובה הנכונה: ${G.item.a}
+שמות נוספים שכבר ידוע שנחשבים: ${(G.item.alt || []).join(", ") || "אין"}
+מה שהשחקן אמר: "${said}"
+
+כללי שיפוט:
+- שם מקוצר או כינוי שכולם משתמשים בו ומזהה רק את הדבר הזה — נחשב (למשל "מילאן" במקום "איי סי מילאן").
+- תשובה כללית מדי שמתאימה להרבה דברים — לא נחשבת (למשל "סלט" במקום "סלט יווני").
+- שגיאת כתיב, תעתיק אחר, שם באנגלית או הבדל קטן בהגייה — נחשב.
+- תשובה שמתארת דבר אחר — לא נחשבת.
+ענה רק ב-JSON: {"ok": true או false, "reason": "משפט אחד קצר בעברית פשוטה שמסביר למה"}`, { modelTier: "quick" });
+    verdict(!!(r && r.ok), String((r && r.reason) || ""));
+  } catch (e) {
+    res.className = "verdict bad";
+    res.textContent = e && (e.code === "not_granted" || e.code === "sampling_disabled")
+      ? "השופט לא מופעל בטלפון הזה. תחליטו לבד הפעם 🙂"
+      : e && e.code === "rate_limited" ? "השופט עמוס כרגע. נסו שוב עוד מעט, או תחליטו לבד." : "השופט לא ענה. נסו שוב, או תחליטו לבד 🙂";
+    if (e && (e.code === "not_granted" || e.code === "sampling_disabled")) sampleFn = null;
+  }
+  $("jGo").disabled = false;
+}
+$("jGo").onclick = runJudge;
+$("jClose").onclick = closeJudge;
+$("jSaid").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); runJudge(); } });
+
+// ---------- התקנת אפליקציה ----------
+(() => {
+  const isApp = !!window.HAZIRA_IS_APP;
+  const installed = matchMedia("(display-mode: standalone)").matches || matchMedia("(display-mode: fullscreen)").matches || navigator.standalone === true;
+  if (installed) { $("installBox").hidden = true; return; }
+  if (!isApp) return; // בקישור של Claude הכפתור פשוט פותח את האתר של האפליקציה
+  $("installNote").textContent = "האפליקציה תופיע כאייקון בטלפון ותיפתח במסך מלא.";
+  let deferred = null;
+  addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferred = e; });
+  addEventListener("appinstalled", () => { $("installBox").hidden = true; });
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  $("installBtn").addEventListener("click", async (e) => {
+    e.preventDefault();
+    if (deferred) { deferred.prompt(); try { await deferred.userChoice; } catch (x) {} deferred = null; return; }
+    $("installSteps").innerHTML = ios
+      ? "<div>1. פותחים את הדף הזה ב-<b>Safari</b>.</div><div>2. לוחצים על כפתור השיתוף <b>⬆️</b> (ריבוע עם חץ למעלה).</div><div>3. בוחרים <b>\"הוסף למסך הבית\"</b> ולוחצים <b>\"הוסף\"</b>.</div><div>זהו! האייקון של הצ'יטה יופיע במסך הבית 🎉</div>"
+      : "<div>1. פותחים את הדף הזה ב-<b>Chrome</b>.</div><div>2. לוחצים על <b>⋮</b> (שלוש הנקודות למעלה).</div><div>3. בוחרים <b>\"התקן אפליקציה\"</b> או <b>\"הוסף למסך הבית\"</b>.</div><div>זהו! האייקון של הצ'יטה יופיע במסך הבית 🎉</div>";
+    $("installHelp").hidden = false;
+  });
+  $("installClose").onclick = () => { $("installHelp").hidden = true; };
+})();
+
+// ---------- תשובה במיקרופון / בהקלדה ----------
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, onAnswer = null, heard = [], liveItem = null, listenWanted = false, listenRestarts = 0;
+// item: אם נותנים — ברגע שהמיקרופון שומע את התשובה הנכונה, שולחים לבד (בלי ללחוץ "שלח")
+function askAnswer(cb, item) {
+  onAnswer = cb; heard = []; liveItem = item || null; listenRestarts = 0;
+  $("ansIn").value = ""; $("ansBox").hidden = false;
+  const canMic = SR && IS_APP; // בקישור של Claude אין גישה למיקרופון
+  $("micBtn").hidden = !canMic;
+  if (canMic) { listenWanted = true; startListening(); } else setTimeout(() => $("ansIn").focus(), 50);
+}
+function submitAnswer() {
+  if (!onAnswer) return;
+  const typed = $("ansIn").value.trim();
+  const cb = onAnswer; onAnswer = null; liveItem = null;
+  stopListening(); $("ansBox").hidden = true;
+  cb(typed, heard.filter((x) => x && x !== typed));
+}
+const saidRight = (texts) => !!liveItem && texts.some((t) => { const j = localJudge(t, [liveItem.a, ...(liveItem.alt || [])]); return j && j.ok === true; });
+function startListening() {
+  if (!SR || rec) return;
+  try {
+    const r0 = new SR(); rec = r0;
+    r0.lang = "he-IL"; r0.interimResults = true; r0.maxAlternatives = 4; r0.continuous = false;
+    r0.onresult = (e) => {
+      const r = e.results[e.results.length - 1];
+      const texts = [...r].map((x) => x.transcript.trim()).filter(Boolean);
+      if (!texts.length) return;
+      $("ansIn").value = texts[0];
+      if (saidRight(texts)) { heard = texts; return submitAnswer(); }
+      if (r.isFinal) { heard = texts; setTimeout(submitAnswer, 350); }
+    };
+    r0.onerror = (e) => { if (e.error === "not-allowed" || e.error === "service-not-allowed") { listenWanted = false; $("ansIn").focus(); } };
+    r0.onend = () => {
+      if (rec !== r0) return;
+      rec = null; $("micBtn").classList.remove("on");
+      // היה שקט? ממשיכים להקשיב עד שהזמן נגמר
+      if (onAnswer && listenWanted && !heard.length && listenRestarts++ < 8) setTimeout(() => { if (onAnswer && listenWanted) startListening(); }, 200);
+    };
+    r0.start(); $("micBtn").classList.add("on");
+  } catch (e) { rec = null; }
+}
+function stopListening() { listenWanted = false; const r = rec; rec = null; try { r && r.abort(); } catch (e) {} $("micBtn").classList.remove("on"); }
+$("micBtn").onclick = () => { if (rec) stopListening(); else { listenWanted = true; listenRestarts = 0; startListening(); } };
+$("ansGo").onclick = submitAnswer;
+$("ansIn").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); submitAnswer(); } });
+// בודק כמה ניסוחים (המיקרופון לפעמים שומע כמה אפשרויות) ובוחר את הכי טוב
+function judgeAll(texts, item) {
+  const cands = [item.a, ...(item.alt || [])];
+  let best = null;
+  for (const t of texts.filter(Boolean)) {
+    const r = localJudge(t, cands); if (!r) continue;
+    if (r.ok === true) return { ...r, text: t };
+    if (!best || (r.ok === "maybe" && best.ok === false)) best = { ...r, text: t };
+  }
+  return best || { ok: false, reason: "לא נאמרה תשובה.", text: "" };
+}
+
+// ---------- מצב יחיד ----------
+function startSolo(deck) {
+  setPanels("solo");
+  G.deck = deck; G.round = 0;
+  const all = deckOrder(deck.items, deck.reserve);
+  const out = soloOut(target);
+  G.solo = { total: target + out - 1, need: target, maxWrong: out, ok: 0, no: 0 };
+  G.queue = all.slice(0, G.solo.total);
+  $("gTitle").textContent = deck.icon + " " + deck.name + " · " + deck.levelName + " · לבד";
+  paintSolo(); show("game"); keepAwake(); soloNext();
+}
+function paintSolo() {
+  const s = G.solo;
+  $("soloOk").textContent = s.ok; $("soloNo").textContent = s.no;
+  $("soloOkLbl").textContent = "נכונות מתוך " + s.need; $("soloNoLbl").textContent = "טעויות · מותר עד " + (s.maxWrong - 1);
+}
+function soloNext() {
+  const s = G.solo;
+  if (s.ok >= s.need) return soloOver(true);
+  if (s.no >= s.maxWrong || !G.queue.length) return soloOver(false);
+  G.round++;
+  $("gRound").textContent = "תמונה " + G.round + " מתוך " + s.total;
+  prepPicture(G.queue.shift());
+  G.phase = "countdown";
+  acts("מתכוננים…");
+  countdown(() => {
+    G.phase = "answering";
+    acts(`מה זה? <button class="act" data-a="soloSkip">🙈 לא יודע</button>`);
+    startAnswerTimer(null, 15, () => soloAnswer($("ansIn").value.trim(), heard));
+    askAnswer((typed, more) => soloAnswer(typed, more), G.item);
+  });
+}
+async function soloAnswer(typed, more) {
+  if (G.phase !== "answering") return;
+  G.phase = "checking";
+  stopAnswerTimer(); stopListening(); onAnswer = null; $("ansBox").hidden = true;
+  let r = judgeAll([typed, ...(more || [])], G.item);
+  // בקישור של Claude: אם השופט הפשוט לא בטוח — שואלים את Claude
+  if (r.ok !== true && r.text && sampleFn) {
+    acts("השופט חושב…");
+    try { const c = await claudeJudge(r.text); r = { ok: !!c.ok, reason: String(c.reason || ""), text: r.text }; } catch (e) {}
+  }
+  if (r.ok === "maybe") {
+    G.phase = "decide";
+    showAnswerOnStage();
+    acts(`<span style="flex-basis:100%">אמרת: "${escapeHtml(r.text)}". ${escapeHtml(r.reason)}</span>
+      <button class="act good big" data-a="soloYes">✓ נחשב</button><button class="act bad big" data-a="soloNo">✗ לא נחשב</button>`);
+    return;
+  }
+  soloResult(r.ok === true, r.text);
+}
+function soloResult(ok, text) {
+  const s = G.solo;
+  G.phase = "scored";
+  if (!$("stage").querySelector(".answer")) showAnswerOnStage();
+  if (ok) { s.ok++; awardPoints(POINTS_PER_CORRECT); } else s.no++;
+  paintSolo();
+  flash(ok, ok ? "✓ נכון!" : text ? "✗ טעות" : "⏰ לא ענית");
+  acts(ok ? "יפה! ✓" : text ? `אמרת: "${escapeHtml(text)}"` : "");
+  later(soloNext, ok ? 1500 : 2300);
+}
+$("acts").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-a]"); if (!b || G.phase !== "decide") return;
+  if (b.dataset.a === "soloYes") soloResult(true, ""); else if (b.dataset.a === "soloNo") soloResult(false, "·");
+});
+function soloOver(won) {
+  clearTimers(); stopAnswerTimer(); G.phase = "over";
+  const s = G.solo;
+  $("winTxt").textContent = won ? "ניצחת! 🏆" : "נפסלת 😅";
+  $("final").innerHTML = `<span class="gr">${s.ok} ✓</span> : <span class="rd">${s.no} ✗</span>`;
+  show("over");
+  if (won) { sfx.win(); confetti("blue"); } else sfx.bad();
+}
+const escapeHtml = (t) => String(t || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+async function claudeJudge(said) {
+  return sampleFn.json(`אתה השופט במשחק חידון תמונות בעברית.
+קטגוריה: ${G.deck.name}
+חוקי הקטגוריה: ${G.deck.rules}
+התשובה הנכונה: ${G.item.a}
+שמות נוספים שכבר ידוע שנחשבים: ${(G.item.alt || []).join(", ") || "אין"}
+מה שהשחקן אמר (אולי דרך מיקרופון, אז יכולות להיות טעויות שמיעה קטנות): "${said}"
+כללי שיפוט: שם מקוצר שכולם משתמשים בו ומזהה רק את זה — נחשב. כללי מדי — לא נחשב. שגיאת כתיב/שמיעה או תעתיק — נחשב. דבר אחר — לא נחשב.
+ענה רק ב-JSON: {"ok": true או false, "reason": "משפט קצר בעברית פשוטה"}`, { modelTier: "quick" });
+}
+
+// ---------- אונליין (רק באפליקציה) ----------
+// שני הטלפונים מדברים דרך שרת הודעות חינמי (MQTT). מי שיוצר את החדר מנהל את המשחק.
+const BROKERS = ["wss://broker.emqx.io:8084/mqtt", "wss://test.mosquitto.org:8081"];
+const NET = { client: null, topic: "", role: null, code: "", me: Math.random().toString(36).slice(2, 8) };
+const O = {};
+function loadMqtt() {
+  if (window.mqtt) return Promise.resolve();
+  return new Promise((ok, bad) => {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js";
+    s.onload = ok; s.onerror = () => bad(new Error("no internet")); document.head.append(s);
+  });
+}
+function netConnect(i) {
+  return new Promise((ok, bad) => {
+    const c = window.mqtt.connect(BROKERS[i], { connectTimeout: 7000, reconnectPeriod: 2000, clean: true });
+    const t = setTimeout(() => { c.end(true); bad(new Error("timeout")); }, 8000);
+    c.on("connect", () => { clearTimeout(t); ok(c); });
+    c.on("error", () => {});
+  });
+}
+async function netOpen(code, brokerIdx) {
+  await loadMqtt();
+  NET.client = await netConnect(brokerIdx);
+  NET.code = code; NET.topic = "hazira-dg/stg/" + code;
+  NET.client.subscribe(NET.topic, { qos: 1 });
+  NET.client.on("message", (topic, payload) => {
+    let m; try { m = JSON.parse(payload.toString()); } catch (e) { return; }
+    if (m.from === NET.me) return;
+    onNet(m);
+  });
+}
+function send(type, data) { if (NET.client) NET.client.publish(NET.topic, JSON.stringify({ type, from: NET.me, ...data }), { qos: 1 }); }
+function netLeave() { try { send("bye", {}); NET.client && NET.client.end(true); } catch (e) {} NET.client = null; NET.role = null; clearTimers(); }
+
+async function hostRoom(c) {
+  $("loadMsg").textContent = "יוצר חדר…"; show("loading");
+  try {
+    let idx = 0, ok = false;
+    for (; idx < BROKERS.length && !ok; idx++) {
+      try { await loadMqtt(); NET.client = await netConnect(idx); ok = true; } catch (e) {}
+    }
+    if (!ok) throw new Error();
+    idx--;
+    const code = String(idx + 1) + String(Math.floor(1000 + Math.random() * 9000));
+    NET.client.end(true);
+    await netOpen(code, idx);
+    NET.role = "host";
+    Object.assign(O, { cat: c, level, target, deck: await buildDeck(c), joined: false });
+    $("lobbyCode").textContent = code;
+    $("lobbyTitle").textContent = c.icon + " " + c.name + " · " + LEVEL_NAME[level] + " · עד " + target;
+    show("lobby");
+  } catch (e) {
+    show("home"); $("hErr").textContent = "לא הצלחתי ליצור חדר. בדקו שיש אינטרנט ונסו שוב."; $("hErr").hidden = false;
+  }
+}
+$("lobbyCancel").onclick = () => { netLeave(); show("home"); };
+$("shareCode").onclick = async () => {
+  const text = "בוא לשחק איתי בצ'יטה! 🐆 🔵🆚🔴 הקוד: " + NET.code + "\nhttps://dandooger.github.io/hazira-staging/";
+  try { if (navigator.share) await navigator.share({ text }); else { await navigator.clipboard.writeText(text); $("lobbyNote").textContent = "הקוד הועתק! הדבק אותו בוואטסאפ לחבר."; } } catch (e) {}
+};
+$("joinGo").onclick = () => joinRoom($("joinCode").value.replace(/\D/g, ""));
+async function joinRoom(code) {
+  $("joinErr").hidden = true;
+  if (code.length !== 5 || !BROKERS[+code[0] - 1]) { $("joinErr").textContent = "הקוד צריך להיות 5 ספרות."; $("joinErr").hidden = false; return; }
+  $("loadMsg").textContent = "מתחבר לחדר…"; show("loading");
+  try {
+    await netOpen(code, +code[0] - 1);
+    NET.role = "guest"; O.joinTimer = setTimeout(() => { if (!O.started) { netLeave(); show("home"); $("joinErr").textContent = "לא מצאתי חדר עם הקוד הזה. בדקו אותו ונסו שוב."; $("joinErr").hidden = false; } }, 9000);
+    O.started = false;
+    send("join", { name: prof.name });
+  } catch (e) { show("home"); $("joinErr").textContent = "לא הצלחתי להתחבר. בדקו שיש אינטרנט."; $("joinErr").hidden = false; }
+}
+const friend = () => O.themName || "החבר";
+
+// מי אני ומי החבר (המארח כחול, המצטרף אדום)
+const myColor = () => (NET.role === "host" ? "blue" : "red");
+const meKey = () => NET.role;
+const themKey = () => (NET.role === "host" ? "guest" : "host");
+// באונליין יש כפתור אחד גדול (שלי). הניקוד של החבר כתוב עליו
+function paintOnline() {
+  const mine = O.score[meKey()], theirs = O.score[themKey()], C = cap(myColor());
+  $("sc" + C).textContent = mine;
+  $("bar" + C).style.width = Math.min(100, mine / O.target * 100) + "%";
+  btn(myColor()).querySelector(".vs").textContent = friend() + ": " + theirs;
+}
+function startOnlineScreen() {
+  setPanels("online", [myColor()]);
+  const mine = btn(myColor());
+  mine.querySelector(".who").textContent = prof.name || "אני"; mine.querySelector(".vs").hidden = false;
+  $("gTitle").textContent = O.title;
+  paintOnline(); show("game"); keepAwake();
+}
+// מזהה תמונה כך שהטלפון השני יכול לבנות אותה בעצמו
+async function itemFromRef(ref) {
+  const d = await getCat(ref.c);
+  const it = d.levels[ref.lv][ref.i];
+  return ref.fx ? { ...it, fx: ref.fx, fxLevel: ref.fxLevel, hint: ref.hint } : it;
+}
+
+// ---- המארח מנהל את המשחק ----
+function hostStart() {
+  O.score = { host: 0, guest: 0 }; O.n = 0; O.title = O.deck.icon + " " + O.deck.name + " · " + O.deck.levelName;
+  O.queue = deckOrder(O.deck.items, O.deck.reserve); O.reserve = [];
+  send("start", { title: O.title, target: O.target, score: O.score, name: prof.name });
+  startOnlineScreen();
+  later(hostRound, 800);
+}
+function hostRound() {
+  if (!O.queue.length) O.queue = deckOrder(O.deck.items, O.deck.reserve);
+  const it = O.queue.shift();
+  O.n++; O.buzzes = []; O.answerer = null; O.result = null; O.dunno = {}; O.readyOpen = false;
+  // אותו זום / סדר חתיכות לשני הטלפונים
+  const fxSeed = { zoom: null, tiles: null };
+  if (it.fx === "zoom") { const s = { easy: 0.5, medium: 0.32, hard: 0.2 }[it.fxLevel] || 0.32, pad = Math.min(0.12, (1 - s) / 2); fxSeed.zoom = { s, x: pad + Math.random() * (1 - s - 2 * pad), y: pad + Math.random() * (1 - s - 2 * pad) }; }
+  if (it.fx === "tiles") { const n = { easy: 2, medium: 3, hard: 4 }[it.fxLevel] || 3, order = [...Array(n * n).keys()]; do { shuffleArr(order); } while (order.every((v, i) => v === i)); fxSeed.tiles = order; }
+  const msg = { n: O.n, ref: it.ref, fxSeed, score: O.score };
+  send("round", msg);
+  playRound(msg, it);
+}
+function hostGotBuzz(who, rt, n) {
+  if (n !== O.n || O.answerer) return;
+  O.buzzes.push({ who, rt });
+  if (O.buzzes.length === 1) later(() => {
+    // מי שלחץ הכי מהר (לפי הזמן שעבר אצלו מאז שהתמונה נפתחה) — כדי שהאינטרנט לא ישפיע
+    O.buzzes.sort((a, b) => a.rt - b.rt);
+    O.answerer = O.buzzes[0].who;
+    send("answering", { n: O.n, who: O.answerer });
+    onAnswering(O.answerer);
+  }, 450);
+}
+function hostGotAnswer(texts, n) {
+  if (n !== O.n || O.result) return;
+  const r = judgeAll(texts, G.item);
+  if (r.ok === "maybe") {
+    O.pending = r;
+    const judge = O.answerer === "host" ? "guest" : "host";
+    O.pendingText = r.text;
+    send("confirm", { n: O.n, judge, text: r.text, reason: r.reason });
+    onConfirm(judge, r.text, r.reason);
+    return;
+  }
+  hostFinish(r.ok === true, r.text);
+}
+function hostFinish(ok, text, none) {
+  if (O.result) return;
+  O.result = true; clearTimers(); stopAnswerTimer();
+  let point = null;
+  if (!none) { point = ok ? O.answerer : (O.answerer === "host" ? "guest" : "host"); O.score[point]++; }
+  const w = point && O.score[point] >= O.target ? point : null;
+  const msg = { n: O.n, ok, text, none: none || false, answerer: O.answerer, point, score: O.score, final: !!w };
+  // לא ממשיכים לבד: כל אחד לוחץ "מוכן", ורק כששניהם מוכנים עוברים לתמונה הבאה
+  O.ready = { host: false, guest: false }; O.readyOpen = !w;
+  send("result", msg); showResult(msg);
+  if (w) later(() => { send("over", { winner: w, score: O.score }); onlineOver(w); }, 2200);
+}
+// "לא יודע": אם שניהם לחצו — מראים את התשובה וממשיכים
+function hostGotDunno(who, n) {
+  if (n !== O.n || O.answerer || O.result) return;
+  O.dunno[who] = true;
+  send("dunnoState", { n, dunno: O.dunno });
+  if (O.dunno.host && O.dunno.guest) hostFinish(false, "", "dunno"); else openActs();
+}
+function hostGotReady(who, on, n) {
+  if (n !== O.n || !O.readyOpen) return;
+  O.ready[who] = !!on;
+  send("readyState", { n, ready: O.ready });
+  readyActs();
+  if (O.ready.host && O.ready.guest) { O.readyOpen = false; later(hostRound, 300); }
+}
+
+// ---- מה ששני הטלפונים עושים ----
+async function playRound(msg, item) {
+  G.phase = "countdown"; O.n = msg.n; O.score = msg.score; O.myBuzzSent = false; O.dunno = {};
+  const it = item || await itemFromRef(msg.ref);
+  if (msg.fxSeed && msg.fxSeed.zoom) it.zoomSeed = msg.fxSeed.zoom;
+  if (msg.fxSeed && msg.fxSeed.tiles) it.tileSeed = msg.fxSeed.tiles;
+  prepPicture(it);
+  if (it.zoomSeed) G.zoom = it.zoomSeed;
+  if (it.tileSeed) G.tileOrder = it.tileSeed;
+  setSides(null); paintOnline();
+  $("gRound").textContent = "תמונה " + msg.n;
+  acts("מתכוננים…");
+  countdown(() => {
+    G.phase = "open"; O.openedAt = performance.now();
+    openActs();
+    // אם אף אחד לא לוחץ כלום 30 שניות — מראים את התשובה
+    if (NET.role === "host") later(() => { if (!O.answerer && !O.result) hostFinish(false, "", true); }, 30000);
+  });
+}
+function openActs() {
+  if (G.phase !== "open" || O.myBuzzSent) return;
+  const meD = O.dunno[meKey()], themD = O.dunno[themKey()];
+  acts(meD ? `🙈 סימנת שאתה לא יודע. מחכים לחבר… <span class="note">(נזכרת? לחץ על הכפתור!)</span>`
+    : `מי יודע? לחץ על הכפתור! <button class="act" data-a="dunno">🙈 לא יודע</button>${themD ? ` <span class="note">(החבר לא יודע 🤷)</span>` : ""}`);
+}
+function onlineDunno() {
+  if (G.phase !== "open" || O.myBuzzSent || O.dunno[meKey()]) return;
+  O.dunno[meKey()] = true; openActs();
+  if (NET.role === "host") hostGotDunno("host", O.n); else send("dunno", { n: O.n });
+}
+function onlineBuzz() {
+  if (G.phase !== "open" || O.myBuzzSent) return;
+  O.myBuzzSent = true; buzzVibrate();
+  const rt = performance.now() - O.openedAt;
+  if (NET.role === "host") hostGotBuzz("host", rt, O.n); else send("buzz", { n: O.n, rt });
+  acts("לחצת! מחכים…");
+}
+function onAnswering(who) {
+  G.phase = "answering";
+  const color = who === "host" ? "blue" : "red";
+  setSides(color);
+  sfx.buzz(color);
+  const mine = who === NET.role;
+  startAnswerTimer(color, 15, () => { if (mine) submitAnswer(); });
+  if (mine) {
+    acts("אתה ראשון! תגיד את התשובה 🎤");
+    // המיקרופון מתחיל לבד. אמרת את התשובה הנכונה — זה נשלח לבד והזמן נעצר
+    askAnswer((typed, more) => {
+      stopAnswerTimer();
+      const texts = [typed, ...(more || [])];
+      acts("אמרת: \"" + escapeHtml(typed || "…") + "\". בודק…");
+      if (NET.role === "host") hostGotAnswer(texts, O.n); else send("answer", { n: O.n, texts });
+    }, G.item);
+  } else acts(friend() + " עונה… ⏳");
+  // ביטחון: אם המארח לא קיבל תשובה אחרי 20 שניות — טעות
+  if (NET.role === "host") later(() => { if (!O.result && !O.pending) hostFinish(false, ""); }, 20000);
+}
+function onConfirm(judge, text, reason) {
+  G.phase = judge === NET.role ? "confirm" : "waitConfirm";
+  stopAnswerTimer();
+  showAnswerOnStage();
+  if (judge === NET.role) acts(`<span style="flex-basis:100%">החבר אמר: "${escapeHtml(text)}". ${escapeHtml(reason)} מה אתה אומר?</span>
+    <button class="act good big" data-a="decideYes">✓ נחשב</button><button class="act bad big" data-a="decideNo">✗ לא נחשב</button>`);
+  else acts(`אמרת: "${escapeHtml(text)}". השופט לא בטוח — החבר מחליט…`);
+}
+function onlineDecide(ok) {
+  if (G.phase !== "confirm") return;
+  G.phase = "decided";
+  if (NET.role === "host") { O.pending = null; hostFinish(ok, O.pendingText || ""); } else send("decide", { n: O.n, ok });
+}
+function showResult(m) {
+  G.phase = "scored"; clearTimers(); stopAnswerTimer(); stopListening(); onAnswer = null; $("ansBox").hidden = true;
+  O.score = m.score; paintOnline(); setSides(null);
+  if (!$("stage").querySelector(".answer")) showAnswerOnStage();
+  if (m.none) O.resultLine = m.none === "dunno" ? "שניכם לא ידעתם 🤷 אין נקודה." : "אף אחד לא לחץ. אין נקודה.";
+  else {
+    const answererIsMe = m.answerer === NET.role;
+    flash(m.ok, m.ok ? (answererIsMe ? "✓ צדקת!" : "✓ נכון!") : m.text ? "✗ טעות" : "⏰ נגמר הזמן");
+    if (m.ok && answererIsMe) awardPoints(POINTS_PER_CORRECT);
+    O.resultLine = (answererIsMe ? "ענית" : "החבר ענה") + (m.text ? `: "${escapeHtml(m.text)}"` : "") + " · נקודה " + (m.point === NET.role ? "לך! 🎉" : "לחבר");
+  }
+  if (m.final) { acts(O.resultLine); return; }
+  G.phase = "ready"; O.ready = { host: false, guest: false };
+  readyActs();
+}
+// בין תמונה לתמונה: כל אחד לוחץ "מוכן" (ואפשר לבטל). ממשיכים רק כששניהם מוכנים
+function readyActs() {
+  if (G.phase !== "ready") return;
+  const me = O.ready[meKey()], them = O.ready[themKey()];
+  acts(`<span style="flex-basis:100%">${O.resultLine}</span>
+    <button class="act big ${me ? "good" : ""}" data-a="ready">${me ? "✓ אני מוכן (לחץ לביטול)" : "✋ מוכן"}</button>
+    <span class="note">${escapeHtml(friend())}: ${them ? "מוכן ✓" : "עוד לא מוכן…"}</span>`);
+}
+function onlineReady() {
+  if (G.phase !== "ready") return;
+  const on = !O.ready[meKey()];
+  O.ready[meKey()] = on; readyActs();
+  if (NET.role === "host") hostGotReady("host", on, O.n); else send("ready", { n: O.n, on });
+}
+function onlineOver(w) {
+  clearTimers(); G.phase = "over";
+  const iWon = w === NET.role;
+  $("winTxt").textContent = iWon ? "ניצחת! 🏆" : "החבר ניצח 😅";
+  $("final").innerHTML = `<span class="${cls[myColor()]}">${O.score[meKey()]}</span> : <span class="${cls[myColor() === "blue" ? "red" : "blue"]}">${O.score[themKey()]}</span>`;
+  show("over"); if (iWon) { sfx.win(); confetti(myColor()); }
+}
+function onNet(m) {
+  if (m.type === "bye") { if (NET.role && !$("game").hidden) { clearTimers(); acts("החבר יצא מהמשחק 👋"); } return; }
+  if (NET.role === "host") {
+    if (m.type === "join" && !O.joined) { O.joined = true; O.themName = m.name || ""; hostStart(); }
+    else if (m.type === "buzz") hostGotBuzz("guest", m.rt, m.n);
+    else if (m.type === "answer") hostGotAnswer(m.texts || [], m.n);
+    else if (m.type === "decide" && m.n === O.n && O.pending) { const t = O.pending.text; O.pending = null; hostFinish(!!m.ok, t); }
+    else if (m.type === "dunno") hostGotDunno("guest", m.n);
+    else if (m.type === "ready") hostGotReady("guest", m.on, m.n);
+    return;
+  }
+  // המצטרף
+  if (m.type === "start") { O.started = true; clearTimeout(O.joinTimer); O.title = m.title; O.target = m.target; O.score = m.score; O.themName = m.name || ""; startOnlineScreen(); }
+  else if (m.type === "round") playRound(m);
+  else if (m.type === "answering" && m.n === O.n) onAnswering(m.who);
+  else if (m.type === "confirm" && m.n === O.n) onConfirm(m.judge, m.text, m.reason);
+  else if (m.type === "result" && m.n === O.n) showResult(m);
+  else if (m.type === "dunnoState" && m.n === O.n) { O.dunno = m.dunno || {}; openActs(); }
+  else if (m.type === "readyState" && m.n === O.n) { O.ready = m.ready; readyActs(); }
+  else if (m.type === "over") onlineOver(m.winner);
+}
+
+// ---------- פתיחה: הצ'יטה מהלוגו (תמונה אמיתית, עם הברקים) רצה ~2.5 שניות, נכנסת ללוגו, ואז השם והמילים ----------
+const INTRO = { timers: [] };
+function playIntro() {
+  const hero = $("hero"), shot = $("shot"), img = shot.querySelector("img"), zap = $("zap"), badge = $("badge");
+  INTRO.timers.forEach(clearTimeout); INTRO.timers = [];
+  hero.querySelectorAll("*").forEach((el) => el.getAnimations().forEach((a) => a.cancel()));
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const at = (ms, fn) => INTRO.timers.push(setTimeout(fn, ms));
+  // נכנסת מהר מהצד, מטושטשת מהמהירות
+  shot.animate([{ opacity: 0, transform: "translateX(75%)", filter: "blur(10px) brightness(1.3)" }, { opacity: 1, transform: "translateX(0)", filter: "blur(0) brightness(1)" }],
+    { duration: 650, easing: "cubic-bezier(.15,.8,.3,1)", fill: "forwards" });
+  // ריצה: קפיצות קטנות של הגוף + המצלמה מתקרבת לאט
+  img.animate([{ transform: "translate(0,0) scale(1)" }, { transform: "translate(-4px,-5px) scale(1.02)" }, { transform: "translate(0,0) scale(1.04)" }],
+    { duration: 230, iterations: 11, direction: "alternate", easing: "ease-in-out" });
+  // קווי מהירות וברקים
+  hero.querySelectorAll(".speed i").forEach((s, i) => s.animate([{ right: "-50%", opacity: 0 }, { opacity: 0.9, offset: 0.2 }, { right: "130%", opacity: 0 }], { duration: 380 + i * 60, delay: 200 + i * 70, iterations: 5 }));
+  [450, 1150, 1500, 2150].forEach((t) => at(t, () => {
+    zap.animate([{ opacity: 0 }, { opacity: 1, offset: 0.15 }, { opacity: 0.2, offset: 0.35 }, { opacity: 0.9, offset: 0.5 }, { opacity: 0 }], { duration: 320 });
+    shot.animate([{ filter: "brightness(1)" }, { filter: "brightness(1.7) contrast(1.1)", offset: 0.2 }, { filter: "brightness(1)" }], { duration: 320 });
+  }));
+  // נכנסת לתוך הלוגו
+  at(2500, () => {
+    shot.animate([{ opacity: 1, transform: "translate(0,0) scale(1)", borderRadius: "0px" },
+      { opacity: 1, transform: "translate(0,-57px) scale(.3)", borderRadius: "70px", offset: 0.8 },
+      { opacity: 0, transform: "translate(0,-57px) scale(.28)", borderRadius: "80px" }], { duration: 520, easing: "cubic-bezier(.6,0,.4,1)", fill: "forwards" });
+    sfx.go && sfx.go();
+  });
+  at(2880, () => {
+    badge.animate([{ opacity: 0, transform: "scale(.6)" }, { opacity: 1, transform: "scale(1.15)", offset: 0.55 }, { opacity: 1, transform: "scale(1)" }],
+      { duration: 520, easing: "cubic-bezier(.3,1.5,.5,1)", fill: "forwards" });
+    badge.animate([{ boxShadow: "0 0 0 3px #FFC400, 0 0 60px #FFE27A" }, { boxShadow: "0 0 0 3px #FFC400, 0 0 24px rgba(255,196,0,.6)" }], { duration: 900, delay: 250 });
+  });
+  // "הצ'יטה" אות אחרי אות, ואז "ראש בראש · זריזות · מחשבה"
+  $("ttl").querySelectorAll("span").forEach((s, i) => at(3300 + i * 95, () => s.animate(
+    [{ opacity: 0, transform: "translateY(26px) scale(.3) rotate(-18deg)" }, { opacity: 1, transform: "translateY(-6px) scale(1.15) rotate(4deg)", offset: 0.65 }, { opacity: 1, transform: "none" }],
+    { duration: 480, easing: "ease-out", fill: "forwards" })));
+  $("sub").querySelectorAll("span").forEach((s, i) => at(4000 + i * 230, () => s.animate(
+    [{ opacity: 0, transform: "translateY(12px)" }, { opacity: 1, transform: "none" }], { duration: 380, easing: "ease-out", fill: "forwards" })));
+}
+$("hero").addEventListener("click", playIntro);
+$("hero").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); playIntro(); } });
+playIntro();
+
+// ---------- פרופיל: שם, תמונה, נקודות ודרגות ----------
+// כל תשובה נכונה = נקודה אחת. מדרגה 1 ל-2 צריך 100, מ-2 ל-3 עוד 200, מ-3 ל-4 עוד 300, וכן הלאה
+const POINTS_PER_CORRECT = 1;
+const AVATARS = ["🐆","🦁","🐯","🐼","🐨","🐸","🐵","🦊","🐶","🐱","🐰","🐻","🐷","🐮","🐔","🐧","🦄","🐲","🦖","🐙","🦈","🐬","🦋","🐝","🦉","🦅","🐢","🦒",
+  "⚽","🏀","🎾","🏈","🏐","🏓","🥊","🛹","🎮","👾","🤖","👽","🚀","🛸","⭐","🌈","🔥","⚡","💎","👑","🎸","🎧","🎨","🍕","🍩","🍦","🍓","🍉","🌮","🧁",
+  "😎","🤩","😜","🥳","🤠","🧙","👸","🦸","🥷","🧜‍♀️","🧚","🏆"];
+const AV_BG = ["#FFE27A","#BFE3FF","#FFC9D6","#C9F2D0","#E3D2FF","#FFD9B0","#D6F0F0","#F2F2F2"];
+const PROF_KEY = "hazira-stg-profile-v1";
+let prof = null;
+try { prof = JSON.parse(localStorage.getItem(PROF_KEY) || "null"); } catch (e) { prof = null; }
+if (!prof || !prof.id) prof = { id: Math.random().toString(36).slice(2, 10), name: "", av: 0, photo: null, points: 0, pv: 2 };
+// פעם אחת: מאפסים את הנקודות מהגרסה שבה תשובה נכונה הייתה 10 נקודות
+if (prof.pv !== 2) { prof.points = 0; prof.pv = 2; try { localStorage.setItem(PROF_KEY, JSON.stringify(prof)); } catch (e) {} }
+const saveProf = () => { try { localStorage.setItem(PROF_KEY, JSON.stringify(prof)); } catch (e) {} if (window.acctSoon) acctSoon(); };
+function levelInfo(points) {
+  let lvl = 1, left = points, need = 100;
+  while (left >= need) { left -= need; lvl++; need = 100 * lvl; }
+  return { lvl, have: left, need, pct: left / need };
+}
+// תמונת פרופיל: אימוג'י על עיגול צבעוני, או תמונה מהגלריה (רק אצלי)
+function avEl(av, size, photo) {
+  const d = document.createElement("span");
+  d.className = "av"; d.style.width = d.style.height = size + "px"; d.style.fontSize = Math.round(size * 0.58) + "px";
+  if (photo) { const i = document.createElement("img"); i.src = photo; i.alt = ""; d.append(i); }
+  else { const k = Math.max(0, Math.min(AVATARS.length - 1, av | 0)); d.textContent = AVATARS[k]; d.style.setProperty("--avbg", AV_BG[k % AV_BG.length]); }
+  return d;
+}
+// תמונה עם עיגול אחוזים מסביב (כמה קרוב לדרגה הבאה) ומספר הדרגה
+function ringAv(host, size) {
+  const L = levelInfo(prof.points), r = size / 2 + 5, C = 2 * Math.PI * (r - 3);
+  host.innerHTML = "";
+  host.style.width = host.style.height = size + 12 + "px";
+  host.insertAdjacentHTML("beforeend", `<svg viewBox="0 0 ${2 * r + 2} ${2 * r + 2}" width="${size + 12}" height="${size + 12}"><circle class="track" cx="${r + 1}" cy="${r + 1}" r="${r - 3}" fill="none" stroke-width="5"/><circle class="prog" cx="${r + 1}" cy="${r + 1}" r="${r - 3}" fill="none" stroke-width="5" stroke-dasharray="${C}" stroke-dashoffset="${C}"/></svg>`);
+  host.append(avEl(prof.av, size, prof.photo));
+  const b = document.createElement("span"); b.className = "lvl"; b.textContent = L.lvl; host.append(b);
+  requestAnimationFrame(() => { host.querySelector(".prog").style.strokeDashoffset = C * (1 - L.pct); });
+}
+function paintProf() {
+  ringAv($("profRing"), 48);
+  $("ptsDot").textContent = prof.points + " ⭐";
+  if (!$("profile").hidden) paintProfPage();
+}
+function paintProfPage() {
+  const L = levelInfo(prof.points);
+  ringAv($("profBig"), 96);
+  $("profName").value = prof.name;
+  $("profLvl").textContent = "דרגה " + L.lvl + " · " + prof.points + " נקודות ⭐";
+  $("profBar").style.width = Math.round(L.pct * 100) + "%";
+  $("profNext").textContent = "עוד " + (L.need - L.have) + " נקודות לדרגה " + (L.lvl + 1) + " (כל תשובה נכונה = " + POINTS_PER_CORRECT + ")";
+  fillAvGrid($("avGrid"), (k) => { prof.av = k; prof.photo = null; saveProf(); paintProf(); presenceSay(); photoSay(); });
+}
+function fillAvGrid(grid, pick) {
+  grid.innerHTML = "";
+  AVATARS.forEach((e, k) => {
+    const b = document.createElement("button");
+    b.setAttribute("aria-label", "תמונה " + (k + 1)); b.setAttribute("aria-pressed", String(!prof.photo && prof.av === k));
+    b.append(avEl(k, 48));
+    b.onclick = () => { grid.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); pick(k); };
+    grid.append(b);
+  });
+}
+// נקודות על תשובה נכונה (לבד, ביחד — הכחול הוא אני — ובאונליין)
+function awardPoints(n) {
+  const before = levelInfo(prof.points).lvl;
+  prof.points += n; saveProf();
+  const p = document.createElement("div"); p.className = "plus"; p.textContent = "+" + n + " ⭐"; document.body.append(p); setTimeout(() => p.remove(), 1400);
+  paintProf(); presenceSay();
+  const after = levelInfo(prof.points).lvl;
+  if (after > before) setTimeout(() => {
+    const a = $("lvlUpAv"); a.innerHTML = ""; const w = document.createElement("span"); w.className = "ringwrap"; a.append(w); ringAv(w, 90);
+    $("lvlUpT").textContent = "עלית לדרגה " + after + "! 🎉";
+    $("lvlUp").hidden = false; sfx.win();
+  }, 900);
+}
+$("lvlUpOk").onclick = () => { $("lvlUp").hidden = true; };
+$("profBtn").onclick = () => { show("profile"); paintProfPage(); };
+$("profBack").onclick = () => { show("home"); };
+$("profPhoto").onclick = () => $("profFile").click();
+$("profFile").addEventListener("change", () => {
+  const f = $("profFile").files && $("profFile").files[0]; if (!f) return;
+  const img = new Image();
+  img.onload = () => {
+    const s = 256, cv = document.createElement("canvas"); cv.width = cv.height = s;
+    const k = Math.max(s / img.width, s / img.height), w = img.width * k, h = img.height * k;
+    cv.getContext("2d").drawImage(img, (s - w) / 2, (s - h) / 2, w, h);
+    prof.photo = cv.toDataURL("image/jpeg", 0.82); saveProf(); paintProf(); photoSay(); URL.revokeObjectURL(img.src);
+  };
+  img.src = URL.createObjectURL(f); $("profFile").value = "";
+});
+// ---------- חשבון: שם משתמש + סיסמה ----------
+// החשבון (שם, תמונה, נקודות) נשמר ברשת, כדי שאפשר יהיה להיכנס אליו מכל טלפון.
+// הסיסמה לא נשמרת בכלל — רק "טביעת אצבע" מוצפנת שלה (PBKDF2 עם מלח).
+const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+async function hashPass(pass, salt) {
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: new TextEncoder().encode(salt), iterations: 150000 }, key, 256);
+  return b64(bits);
+}
+const newSalt = () => b64(crypto.getRandomValues(new Uint8Array(16)));
+const W = { mode: "new" };
+function askName(msg, mode) {
+  W.mode = mode || (prof.name && IS_APP ? "setpass" : "new");
+  $("welcome").hidden = false;
+  paintWelcome();
+  $("wErr").hidden = !msg; if (msg) $("wErr").textContent = msg;
+  setTimeout(() => (W.mode === "setpass" ? $("wPass") : $("wName")).focus(), 50);
+}
+function paintWelcome() {
+  const m = W.mode;
+  $("wTabs").hidden = m === "setpass" || !IS_APP;
+  $("wTabNew").setAttribute("aria-pressed", String(m === "new")); $("wTabLogin").setAttribute("aria-pressed", String(m === "login"));
+  $("wH").textContent = m === "login" ? "🔑 כניסה לחשבון" : m === "setpass" ? "🔒 בחר סיסמה לחשבון" : "🐆 ברוך הבא לצ'יטה!";
+  $("wNote").textContent = m === "login" ? "כתוב את שם המשתמש והסיסמה שלך." : m === "setpass"
+    ? "עכשיו יש סיסמאות! בחר סיסמה, וככה תוכל להיכנס לחשבון שלך (עם הנקודות והדרגה) גם מטלפון אחר."
+    : "איך אתה רוצה שיקראו לך? זה השם שחברים יראו באונליין.";
+  $("wName").readOnly = m === "setpass"; if (m === "setpass") $("wName").value = prof.name;
+  $("wPass").hidden = $("wSafe").hidden = !IS_APP;
+  $("wPass").autocomplete = m === "login" ? "current-password" : "new-password";
+  $("wAvBox").hidden = m !== "new";
+  $("wGo").textContent = m === "login" ? "כניסה" : m === "setpass" ? "שמור סיסמה" : "יאללה, מתחילים!";
+  $("wCancel").hidden = !W.canCancel;
+  if (m === "new") fillAvGrid($("wGrid"), (k) => { prof.av = k; });
+}
+$("wTabNew").onclick = () => { W.mode = "new"; $("wErr").hidden = true; paintWelcome(); };
+$("wTabLogin").onclick = () => { W.mode = "login"; $("wErr").hidden = true; paintWelcome(); };
+$("wCancel").onclick = () => { $("welcome").hidden = true; W.canCancel = false; };
+const wFail = (t) => { $("wErr").textContent = t; $("wErr").hidden = false; $("wGo").disabled = false; paintWelcome(); };
+// שומר את הסיסמה במנהל הסיסמאות של גוגל (אם הטלפון מאפשר)
+function storeCred(name, pass) { try { if (window.PasswordCredential && navigator.credentials) navigator.credentials.store(new PasswordCredential({ id: name, password: pass, name })).catch(() => {}); } catch (e) {} }
+$("wForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = $("wName").value.trim(), pass = $("wPass").value;
+  $("wErr").hidden = true;
+  if (!name) return wFail("צריך לכתוב שם משתמש 🙂");
+  if (IS_APP && pass.length < 4) return wFail("הסיסמה צריכה להיות לפחות 4 אותיות או מספרים.");
+  $("wGo").disabled = true; $("wGo").textContent = "בודק…";
+  if (W.mode === "login") {
+    const c = await presenceConnect(); if (!c) return wFail("אין חיבור לאינטרנט. נסה שוב.");
+    const rec = await getRetained("acct/" + nameKey(name));
+    if (!rec || !rec.hash) return wFail("לא מצאתי משתמש בשם \"" + name + "\".");
+    if ((await hashPass(pass, rec.salt)) !== rec.hash) return wFail("הסיסמה לא נכונה 🙁");
+    presenceGone();
+    prof = { id: rec.id, name: rec.name, av: rec.av | 0, photo: rec.photo || null, points: rec.points | 0, pv: 2, salt: rec.salt, hash: rec.hash, t: rec.t || 0 };
+    try { localStorage.setItem(PROF_KEY, JSON.stringify(prof)); } catch (x) {}
+    storeCred(name, pass);
+    location.reload(); // נכנסים מחדש עם החשבון
+    return;
+  }
+  if (W.mode === "new") {
+    const owner = await nameOwner(name);
+    const rec = IS_APP ? await getRetained("acct/" + nameKey(name)) : null;
+    if ((owner && owner !== prof.id) || (rec && rec.id !== prof.id)) return wFail("שם המשתמש \"" + name + "\" כבר קיים 🙁 בחר שם אחר, או לחץ \"יש לי כבר חשבון\".");
+    claimName(name, prof.name);
+    prof.name = name;
+  }
+  if (IS_APP) { prof.salt = newSalt(); prof.hash = await hashPass(pass, prof.salt); storeCred(prof.name, pass); }
+  saveProf(); acctPut();
+  $("welcome").hidden = true; W.canCancel = false; $("wGo").disabled = false; $("wPass").value = "";
+  paintProf(); presenceSay();
+});
+// ---------- החשבון ברשת ----------
+function acctPut() {
+  if (!IS_APP || !prof.hash || !prof.name || !PRES.client || !PRES.client.connected) return;
+  prof.t = Date.now(); try { localStorage.setItem(PROF_KEY, JSON.stringify(prof)); } catch (e) {}
+  PRES.client.publish(PRES_ROOT + "acct/" + nameKey(prof.name), JSON.stringify({ v: 1, id: prof.id, name: prof.name, av: prof.av, points: prof.points, pv: 2, photo: myThumb || null, salt: prof.salt, hash: prof.hash, t: prof.t }), { retain: true, qos: 1 });
+}
+let acctTimer = 0;
+function acctSoon() { clearTimeout(acctTimer); acctTimer = setTimeout(acctPut, 1500); }
+// אחרי חיבור: מסנכרנים עם החשבון ברשת (נקודות = הגבוה מבין שני הטלפונים)
+async function acctSync() {
+  if (!IS_APP || !prof.name) return;
+  if (!prof.hash) { if ($("welcome").hidden) askName("", "setpass"); return; }
+  const rec = await getRetained("acct/" + nameKey(prof.name));
+  if (rec && rec.id === prof.id && rec.hash !== prof.hash) { W.canCancel = false; $("wName").value = prof.name; askName("הסיסמה של החשבון שונתה בטלפון אחר. תיכנס שוב עם הסיסמה החדשה.", "login"); return; }
+  if (rec && rec.id === prof.id) {
+    prof.points = Math.max(prof.points | 0, rec.points | 0);
+    if ((rec.t || 0) > (prof.t || 0)) prof.av = rec.av | 0;
+    try { localStorage.setItem(PROF_KEY, JSON.stringify(prof)); } catch (e) {}
+    paintProf();
+  }
+  acctPut();
+}
+// ---------- הגדרות ----------
+$("gearBtn").onclick = (e) => { e.stopPropagation(); show("settings"); paintSettings(); };
+$("setBack").onclick = () => show("home");
+function paintSettings() {
+  $("setWho").textContent = "מחובר כ: " + (prof.name || "—");
+  $("setAcct").textContent = IS_APP ? (prof.hash ? "החשבון שמור. אפשר להיכנס אליו מכל טלפון עם השם והסיסמה." : "לחשבון עוד אין סיסמה.") : "חשבונות וסיסמאות עובדים רק באפליקציה.";
+  $("setLogin").hidden = !IS_APP; $("passForm").parentElement.hidden = !IS_APP;
+  $("passUser").value = prof.name; $("passMsg").hidden = true;
+}
+$("setLogin").onclick = () => { W.canCancel = true; $("wName").value = ""; $("wPass").value = ""; show("home"); askName("", "login"); };
+$("passForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const p = $("newPass").value, msg = $("passMsg");
+  msg.hidden = false;
+  if (p.length < 4) { msg.textContent = "הסיסמה צריכה להיות לפחות 4 אותיות או מספרים."; return; }
+  const c = await presenceConnect(); if (!c) { msg.textContent = "אין חיבור לאינטרנט. נסה שוב."; return; }
+  prof.salt = newSalt(); prof.hash = await hashPass(p, prof.salt); saveProf(); acctPut(); storeCred(prof.name, p);
+  $("newPass").value = ""; msg.textContent = "✓ הסיסמה נשמרה!";
+});
+paintProf();
+if (!prof.name) askName("", "new");
+
+$("profName").addEventListener("change", async () => {
+  const v = $("profName").value.trim(), old = prof.name;
+  $("profNameErr").hidden = true;
+  if (!v || v === old) { $("profName").value = old; return; }
+  const owner = await nameOwner(v);
+  if (owner && owner !== prof.id) { $("profName").value = old; $("profNameErr").textContent = "שם המשתמש \"" + v + "\" כבר קיים 🙁 בחר שם אחר."; $("profNameErr").hidden = false; return; }
+  claimName(v, old);
+  if (prof.hash && PRES.client && PRES.client.connected) PRES.client.publish(PRES_ROOT + "acct/" + nameKey(old), "", { retain: true, qos: 1 });
+  prof.name = v; saveProf(); paintProf(); presenceSay();
+});
+paintProf();
+if (!prof.name) askName();
+
+// ---------- מי מחובר עכשיו + הזמנות (רק באפליקציה) ----------
+// כל אחד מפרסם "אני כאן" (שם, תמונה מוכנה, דרגה, אם הוא באמצע משחק). הזמנה נשלחת לתיבה של החבר.
+const PRES = { client: null, list: {}, pending: [], invited: {}, timer: null, ready: null, photos: {} };
+// תמונה מהגלריה: שולחים גרסה קטנה (96 פיקסלים) כדי שגם אחרים יראו אותה
+let myThumb = null;
+function makeThumb(done) {
+  if (!prof.photo) { myThumb = null; return done(); }
+  const img = new Image();
+  img.onload = () => { const cv = document.createElement("canvas"); cv.width = cv.height = 96; cv.getContext("2d").drawImage(img, 0, 0, 96, 96); myThumb = cv.toDataURL("image/jpeg", 0.7); done(); };
+  img.onerror = () => { myThumb = null; done(); };
+  img.src = prof.photo;
+}
+function photoSay() {
+  makeThumb(() => { if (PRES.client && PRES.client.connected) PRES.client.publish(PRES_ROOT + "photo/" + prof.id, myThumb || "", { retain: true, qos: 1 }); acctSoon(); });
+}
+const photoOf = (id) => (id === prof.id ? prof.photo : PRES.photos[id]) || null;
+const PRES_ROOT = "hazira-dg/stg/";
+const ST_NAME = { home: "במסך הבית", lobby: "בחדר, מחכה לחבר", playing: "באמצע משחק" };
+const myStatus = () => (!$("game").hidden ? "playing" : !$("lobby").hidden ? "lobby" : "home");
+function presenceSay() {
+  if (!PRES.client || !PRES.client.connected || !prof.name) return;
+  // יצא מהאפליקציה / עבר לאפליקציה אחרת / כיבה מסך — יורד מהרשימה
+  if (document.hidden) return presenceGone();
+  PRES.client.publish(PRES_ROOT + "presence/" + prof.id, JSON.stringify({ id: prof.id, name: prof.name, av: prof.av, lvl: levelInfo(prof.points).lvl, st: myStatus(), pts: prof.points, t: Date.now() }), { retain: true, qos: 1 });
+}
+function presenceGone() { if (PRES.client && PRES.client.connected) PRES.client.publish(PRES_ROOT + "presence/" + prof.id, "", { retain: true, qos: 1 }); }
+document.addEventListener("visibilitychange", () => { if (document.hidden) presenceGone(); else presenceSay(); });
+addEventListener("pagehide", presenceGone);
+
+// שמות משתמש: כל שם שמור אצל מי שלקח אותו ראשון. אי אפשר שיהיו שני "דניאל"
+const nameKey = (n) => encodeURIComponent(String(n).trim().toLowerCase().replace(/[ךםןףץ]/g, (c) => ({ "ך": "כ", "ם": "מ", "ן": "נ", "ף": "פ", "ץ": "צ" }[c])).replace(/[\s"'׳״.\-_]+/g, ""));
+async function getRetained(sub) {
+  const c = await presenceConnect(); if (!c) return null; // בלי אינטרנט — לא בודקים
+  const topic = PRES_ROOT + sub;
+  return new Promise((done) => {
+    let finished = false;
+    const onMsg = (t, p) => { if (t === topic) finish(p.toString()); };
+    const finish = (s) => {
+      if (finished) return; finished = true;
+      c.removeListener("message", onMsg); c.unsubscribe(topic);
+      let m = null; try { m = s ? JSON.parse(s) : null; } catch (e) {}
+      done(m);
+    };
+    c.on("message", onMsg); c.subscribe(topic, { qos: 1 });
+    setTimeout(() => finish(""), 1800);
+  });
+}
+async function nameOwner(name) { const m = await getRetained("names/" + nameKey(name)); return m && m.id ? m.id : null; }
+function claimName(name, old) {
+  if (!PRES.client || !PRES.client.connected) return;
+  if (old && nameKey(old) !== nameKey(name)) PRES.client.publish(PRES_ROOT + "names/" + nameKey(old), "", { retain: true, qos: 1 });
+  PRES.client.publish(PRES_ROOT + "names/" + nameKey(name), JSON.stringify({ id: prof.id, name, t: Date.now() }), { retain: true, qos: 1 });
+}
+// מתחברים (גם לפני שיש שם, כדי לבדוק אם שם תפוס)
+function presenceConnect() {
+  if (!IS_APP) return Promise.resolve(null);
+  if (PRES.ready) return PRES.ready;
+  PRES.ready = (async () => {
+    try { await loadMqtt(); } catch (e) { PRES.ready = null; return null; }
+    const c = window.mqtt.connect(BROKERS[0], { clientId: "hz_" + prof.id + "_" + Math.random().toString(36).slice(2, 6), reconnectPeriod: 4000, keepalive: 20,
+      will: { topic: PRES_ROOT + "presence/" + prof.id, payload: "", retain: true, qos: 1 } });
+    PRES.client = c;
+    c.on("error", () => {});
+    c.on("connect", () => { c.subscribe([PRES_ROOT + "presence/+", PRES_ROOT + "photo/+", PRES_ROOT + "inbox/" + prof.id], { qos: 1 }); presenceSay(); photoSay(); });
+    c.on("message", onPresenceMsg);
+    clearInterval(PRES.timer);
+    PRES.timer = setInterval(() => {
+      presenceSay();
+      for (const [id, p] of Object.entries(PRES.list)) if (Date.now() - p.seen > 70000) delete PRES.list[id];
+      paintOnlineList();
+    }, 20000);
+    return new Promise((ok) => { if (c.connected) ok(c); c.once("connect", () => ok(c)); setTimeout(() => ok(c.connected ? c : null), 8000); });
+  })();
+  return PRES.ready;
+}
+async function presenceStart() {
+  const c = await presenceConnect(); if (!c || !prof.name) return;
+  // שם ישן מלפני שהיו שמות ייחודיים: אם מישהו אחר כבר לקח אותו — בוחרים שם חדש
+  const owner = await nameOwner(prof.name);
+  if (owner && owner !== prof.id) { const old = prof.name; prof.name = ""; saveProf(); $("wName").value = ""; askName("השם \"" + old + "\" כבר תפוס אצל מישהו אחר 🙁 בחר שם חדש.", "new"); return; }
+  if (!owner) claimName(prof.name);
+  presenceSay();
+  acctSync();
+}
+function onPresenceMsg(topic, payload) {
+  const s = payload.toString();
+  if (topic.startsWith(PRES_ROOT + "photo/")) {
+    const id = topic.split("/").pop();
+    if (id !== prof.id) { if (s.startsWith("data:image/")) PRES.photos[id] = s; else delete PRES.photos[id]; paintOnlineList(); }
+    return;
+  }
+  if (topic.startsWith(PRES_ROOT + "presence/")) {
+    const id = topic.split("/").pop();
+    if (id === prof.id) return;
+    let m = null; try { m = s ? JSON.parse(s) : null; } catch (e) {}
+    if (!m || Date.now() - (m.t || 0) > 70000) delete PRES.list[id]; else PRES.list[id] = { ...m, seen: Date.now() };
+    paintOnlineList();
+    return;
+  }
+  if (!topic.startsWith(PRES_ROOT + "inbox/")) return;
+  let m; try { m = JSON.parse(s); } catch (e) { return; }
+  if (m.type === "invite") { PRES.pending = PRES.pending.filter((x) => x.from.id !== m.from.id).concat(m); nextInvite(); }
+  else if (m.type === "decline" && !$("lobby").hidden) { $("inviteNote").textContent = m.name + ": לא עכשיו 🙁"; $("inviteNote").hidden = false; }
+}
+const stText = (p) => (p.st === "playing" ? "🎮 " : p.st === "lobby" ? "⏳ " : "🏠 ") + (ST_NAME[p.st] || ST_NAME.home);
+const qNorm = (s) => String(s || "").toLowerCase().replace(/[\s"'׳״.\-_]+/g, "");
+function sendInvite(p) {
+  PRES.client.publish(PRES_ROOT + "inbox/" + p.id, JSON.stringify({ type: "invite", from: { id: prof.id, name: prof.name, av: prof.av, lvl: levelInfo(prof.points).lvl }, code: NET.code, what: $("lobbyTitle").textContent, t: Date.now() }), { qos: 1 });
+  PRES.invited[p.id] = true;
+  $("inviteNote").textContent = p.st === "playing" ? p.name + " באמצע משחק. ההזמנה תחכה עד שהמשחק ייגמר." : p.st === "lobby" ? p.name + " בחדר אחר עכשיו. ההזמנה תחכה עד שיחזור למסך הבית." : "ההזמנה נשלחה ל" + p.name + "!";
+  $("inviteNote").hidden = false;
+  paintOnlineList();
+}
+function playerRow(p, size, withInvite) {
+  const row = document.createElement("div"); row.className = "pitem";
+  row.append(avEl(p.av, size, photoOf(p.id)));
+  const t = document.createElement("span"); t.className = "nm"; t.textContent = p.name + " ";
+  const st = document.createElement("span"); st.className = "st"; st.textContent = stText(p) + " · דרגה " + (p.lvl || 1);
+  t.append(document.createElement("br"), st); row.append(t);
+  row.onclick = () => openPlayer(p);
+  if (withInvite) {
+    const b = document.createElement("button"); b.textContent = PRES.invited[p.id] ? "הוזמן ✓" : "הזמן"; b.disabled = !!PRES.invited[p.id];
+    b.onclick = (e) => { e.stopPropagation(); sendInvite(p); };
+    row.append(b);
+  }
+  return row;
+}
+function paintOnlineList() {
+  const all = Object.values(PRES.list).sort((a, b) => (a.st === "playing") - (b.st === "playing") || a.name.localeCompare(b.name, "he"));
+  const filt = (q) => { const k = qNorm(q); return k ? all.filter((p) => qNorm(p.name).includes(k)) : all; };
+  const hb = $("homeList");
+  if (hb && !$("joinBox").hidden) {
+    const people = filt($("homeSearch").value);
+    hb.innerHTML = people.length ? "" : `<div class="note">${all.length ? "לא מצאתי שחקן בשם הזה." : "אף אחד עוד לא מחובר עכשיו."}</div>`;
+    for (const p of people) hb.append(playerRow(p, 34, false));
+  }
+  const box = $("onlineList"); if (!box || $("lobby").hidden) return;
+  const people = filt($("lobbySearch").value);
+  box.innerHTML = "";
+  if (!people.length) { box.innerHTML = `<div class="note" style="text-align:center">${all.length ? "לא מצאתי שחקן בשם הזה." : "אין עכשיו עוד מישהו מחובר. שלח לחבר את הקוד 👆"}</div>`; return; }
+  for (const p of people) box.append(playerRow(p, 40, true));
+}
+$("homeSearch").addEventListener("input", paintOnlineList);
+$("lobbySearch").addEventListener("input", paintOnlineList);
+// לוחצים על שחקן — רואים את הפרופיל שלו: תמונה, דרגה, נקודות ואיפה הוא עכשיו
+function openPlayer(p) {
+  const pts = p.pts | 0, L = levelInfo(pts), host = $("pvAv"), size = 96, r = size / 2 + 5, C = 2 * Math.PI * (r - 3);
+  host.innerHTML = ""; host.style.width = host.style.height = size + 12 + "px";
+  host.insertAdjacentHTML("beforeend", `<svg viewBox="0 0 ${2 * r + 2} ${2 * r + 2}" width="${size + 12}" height="${size + 12}"><circle class="track" cx="${r + 1}" cy="${r + 1}" r="${r - 3}" fill="none" stroke-width="5"/><circle class="prog" cx="${r + 1}" cy="${r + 1}" r="${r - 3}" fill="none" stroke-width="5" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - L.pct)}"/></svg>`);
+  host.append(avEl(p.av, size, photoOf(p.id)));
+  const b = document.createElement("span"); b.className = "lvl"; b.textContent = L.lvl; host.append(b);
+  $("pvName").textContent = p.name;
+  $("pvLvl").textContent = "דרגה " + L.lvl + " · " + pts + " נקודות ⭐";
+  $("pvBar").style.width = Math.round(L.pct * 100) + "%";
+  $("pvSt").textContent = stText(p);
+  const canInvite = !$("lobby").hidden && NET.code && !PRES.invited[p.id];
+  $("pvInvite").hidden = !canInvite;
+  $("pvInvite").onclick = () => { sendInvite(p); $("pview").hidden = true; };
+  $("pview").hidden = false;
+}
+$("pvClose").onclick = () => { $("pview").hidden = true; };
+// הזמנה מחכה עד שחוזרים למסך הבית (כמו בבראול סטארס)
+function nextInvite() {
+  if (!PRES.pending.length || ($("home").hidden && $("over").hidden) || !$("invite").hidden || !$("welcome").hidden || document.hidden) return;
+  const m = PRES.pending.shift();
+  if (Date.now() - (m.t || 0) > 10 * 60000) return nextInvite();
+  const a = $("invAv"); a.innerHTML = ""; a.append(avEl(m.from.av, 72, photoOf(m.from.id)));
+  $("invH").textContent = "הזמנה מ" + m.from.name + "! 🎮";
+  $("invWhat").textContent = m.what || "";
+  $("invite").hidden = false;
+  $("invYes").onclick = () => { $("invite").hidden = true; mode = "online"; paintMode(); joinRoom(m.code); };
+  $("invNo").onclick = () => {
+    $("invite").hidden = true;
+    PRES.client && PRES.client.publish(PRES_ROOT + "inbox/" + m.from.id, JSON.stringify({ type: "decline", name: prof.name }), { qos: 1 });
+    setTimeout(nextInvite, 300);
+  };
+}
+// מעדכנים "באמצע משחק / בבית" כשעוברים מסך
+new MutationObserver(() => { presenceSay(); if (!$("lobby").hidden) { PRES.invited = {}; $("inviteNote").hidden = true; paintOnlineList(); } })
+  .observe($("lobby"), { attributes: true, attributeFilter: ["hidden"] });
+for (const s of ["game", "home", "over"]) new MutationObserver(() => { presenceSay(); if (s === "home") paintOnlineList(); }).observe($(s), { attributes: true, attributeFilter: ["hidden"] });
+document.addEventListener("visibilitychange", () => { if (!document.hidden) setTimeout(nextInvite, 400); });
+$("modes").addEventListener("click", () => setTimeout(paintOnlineList, 0));
+presenceStart();
+
+// ---------- ניצחון ----------
+function gameOver(w) {
+  clearTimers(); stopAnswerTimer(); G.phase = "over";
+  $("winTxt").innerHTML = `<span class="${cls[w]}">${heb[w]}</span> ניצח! 🏆`;
+  $("final").innerHTML = G.players.map((k) => `<span class="${cls[k]}">${G.score[k]}</span>`).join(" : ");
+  show("over"); sfx.win(); confetti(w);
+}
+$("again").onclick = () => { stopConfetti(); if (G.mode === "solo") startSolo(G.deck); else if (G.mode === "online") { netLeave(); show("home"); } else startGame(G.deck); };
+$("toMenu").onclick = () => { stopConfetti(); show("home"); };
+$("quit").onclick = () => { clearTimers(); stopAnswerTimer(); stopListening(); G.phase = "idle"; if (G.mode === "online") netLeave(); show("home"); };
+
+let confRaf;
+function confetti(w) {
+  const cv = $("confetti"), ctx = cv.getContext("2d");
+  cv.width = innerWidth; cv.height = innerHeight;
+  const main = { blue: ["#2F7BFF", "#8FB6FF"], red: ["#FF3B4A", "#FF9AA2"], green: ["#1FB45A", "#8BE3AE"], yellow: ["#E8A800", "#FFE08A"], purple: ["#9B5CFF", "#CFB2FF"], pink: ["#FF4FA3", "#FFB3D6"] }[w] || ["#2F7BFF", "#8FB6FF"];
+  const cols = [...main, "#FFC940", "#fff"];
+  const ps = Array.from({ length: 140 }, () => ({ x: Math.random() * cv.width, y: -Math.random() * cv.height, v: 2 + Math.random() * 4,
+    s: 6 + Math.random() * 8, r: Math.random() * 6, dr: (Math.random() - .5) * .2, c: cols[Math.random() * cols.length | 0] }));
+  const draw = () => {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    for (const p of ps) {
+      p.y += p.v; p.r += p.dr; if (p.y > cv.height) p.y = -20;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); ctx.restore();
+    }
+    confRaf = requestAnimationFrame(draw);
+  };
+  stopConfetti(); draw();
+}
+function stopConfetti() { cancelAnimationFrame(confRaf); }
+</script>
+
+<script>
+// עדכון אוטומטי: בכל פתיחה של האפליקציה בודקים אם יש גרסה חדשה, ואם כן — מתעדכנים לבד
+(function () {
+  let reloading = false;
+  const reloadNow = () => {
+    if (reloading) return;
+    // שומר מפני לולאה: לא יותר מ-3 רענונים בדקה (אם השרת עוד מגיש דף ישן לכמה דקות)
+    let n = [];
+    try { n = JSON.parse(sessionStorage.getItem("hazira-reloads") || "[]").filter((t) => Date.now() - t < 60000); } catch (e) {}
+    if (n.length >= 3) return;
+    try { sessionStorage.setItem("hazira-reloads", JSON.stringify([...n, Date.now()])); } catch (e) {}
+    reloading = true; location.reload();
+  };
+  async function check() {
+    try {
+      const r = await fetch("version.json?t=" + Date.now(), { cache: "no-store" });
+      const { v } = await r.json();
+      if (v && v !== window.HAZIRA_VERSION) {
+        // לא מפריעים באמצע משחק
+        const busy = document.getElementById("game") && !document.getElementById("game").hidden;
+        if (busy) { window.HAZIRA_UPDATE_PENDING = true; return; }
+        const reg = await navigator.serviceWorker?.getRegistration();
+        if (reg) await reg.update().catch(() => {});
+        reloadNow();
+      }
+    } catch (e) {}
+  }
+  if ("serviceWorker" in navigator) {
+    addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+    navigator.serviceWorker.addEventListener("controllerchange", () => { if (window.HAZIRA_UPDATE_PENDING || reloading) reloadNow(); });
+  }
+  addEventListener("load", check);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });
+  // כשחוזרים למסך הבית אחרי משחק — אם חיכה עדכון, מתעדכנים
+  setInterval(() => { const home = document.getElementById("home"); if (window.HAZIRA_UPDATE_PENDING && home && !home.hidden) reloadNow(); }, 3000);
+})();
+</script>
+</body>
+</html>
