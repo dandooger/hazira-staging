@@ -11,11 +11,11 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790603458992"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790604287463"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
-<div style="position:sticky;top:0;z-index:50;background:#6B21A8;color:#fff;text-align:center;font:700 14px Arial;padding:4px">🧪 גרסת בדיקה (staging) — לא האפליקציה האמיתית</div>
+<div class="notr" style="position:sticky;top:0;z-index:50;background:#6B21A8;color:#fff;text-align:center;font:700 14px Arial;padding:4px">🧪 staging · גרסת בדיקה</div>
 <title>הצ'יטה</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Assistant:wght@400;600;800&display=swap">
@@ -370,8 +370,8 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
     <div class="lvlbar"><b id="setWho"></b><span class="note" id="setAcct"></span></div>
     <button class="go" id="setLogin">🔑 התחברות לחשבון אחר</button>
     <div class="lvlbar">
-      <b>✏️ שינוי שם משתמש</b>
-      <form id="nameForm" class="setform" autocomplete="on">
+      <button class="act" id="nameOpen" type="button" aria-expanded="false">✏️ שינוי שם משתמש</button>
+      <form id="nameForm" class="setform" autocomplete="on" hidden>
         <input id="newName" name="username" autocomplete="username" maxlength="14" placeholder="שם משתמש חדש">
         <input id="nameCurPass" type="password" autocomplete="current-password" placeholder="הסיסמה הנוכחית שלך">
         <button class="act" type="submit">שמור שם</button>
@@ -379,8 +379,8 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
       </form>
     </div>
     <div class="lvlbar">
-      <b>🔒 שינוי סיסמה</b>
-      <form id="passForm" class="setform" autocomplete="on">
+      <button class="act" id="passOpen" type="button" aria-expanded="false">🔒 שינוי סיסמה</button>
+      <form id="passForm" class="setform" autocomplete="on" hidden>
         <input name="username" autocomplete="username" id="passUser" hidden>
         <input id="curPass" type="password" autocomplete="current-password" placeholder="הסיסמה הנוכחית">
         <input id="newPass" type="password" autocomplete="new-password" placeholder="סיסמה חדשה (לפחות 4)">
@@ -1985,12 +1985,15 @@ async function acctSync() {
 }
 // ---------- הגדרות ----------
 $("gearBtn").onclick = (e) => { e.stopPropagation(); show("settings"); paintSettings(); };
+// "שינוי שם משתמש" / "שינוי סיסמה": השדות מופיעים רק אחרי שלוחצים על הכפתור
+for (const [b, f] of [["nameOpen", "nameForm"], ["passOpen", "passForm"]]) $(b).onclick = () => { const open = $(f).hidden; $(f).hidden = !open; $(b).setAttribute("aria-expanded", String(open)); if (open) $(f).querySelector("input:not([hidden])").focus(); };
 $("setBack").onclick = () => show("home");
 function paintSettings() {
   $("setWho").textContent = "מחובר כ: " + (prof.name || "—");
   $("setAcct").textContent = IS_APP ? (prof.hash ? "החשבון שמור. אפשר להיכנס אליו מכל טלפון עם השם והסיסמה." : "לחשבון עוד אין סיסמה.") : "חשבונות וסיסמאות עובדים רק באפליקציה.";
-  $("setLogin").hidden = !IS_APP; $("passForm").parentElement.hidden = !IS_APP;
+  $("setLogin").hidden = !IS_APP; $("passForm").parentElement.hidden = $("nameForm").parentElement.hidden = !IS_APP;
   $("passUser").value = prof.name; $("passMsg").hidden = true;
+  $("nameForm").hidden = $("passForm").hidden = true; $("nameOpen").setAttribute("aria-expanded", "false"); $("passOpen").setAttribute("aria-expanded", "false");
 }
 $("setLogin").onclick = () => { W.canCancel = true; $("wName").value = ""; $("wPass").value = ""; show("home"); askName("", "login"); };
 const curOk = async (p) => !prof.hash || (await hashPass(p, prof.salt)) === prof.hash;
