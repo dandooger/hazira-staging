@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790604287463"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790605764717"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -352,7 +352,7 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
     <h2 id="lobbyTitle">החדר מוכן!</h2>
     <div class="code" id="lobbyCode">·····</div>
     <div class="note" id="lobbyNote">שלח לחבר את הקוד. הוא פותח את האפליקציה, בוחר "אונליין" ומקליד אותו.</div>
-    <div class="row" style="justify-content:center"><button class="go" id="shareCode">📤 שלח לחבר</button><button class="ghost" id="lobbyCancel">ביטול</button></div>
+    <div class="row" style="justify-content:center"><button class="go" id="shareCode">📤 שלח לחבר</button><button class="ghost" id="lobbyCancel">ביטול</button><button class="ghost langbtn notr" type="button" aria-label="Language / שפה">🌐</button></div>
     <div class="spinner" style="width:40px;height:40px;border-width:5px"></div>
     <h2 style="font-size:20px">או הזמן מי שמחובר עכשיו:</h2>
     <input class="psearch" id="lobbySearch" type="search" placeholder="🔍 חפש שחקן לפי שם" autocomplete="off" style="width:min(420px,100%)">
@@ -393,7 +393,7 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
 </section>
 
 <section id="profile" class="screen" hidden>
-  <div class="row" style="justify-content:space-between"><h2>הפרופיל שלי</h2><button class="ghost" id="profBack">חזרה ←</button></div>
+  <div class="row" style="justify-content:space-between"><h2>הפרופיל שלי</h2><div class="row" style="gap:6px"><button class="ghost langbtn notr" type="button" aria-label="Language / שפה">🌐</button><button class="ghost" id="profBack">חזרה ←</button></div></div>
   <div class="profhead"><span class="ringwrap" id="profBig"></span><input id="profName" maxlength="14" autocomplete="off" aria-label="שם משתמש" readonly title="את השם משנים בהגדרות ⚙️"></div>
   <div class="err" id="profNameErr" hidden></div>
   <div class="lvlbar"><b id="profLvl"></b><div class="bar"><i id="profBar"></i></div><span class="note" id="profNext"></span></div>
@@ -413,7 +413,7 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
   <div class="topbar">
     <div class="title"><span id="gTitle"></span><small id="gRound"></small></div>
     <div class="timer" id="timer" hidden></div>
-    <button class="ghost" id="quit">יציאה</button>
+    <div class="row" style="gap:6px;flex-wrap:nowrap"><button class="ghost langbtn notr" type="button" aria-label="Language / שפה">🌐</button><button class="ghost" id="quit">יציאה</button></div>
   </div>
   <!-- 4-5 שחקנים: שורת כפתורים ותמונה הפוכות, בשביל מי שיושב מול הטלפון -->
   <div class="buzzers top" id="buzzersTop" hidden></div>
@@ -484,6 +484,16 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
   </div>
 </div>
 
+<!-- החלפת שפה מכל מסך -->
+<div class="modal notr" id="langModal" hidden>
+  <div class="card" style="text-align:center;justify-items:center">
+    <h3>🌐 שפה · Language</h3>
+    <div class="langrow" style="justify-content:center"><button class="go" id="lmHe" type="button">עברית</button><button class="go" id="lmEn" type="button">English</button></div>
+    <div class="note" id="lmNote" hidden>המשחק יתחיל מחדש · The game will restart</div>
+    <button class="ghost" id="lmClose" type="button">✕</button>
+  </div>
+</div>
+
 <!-- הזמנה למשחק -->
 <div class="modal" id="invite" hidden>
   <div class="card" role="dialog" aria-labelledby="invH" style="text-align:center;justify-items:center">
@@ -518,7 +528,7 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
   <div style="position:relative">
     <h2 id="winTxt"></h2>
     <div class="final" id="final"></div>
-    <div class="row" style="justify-content:center"><button class="go" id="again">עוד משחק</button><button class="ghost" id="toMenu">קטגוריה אחרת</button></div>
+    <div class="row" style="justify-content:center"><button class="go" id="again">עוד משחק</button><button class="ghost" id="toMenu">קטגוריה אחרת</button><button class="ghost langbtn notr" type="button" aria-label="Language / שפה">🌐</button></div>
   </div>
 </section>
 
@@ -1799,6 +1809,10 @@ function setLang(l) { try { localStorage.setItem(LANG_KEY, l); } catch (e) {} lo
 $("langHe").onclick = () => setLang("he"); $("langEn").onclick = () => setLang("en");
 $("langHe").setAttribute("aria-pressed", String(LANG === "he")); $("langEn").setAttribute("aria-pressed", String(LANG === "en"));
 $("wLang").textContent = LANG === "en" ? "🌐 עברית" : "🌐 English"; $("wLang").onclick = () => setLang(LANG === "en" ? "he" : "en");
+document.querySelectorAll(".langbtn").forEach((b) => (b.onclick = () => { $("lmNote").hidden = $("game").hidden && $("lobby").hidden; $("langModal").hidden = false; }));
+$("lmHe").onclick = () => { if (G.mode === "online" && NET.client) netLeave(); setLang("he"); };
+$("lmEn").onclick = () => { if (G.mode === "online" && NET.client) netLeave(); setLang("en"); };
+$("lmClose").onclick = () => { $("langModal").hidden = true; };
 startI18n();
 
 // ---------- פרופיל: שם, תמונה, נקודות ודרגות ----------
