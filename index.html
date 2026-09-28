@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790588973790"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790589463640"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -126,10 +126,11 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
   text-shadow:0 0 40px rgba(255,255,255,.8);pointer-events:none}
 .count.tick{animation:tick 1s ease-out}
 @keyframes tick{0%{transform:scale(1.6);opacity:0}25%{opacity:1}100%{transform:scale(.8);opacity:.2}}
-.timer{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:var(--display);font-size:32px;line-height:1;
-  background:rgba(26,20,5,.88);color:#fff;border:3px solid var(--tc,#FFC400);border-radius:999px;padding:7px 20px;min-width:3em;text-align:center;font-variant-numeric:tabular-nums}
+/* הטיימר בפס העליון, ליד השם — לא על התמונה */
+.timer{flex:none;font-family:var(--display);font-size:26px;line-height:1;
+  background:rgba(26,20,5,.88);color:#fff;border:3px solid var(--tc,#FFC400);border-radius:999px;padding:6px 16px;min-width:3em;text-align:center;font-variant-numeric:tabular-nums}
 .timer.low{color:var(--bad);border-color:var(--bad);animation:pulse .5s ease-in-out infinite alternate}
-@keyframes pulse{to{transform:translateX(-50%) scale(1.12)}}
+@keyframes pulse{to{transform:scale(1.12)}}
 .answer{position:absolute;inset-inline:0;bottom:0;padding:12px 14px;background:linear-gradient(0deg,rgba(0,0,0,.92),rgba(0,0,0,.6));color:#fff;text-align:center;
   font-family:var(--display);font-size:clamp(26px,8vw,44px);animation:up .3s ease-out}
 .answer small{display:block;font-family:var(--body);font-size:14px;color:#D8D2BE;margin-top:2px}
@@ -394,6 +395,7 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
 <section id="game" class="screen" hidden>
   <div class="topbar">
     <div class="title"><span id="gTitle"></span><small id="gRound"></small></div>
+    <div class="timer" id="timer" hidden></div>
     <button class="ghost" id="quit">יציאה</button>
   </div>
   <!-- 4-5 שחקנים: שורת כפתורים ותמונה הפוכות, בשביל מי שיושב מול הטלפון -->
@@ -401,7 +403,6 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
   <div class="stage mirror" id="stage2" hidden aria-hidden="true"></div>
   <div class="stage hide" id="stage">
     <div class="pic" id="picWrap"><img id="pic" alt=""><div class="emo" id="emo" hidden></div></div>
-    <div class="timer" id="timer" hidden></div>
     <div class="hintchip" id="hintchip" hidden></div>
     <div class="count" id="count"></div>
   </div>
