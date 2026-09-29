@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790683443046"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790684147434"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -1891,7 +1891,7 @@ async function joinRoom(code) {
     resetO({ started: false, joinT0: t0, typing: {} });
     await netOpen(code, +code[0] - 1);
     NET.role = "guest";
-    O.joinTimer = setTimeout(() => { if (!O.players.length) { netLeave(); show("home"); $("joinErr").textContent = "לא מצאתי חדר עם הקוד הזה. בדקו אותו ונסו שוב."; $("joinErr").hidden = false; } }, 12000);
+    O.joinTimer = setTimeout(() => { if (!O.players.length) { netLeave(); show("home"); $("joinErr").textContent = "לא מצאתי חדר עם הקוד הזה. בדקו אותו ונסו שוב."; $("joinErr").hidden = false; } }, 20000);
     send("join", { name: prof.name, pid: prof.id, av: prof.av | 0 });
   } catch (e) { show("home"); $("joinErr").textContent = "לא הצלחתי להתחבר. בדקו שיש אינטרנט."; $("joinErr").hidden = false; }
 }
@@ -1966,7 +1966,7 @@ function onlineAgain() {
   if (isHost()) { show("lobby"); sendLobby(); renderChat(); roomSave("host"); return; }
   O.players = []; O.joinT0 = 0; clearTimeout(O.joinTimer);
   paintLobby(); renderChat(); show("lobby"); roomSave("guest");
-  O.joinTimer = setTimeout(() => { if (!O.players.length) roomClosed("👋 מנהל החדר כבר לא בחדר"); }, 12000);
+  O.joinTimer = setTimeout(() => { if (!O.players.length) roomClosed("👋 מנהל החדר כבר לא בחדר"); }, 20000);
   send("join", { name: prof.name, pid: prof.id, av: prof.av | 0 });
 }
 $("startGame").onclick = () => { if (isHost() && !O.started && O.players.length >= 2) hostStart(); };
@@ -2212,6 +2212,7 @@ function onAnswering(who) {
   if (isHost()) later(() => { if (!O.result && !O.pending) hostFinish(false, ""); }, 20000);
 }
 function onConfirm(judge, who, text, reason) {
+  if (!G.item) return;
   G.phase = judge === NET.me ? "confirm" : "waitConfirm";
   stopAnswerTimer();
   showAnswerOnStage();
@@ -2227,6 +2228,7 @@ function onlineDecide(ok) {
   if (isHost()) { const t = (O.pending && O.pending.text) || ""; O.pending = null; hostFinish(ok, t); } else send("decide", { n: O.n, ok });
 }
 function showResult(m) {
+  if (!G.item) return; // התמונה עוד לא נטענה בטלפון הזה
   G.phase = "scored"; clearTimers(); stopAnswerTimer(); stopListening(); onAnswer = null; $("ansBox").hidden = true;
   O.score = m.score; paintOnline(); setSides(null);
   logTries(G.item, m.texts || (m.text ? [m.text] : []), m.none ? "" : m.answerer === NET.me ? T("אתה", "You") : pName(m.answerer));
