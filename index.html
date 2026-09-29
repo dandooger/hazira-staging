@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790682906001"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790683443046"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -1930,6 +1930,8 @@ function paintLobby() {
 }
 function sendLobby() { send("lobby", { players: O.players, title: O.title, target: O.target, hostId: NET.me, chat: O.chat.slice(-20) }); paintLobby(); }
 function hostGotJoin(m) {
+  // מי שכבר בחדר ושולח שוב "נכנס" (למשל הודעה שהתעכבה) — לא זורקים אותו
+  if (pOf(m.from)) { if (!O.started) sendLobby(); return; }
   if (O.started) return send("no", { to: m.from, why: "started" });
   if (!pOf(m.from)) {
     // אותו חשבון שנכנס שוב (למשל אחרי ניתוק) — במקום הישן
