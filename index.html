@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790684147434"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790687765206"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -317,7 +317,12 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
 .readywait{position:absolute;inset:0;z-index:6;background:var(--stage);display:grid;grid-template-rows:auto 1fr auto;gap:8px;padding:10px;text-align:center}
 .readywait[hidden]{display:none}
 .readywait b{font-family:var(--display);font-weight:400;font-size:22px}
-#rwHead{display:grid;gap:4px;justify-items:center}
+#rwHead{display:grid;gap:6px;justify-items:stretch}
+.ansrect{background:var(--ink);color:#FFC400;border-radius:12px;padding:8px 12px;font-size:18px;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline;justify-content:center}
+.ansrect b{font-family:var(--display);font-weight:400;font-size:26px;color:#fff}
+.ansrect small{flex-basis:100%;font-size:13px;opacity:.85}
+.rwline{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center}
+.rwline .rchip{padding:2px 10px;font-size:14px}
 .chatlog.big{max-height:none;min-height:0;background:var(--ground);border-radius:12px;padding:8px}
 .typingrow{display:flex;align-items:center;gap:6px}
 .typing{display:inline-flex;gap:4px;align-items:center;border-radius:14px;padding:9px 12px}
@@ -329,6 +334,10 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
 .howto{margin:0;padding-inline-start:22px;display:grid;gap:8px;font-size:18px;line-height:1.45}
 .tile[data-f]{cursor:pointer}
 .tile[data-f]:hover,.tile[data-f]:focus-visible{border-color:var(--ink)}
+.dmcard .chatlog.big{height:min(46vh,420px);overflow:auto}
+.cmsg.me{background:#2F7BFF;justify-self:end;max-width:85%}
+.cmsg.them{background:#5A4712;justify-self:start;max-width:85%}
+.dmtoast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:12;max-width:min(520px,92vw);background:#1A1405;color:#FFC400;border:2px solid #FFC400;border-radius:14px;padding:10px 16px;font-size:16px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.35);cursor:pointer}
 .fbrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 #fbText{font:inherit;font-size:18px;color:var(--ink);background:var(--ground);border:1px solid var(--line);border-radius:10px;padding:12px;width:100%;resize:vertical;min-height:120px}
 .gearbtn .dot{position:absolute;top:-3px;inset-inline-end:-3px;width:14px;height:14px;border-radius:50%;background:var(--red,#FF3B4A);border:2px solid #1A1405}
@@ -608,7 +617,7 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
     <div class="favline" id="pvFav" hidden></div>
     <div class="lvlbar" style="width:100%"><b id="pvLvl"></b><div class="bar"><i id="pvBar"></i></div><span class="note" id="pvSt"></span></div>
     <div class="lvlbar" id="pvAdm" style="width:100%;text-align:start" hidden></div>
-    <div class="row" style="justify-content:center"><button class="go" id="pvInvite" hidden>🎮 הזמן לשחק</button><button class="ghost" id="pvClose">סגור</button></div>
+    <div class="row" style="justify-content:center"><button class="go" id="pvInvite" hidden>🎮 הזמן לשחק</button><button class="go" id="pvDm" type="button" hidden>💬 שליחת הודעה</button><button class="ghost" id="pvClose">סגור</button></div>
   </div>
 </div>
 
@@ -661,6 +670,17 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
     <button class="go" id="bonusOk" type="button">איזה כיף! 🎉</button>
   </div>
 </div>
+
+<!-- הודעות פרטיות -->
+<div class="modal" id="dmModal" hidden>
+  <div class="card dmcard" role="dialog" aria-labelledby="dmName">
+    <div class="row" style="justify-content:space-between;flex-wrap:nowrap"><div class="row" style="gap:8px;flex-wrap:nowrap;align-items:center"><span id="dmAv"></span><b id="dmName" class="notr" style="font-size:20px"></b></div><button class="ghost" id="dmClose" type="button" aria-label="סגור">✕</button></div>
+    <div class="note" id="dmNote">השיחה נמחקת כשאחד מכם יוצא מהאפליקציה.</div>
+    <div class="chatlog big" id="dmLog"></div>
+    <form class="chatform" id="dmForm" autocomplete="off"><input id="dmIn" maxlength="200" placeholder="כתוב הודעה…" autocomplete="off"><button class="act" type="submit">שלח</button></form>
+  </div>
+</div>
+<div class="dmtoast notr" id="dmToast" role="button" tabindex="0" hidden></div>
 
 <!-- בדוק אצל שופט: למה כל תשובה נחשבה או לא -->
 <div class="modal" id="jlogModal" hidden>
@@ -805,14 +825,16 @@ const EN_DICT = {
   "✋ מוכן": "✋ Ready", "✋ מוכנים": "✋ Ready", "🙈 לא יודע": "🙈 Don't know", "🏠 חזרה למסך הבית": "🏠 Back to home", "🔁 עוד משחק (באותו חדר)": "🔁 Play again (same room)", "ראה פחות": "See less", "🐆 איך משחקים?": "🐆 How do you play?", "מופיעה תמונה.": "A picture appears.", "מי שלוחץ ראשון על הכפתור — עונה (אומר במיקרופון 🎤 או כותב).": "Whoever presses the button first answers (say it 🎤 or type it).", "צודק? מקבל נקודה ⭐ טעית? אפשר לנסות שוב עד שהזמן נגמר.": "Right? You get a point ⭐ Wrong? Try again until time runs out.", "מי שמגיע ראשון ליעד — מנצח! 🏆": "First to reach the target wins! 🏆", "אפשר לשחק לבד, ביחד על טלפון אחד, או אונליין עם חברים.": "Play solo, together on one phone, or online with friends.", "יאללה, מתחילים!": "Let's go!", "+10 נקודות!": "+10 points!", "כל יום שנכנסים לצ'יטה מקבלים 10 נקודות ⭐ בחצות זה מתאפס, ומחר אפשר לקבל שוב.": "Every day you open The Cheetah you get 10 points ⭐ It resets at midnight, so come back tomorrow for more.", "איזה כיף! 🎉": "Awesome! 🎉", "👋 מנהל החדר כבר לא בחדר": "👋 The room manager isn't in the room anymore",
   // צלילים, חזרה לחדר, צ'אט
   "🔊 צלילים": "🔊 Sounds", "🔊 פועל": "🔊 On", "🔇 כבוי": "🔇 Off", "חוזר לחדר שלך…": "Back to your room…", "⏳ מנהל החדר יצא לרגע… מחכים שיחזור": "⏳ The room manager stepped out… waiting for them to come back", "👋 מנהל החדר יצא, אז החדר נסגר": "👋 The room manager left, so the room closed", "💬 כתוב הודעה…": "💬 Write a message…",
+  // הודעות פרטיות, נקודה לכל השאר
+  "💬 שליחת הודעה": "💬 Send a message", "השיחה נמחקת כשאחד מכם יוצא מהאפליקציה.": "The chat is deleted when one of you leaves the app.", "עוד אין הודעות. כתוב משהו 🙂": "No messages yet. Say something 🙂", " לא מחובר עכשיו, אז השיחה נמחקה.": " isn't online now, so the chat was deleted.", "נקודה לכל השאר!": "A point for everyone else!", " · נקודה לכל השאר": " · a point for everyone else", " (גם לך! 🎉)": " (you too! 🎉)", "התשובה:": "Answer:", "✓ אתה מוכן · ": "✓ You're ready · ", " מנהל החדר עכשיו": " is the room manager now",
 };
 // משפטים עם מספרים/שמות בסדר אחר באנגלית
 const EN_RULES = [
   [/^תמונה (\d+) מתוך (\d+)$/, "Picture $1 of $2"], [/^תמונה (\d+)$/, "Picture $1"],
   [/^עוד (\d+) נקודות לדרגה (\d+) \(כל תשובה נכונה = (\d+)\)$/, "$1 more points to level $2 (each correct answer = $3)"],
   [/^עלית לדרגה (\d+)! 🎉$/, "You reached level $1! 🎉"],
-  [/^שימו את הטלפון באמצע השולחן: (\d+) מצד אחד ו-(\d+) מהצד השני\. יש שתי תמונות, אחת הפוכה בשביל מי שיושב ממול\.( נכון = נקודה למי שענה\. טעות = יורדת לו נקודה\.)?$/,
-    (m, a, b, c) => `Put the phone in the middle of the table: ${a} on one side and ${b} on the other. There are two pictures, one upside down for whoever sits opposite.` + (c ? " Correct = a point. Wrong = they lose a point." : "")],
+  [/^שימו את הטלפון באמצע השולחן: (\d+) מצד אחד ו-(\d+) מהצד השני\. יש שתי תמונות, אחת הפוכה בשביל מי שיושב ממול\.( נכון = נקודה למי שענה\. טעות או לא יודע = נקודה לכל השאר\.)?$/,
+    (m, a, b, c) => `Put the phone in the middle of the table: ${a} on one side and ${b} on the other. There are two pictures, one upside down for whoever sits opposite.` + (c ? " Correct = a point. Wrong or don't know = a point for everyone else." : "")],
   [/^משחק לבד: צריך (\d+) נכונות\. מותר לטעות עד חצי \((\d+)\), והטעות ה-(\d+) פוסלת! עונים במיקרופון 🎤 או בהקלדה\.$/, "Solo: you need $1 correct. You may make up to half that in mistakes ($2); mistake number $3 knocks you out! Answer by microphone 🎤 or typing."],
   [/^✓ פתרת את החידה של היום! \+(\d+) ⭐ · חידה חדשה בעוד (\d+) שעות ו-(\d+) דקות$/, "✓ You solved today's riddle! +$1 ⭐ · New riddle in $2 h $3 min"],
   [/^✗ לא הפעם · חידה חדשה בעוד (\d+) שעות ו-(\d+) דקות$/, "✗ Not this time · New riddle in $1 h $2 min"],
@@ -940,7 +962,7 @@ const IS_APP = !!window.HAZIRA_IS_APP;
 const soloOut = (t) => Math.floor(t / 2) + 1;
 const MODE_NOTE = {
   duo: () => `שימו את הטלפון באמצע השולחן: ${Math.ceil(players / 2)} מצד אחד ו-${Math.floor(players / 2)} מהצד השני. יש שתי תמונות, אחת הפוכה בשביל מי שיושב ממול.`
-    + (players === 2 ? "" : " נכון = נקודה למי שענה. טעות = יורדת לו נקודה."),
+    + (players === 2 ? "" : " נכון = נקודה למי שענה. טעות או לא יודע = נקודה לכל השאר."),
   solo: () => `משחק לבד: צריך ${target} נכונות. מותר לטעות עד חצי (${soloOut(target) - 1}), והטעות ה-${soloOut(target)} פוסלת! עונים במיקרופון 🎤 או בהקלדה.`,
   online: IS_APP ? "כל אחד משחק מהטלפון שלו. מי שלוחץ ראשון עונה במיקרופון 🎤 או בהקלדה, והשופט בודק." : "מצב אונליין עובד רק באפליקציה (לחצו \"התקן אפליקציה\" למעלה).",
 };
@@ -1347,20 +1369,17 @@ function reveal(timeUp) {
 function score(correct) {
   if (G.phase !== "revealed") return;
   G.phase = "scored";
-  // שניים: טעות = נקודה ליריב. 3 ומעלה: טעות = יורדת נקודה למי שענה
-  const two = G.players.length === 2;
-  const winner = correct ? G.buzzer : two ? other(G.buzzer) : null, loser = winner ? null : G.buzzer;
-  const lost = loser && G.score[loser] > 0;
-  if (winner) G.score[winner]++; else if (lost) G.score[loser]--;
+  // נכון = נקודה למי שענה. טעות (או שלא הספיק) = נקודה לכל השאר
+  const winners = correct ? [G.buzzer] : G.players.filter((k) => k !== G.buzzer);
+  for (const k of winners) G.score[k]++;
   if (correct && G.buzzer === "blue") awardPoints(POINTS_PER_CORRECT); // הכחול זה אני
   paintScore();
-  const side = btn(winner || loser);
-  side.classList.remove("pop"); void side.offsetWidth; side.classList.add("pop");
+  for (const k of winners) { const side = btn(k); side.classList.remove("pop"); void side.offsetWidth; side.classList.add("pop"); }
   flash(correct);
   const L_ = T("ל", "");
-  acts(winner ? `נקודה <span class="${cls[winner]}">${L_}${pname[winner]}</span>!`
-    : lost ? `<span class="${cls[loser]}">${L_}${pname[loser]}</span> יורדת נקודה.` : `אין נקודה <span class="${cls[loser]}">${L_}${pname[loser]}</span>.`);
-  if (winner && G.score[winner] >= target) return later(() => gameOver(winner), 1300);
+  acts(winners.length === 1 ? `נקודה <span class="${cls[winners[0]]}">${L_}${pname[winners[0]]}</span>!` : "נקודה לכל השאר!");
+  const top = winners.filter((k) => G.score[k] >= target).sort((a, b) => G.score[b] - G.score[a])[0];
+  if (top) return later(() => gameOver(top), 1300);
   G.phase = "between";
   $("acts").insertAdjacentHTML("beforeend", ` <button class="act big good" data-a="next">✋ מוכנים</button><button class="act" data-a="jlog">⚖️ שופט</button>`);
 }
@@ -2061,7 +2080,7 @@ function hostStart() {
   O.started = true; roomClear();
   O.score = Object.fromEntries(O.players.map((p) => [p.id, 0])); O.n = 0; O.gameTitle = O.deck.icon + " " + O.deck.name + " · " + O.deck.levelName;
   O.queue = deckOrder(O.deck.items, O.deck.reserve); O.reserve = [];
-  send("start", { title: O.gameTitle, target: O.target, score: O.score, players: O.players });
+  send("start", { title: O.gameTitle, target: O.target, score: O.score, players: O.players, cat: O.cat && O.cat.id, level: O.level });
   startOnlineScreen();
   later(hostRound, 800);
 }
@@ -2106,16 +2125,15 @@ function hostGotAnswer(texts, n) {
 function hostFinish(ok, text, none) {
   if (O.result) return;
   O.result = true; clearTimers(); stopAnswerTimer();
-  let point = null, minus = null;
+  // נכון = נקודה למי שענה. טעות (או שלא הספיק לענות) = נקודה לכל השאר
+  let points = [];
   if (!none) {
-    if (ok) point = O.answerer;
-    else if (O.players.length === 2) point = (others().find((p) => p.id !== O.answerer) || O.players.find((p) => p.id !== O.answerer) || {}).id || null;
-    else minus = O.answerer; // 3 שחקנים או יותר: טעות מורידה נקודה למי שענה
-    if (point) O.score[point] = (O.score[point] | 0) + 1;
-    if (minus) O.score[minus] = Math.max(0, (O.score[minus] | 0) - 1);
+    points = ok ? [O.answerer] : O.players.map((p) => p.id).filter((id) => id !== O.answerer);
+    for (const id of points) O.score[id] = (O.score[id] | 0) + 1;
   }
-  const w = point && O.score[point] >= O.target ? point : null;
-  const msg = { n: O.n, ok, text, texts: none ? [] : (O.lastTexts || [text]).filter(Boolean).slice(0, 12), none: none || false, answerer: O.answerer, point, minus, score: O.score, final: !!w };
+  const w = points.filter((id) => O.score[id] >= O.target).sort((a, b) => O.score[b] - O.score[a])[0] || null;
+  const point = points.length === 1 ? points[0] : null;
+  const msg = { n: O.n, ok, text, texts: none ? [] : (O.lastTexts || [text]).filter(Boolean).slice(0, 12), none: none || false, answerer: O.answerer, point, points, score: O.score, final: !!w };
   O.lastTexts = null;
   // לא ממשיכים לבד: כל אחד לוחץ "מוכן", ורק כשכולם מוכנים עוברים לתמונה הבאה
   O.ready = {}; O.readyOpen = !w;
@@ -2151,6 +2169,28 @@ function hostDrop(id) {
   if (O.pending && O.pendingJudge === id) { const t = O.pending.text; O.pending = null; return hostFinish(false, t); }
   if (G.phase === "open" && !O.answerer && allIn(O.dunno)) return hostFinish(false, "", "dunno");
   if (O.readyOpen) { readyActs(); if (allIn(O.ready)) { O.readyOpen = false; later(hostRound, 300); } }
+}
+
+// מנהל החדר יצא באמצע משחק: השחקן הבא ברשימה נהיה המנהל, וכולם ממשיכים
+async function hostMigrate(oldId) {
+  const old = pOf(oldId); if (!old) return;
+  O.players = O.players.filter((p) => p.id !== oldId);
+  if (O.players.length < 2) return roomClosed("👋 מנהל החדר (" + old.name + ") יצא, ונשארת לבד — המשחק נגמר");
+  const nh = O.players[0]; O.hostId = nh.id;
+  chatAdd({ sys: true, text: "👋 " + old.name + " יצא. 👑 " + nh.name + " מנהל החדר עכשיו" });
+  paintOnline();
+  if (nh.id !== NET.me) return;
+  // אני מנהל החדר החדש: בונים את החפיסה ומתחילים תמונה חדשה
+  const c = CAT_BY_ID[O.catId];
+  if (!c) return roomClosed("👋 מנהל החדר יצא, אז המשחק נגמר");
+  NET.role = "host";
+  clearTimers(); stopAnswerTimer(); stopListening(); onAnswer = null; $("ansBox").hidden = true;
+  const keep = level; level = O.level || level;
+  try { O.deck = await buildDeck(c); } catch (e) { level = keep; return roomClosed("👋 מנהל החדר יצא, אז המשחק נגמר"); }
+  level = keep;
+  O.cat = c; O.queue = deckOrder(O.deck.items, O.deck.reserve); O.readyOpen = false; O.result = true; O.pending = null;
+  send("left", { id: oldId, players: O.players, hostId: NET.me });
+  later(hostRound, 1500);
 }
 
 // ---- מה שכל הטלפונים עושים ----
@@ -2240,7 +2280,7 @@ function showResult(m) {
     flash(m.ok, m.ok ? (me ? "✓ צדקת!" : "✓ נכון!") : m.text ? "✗ טעות" : "⏰ נגמר הזמן");
     if (m.ok && me) awardPoints(POINTS_PER_CORRECT);
     O.resultLine = (me ? "ענית" : escapeHtml(pName(m.answerer)) + " ענה") + (m.text ? `: "${escapeHtml(m.text)}"` : "")
-      + (m.point ? " · נקודה " + nm(m.point) + (m.point === NET.me ? "! 🎉" : "") : m.minus ? " · ירדה נקודה " + nm(m.minus) : "");
+      + (m.point ? " · נקודה " + nm(m.point) + (m.point === NET.me ? "! 🎉" : "") : (m.points || []).length ? " · נקודה לכל השאר" + ((m.points || []).includes(NET.me) ? " (גם לך! 🎉)" : "") : "");
   }
   if (m.final) { acts(O.resultLine); return; }
   G.phase = "ready"; O.ready = {};
@@ -2252,12 +2292,14 @@ function readyActs() {
   const me = !!O.ready[NET.me], wait = O.players.filter((p) => !O.ready[p.id]);
   acts(`<span style="flex-basis:100%">${O.resultLine}</span>
     <button class="act big ${me ? "good" : ""}" data-a="ready">${me ? "✓ אני מוכן (לחץ לביטול)" : "✋ מוכן"}</button><button class="act" data-a="jlog">⚖️ שופט</button>`);
+  // בין תמונות, לכולם: למעלה התשובה במלבן, ומתחת — הצ'אט הגדול (בלי ללחוץ "מוכן")
   const w = $("readyWait"), wasHidden = w.hidden;
-  w.hidden = !me;
-  if (!me) return;
-  // מי שמוכן: במקום התמונה — מי עוד לא מוכן + הצ'אט
+  w.hidden = false;
   const h = $("rwHead");
-  h.innerHTML = `<b>✓ אתה מוכן!</b><div class="note">${wait.length ? "מחכים ל:" : "כולם מוכנים! מתחילים…"}</div><div class="rchips"></div>`;
+  h.innerHTML = `<div class="ansrect"><span>התשובה:</span> <b class="notr"></b><small class="notr"></small></div><div class="rwline"><span class="note"></span><span class="rchips"></span></div>`;
+  h.querySelector(".ansrect b").textContent = G.item ? ansOf(G.item) : "";
+  const alts = G.item ? altsOf(G.item) : []; h.querySelector(".ansrect small").textContent = alts.length ? T("נחשב גם: ", "Also counts: ") + alts.join(" · ") : "";
+  h.querySelector(".rwline .note").textContent = (me ? "✓ אתה מוכן · " : "") + (wait.length ? "מחכים ל:" : "כולם מוכנים! מתחילים…");
   for (const p of wait) { const c = document.createElement("span"); c.className = "rchip notr"; c.style.background = CHAT_BG[p.color]; c.textContent = p.name; h.querySelector(".rchips").append(c); }
   if (wasHidden) { renderChat(); $("chatToast").hidden = true; }
 }
@@ -2293,7 +2335,7 @@ function onNet(m) {
         $("lobbyWait").textContent = "⏳ מנהל החדר יצא לרגע… מחכים שיחזור";
         return;
       }
-      return roomClosed("👋 מנהל החדר (" + pName(m.from) + ") יצא, אז המשחק נגמר");
+      return hostMigrate(m.from);
     }
     if (isHost()) hostDrop(m.from);
     return;
@@ -2311,8 +2353,8 @@ function onNet(m) {
   if (m.to && m.to !== NET.me) return;
   if (m.type === "lobby") onLobby(m);
   else if (m.type === "no") onNo(m);
-  else if (m.type === "start") { O.started = true; clearTimeout(O.joinTimer); roomClear(); O.gameTitle = m.title; O.target = m.target; O.score = m.score; O.players = m.players || O.players; startOnlineScreen(); }
-  else if (m.type === "left") { O.players = m.players || O.players; paintOnline(); readyActs(); }
+  else if (m.type === "start") { O.started = true; clearTimeout(O.joinTimer); roomClear(); O.catId = m.cat; O.level = m.level; O.gameTitle = m.title; O.target = m.target; O.score = m.score; O.players = m.players || O.players; startOnlineScreen(); }
+  else if (m.type === "left") { O.players = m.players || O.players; if (m.hostId) O.hostId = m.hostId; paintOnline(); readyActs(); }
   else if (m.type === "end") roomClosed(m.text || "👋 המשחק נגמר");
   else if (m.type === "round") playRound(m);
   else if (m.type === "answering" && m.n === O.n) onAnswering(m.who);
@@ -2733,7 +2775,7 @@ function presenceConnect() {
     PRES.timer = setInterval(() => {
       presenceSay();
       if (++beat % 3 === 0 && prof.photo && !document.hidden) photoSay(); // שולחים שוב את התמונה כל דקה, למקרה שהיא הלכה לאיבוד בדרך
-      for (const [id, p] of Object.entries(PRES.list)) if (Date.now() - p.seen > 70000) delete PRES.list[id];
+      for (const [id, p] of Object.entries(PRES.list)) if (Date.now() - p.seen > 70000) { delete PRES.list[id]; dmGone(id); }
       paintOnlineList();
     }, 20000);
     return new Promise((ok) => { if (c.connected) ok(c); c.once("connect", () => ok(c)); setTimeout(() => ok(c.connected ? c : null), 8000); });
@@ -2765,12 +2807,14 @@ function onPresenceMsg(topic, payload) {
     const id = topic.split("/").pop();
     if (id === prof.id) return;
     let m = null; try { m = s ? JSON.parse(s) : null; } catch (e) {}
-    if (!m || Date.now() - (m.t || 0) > 70000) delete PRES.list[id]; else PRES.list[id] = { ...m, seen: Date.now() };
+    if (!m || Date.now() - (m.t || 0) > 70000) { delete PRES.list[id]; dmGone(id); } else PRES.list[id] = { ...m, seen: Date.now() };
     paintOnlineList();
     return;
   }
   if (!topic.startsWith(PRES_ROOT + "inbox/")) return;
   let m; try { m = JSON.parse(s); } catch (e) { return; }
+  if (m.type === "dm" && m.from && m.from.id) return dmGot(m);
+  if (m.type === "dmtyping" && m.from && m.from.id) { dmTyping[m.from.id] = Date.now() + 3500; if (dmWith && dmWith.id === m.from.id) renderDm(); return; }
   if (m.type === "invite") { PRES.pending = PRES.pending.filter((x) => x.from.id !== m.from.id).concat(m); nextInvite(); }
   else if (m.type === "decline" && !$("lobby").hidden) { $("inviteNote").textContent = m.name + ": לא עכשיו 🙁"; $("inviteNote").hidden = false; }
 }
@@ -2786,7 +2830,7 @@ function sendInvite(p) {
 function playerRow(p, size, withInvite) {
   const row = document.createElement("div"); row.className = "pitem";
   row.append(avEl(p.av, size, photoOf(p.id)));
-  const t = document.createElement("span"); t.className = "nm"; const nm = document.createElement("b"); nm.className = "notr"; nm.textContent = p.name + " "; t.append(nm);
+  const t = document.createElement("span"); t.className = "nm"; const nm = document.createElement("b"); nm.className = "notr"; nm.textContent = p.name + " " + (typeof dmUnread !== "undefined" && dmUnread[p.id] ? "💬" + dmUnread[p.id] + " " : ""); t.append(nm);
   const st = document.createElement("span"); st.className = "st"; st.textContent = stText(p) + " · דרגה " + (p.lvl || 1);
   t.append(document.createElement("br"), st); row.append(t);
   row.onclick = () => openPlayer(p);
@@ -2831,6 +2875,8 @@ function openPlayer(p) {
   const canInvite = !$("lobby").hidden && NET.code && !PRES.invited[p.id];
   $("pvInvite").hidden = !canInvite;
   $("pvInvite").onclick = () => { sendInvite(p); $("pview").hidden = true; };
+  $("pvDm").hidden = !(IS_APP && prof.name && p.id !== prof.id && PRES.list[p.id]);
+  $("pvDm").onclick = () => { $("pview").hidden = true; openDm(p); };
   $("pview").hidden = false;
 }
 $("pvClose").onclick = () => { $("pview").hidden = true; };
@@ -3258,6 +3304,65 @@ function checkDailyBonus(quiet) {
 $("bonusOk").onclick = () => { $("bonus").hidden = true; };
 document.addEventListener("visibilitychange", () => { if (!document.hidden) setTimeout(checkDailyBonus, 800); });
 new MutationObserver(() => { if (!$("home").hidden) setTimeout(checkDailyBonus, 400); }).observe($("home"), { attributes: true, attributeFilter: ["hidden"] });
+
+// ---------- הודעות פרטיות: לכל מי שמחובר ----------
+// נשלחות לתיבה של החבר. לא נשמרות: כשאחד מכם יוצא מהאפליקציה — השיחה נמחקת. כל עוד שניכם מחוברים אפשר לחזור אליה מהפרופיל
+var DMS = {}, dmWith = null, dmTyping = {}, dmUnread = {}, dmTypingSent = 0, dmToastT = 0;
+function openDm(p) {
+  dmWith = { id: p.id, name: p.name, av: p.av | 0 };
+  dmUnread[p.id] = 0; $("dmToast").hidden = true;
+  const a = $("dmAv"); a.innerHTML = ""; a.append(avEl(p.av | 0, 38, photoOf(p.id)));
+  $("dmName").textContent = p.name;
+  $("dmModal").hidden = false; renderDm(); paintOnlineList();
+  setTimeout(() => $("dmIn").focus(), 50);
+}
+function renderDm() {
+  if (!dmWith) return;
+  const id = dmWith.id, on = !!PRES.list[id], box = $("dmLog"), list = DMS[id] || [];
+  box.innerHTML = "";
+  if (!list.length) box.innerHTML = '<div class="cmsg sys">' + (on ? "עוד אין הודעות. כתוב משהו 🙂" : "") + "</div>";
+  for (const m of list) { const d = document.createElement("div"); d.className = "cmsg notr " + (m.me ? "me" : "them"); d.textContent = m.text; box.append(d); }
+  if (on && (dmTyping[id] || 0) > Date.now()) {
+    const row = document.createElement("div"); row.className = "typingrow";
+    row.append(avEl(dmWith.av, 28, photoOf(id)));
+    const b = document.createElement("span"); b.className = "typing"; b.style.background = "#5A4712"; b.innerHTML = "<i></i><i></i><i></i>"; row.append(b); box.append(row);
+  }
+  if (!on) { const g = document.createElement("div"); g.className = "cmsg sys"; g.textContent = "👋 " + dmWith.name + " לא מחובר עכשיו, אז השיחה נמחקה."; box.append(g); }
+  $("dmIn").disabled = !on; box.scrollTop = box.scrollHeight;
+}
+function dmGot(m) {
+  const id = m.from.id, text = String(m.text || "").slice(0, 200); if (!text) return;
+  (DMS[id] = DMS[id] || []).push({ me: false, text, t: m.t || Date.now() });
+  if (DMS[id].length > 80) DMS[id].shift();
+  delete dmTyping[id];
+  if (dmWith && dmWith.id === id && !$("dmModal").hidden) return renderDm();
+  dmUnread[id] = (dmUnread[id] | 0) + 1; paintOnlineList();
+  const t = $("dmToast"); t.textContent = "💬 " + String(m.from.name || "") + ": " + text; t.hidden = false;
+  t.onclick = () => { t.hidden = true; const p = PRES.list[id] || { id, name: m.from.name, av: m.from.av }; openDm(p); };
+  clearTimeout(dmToastT); dmToastT = setTimeout(() => { t.hidden = true; }, 6000);
+}
+function dmGone(id) {
+  delete DMS[id]; delete dmTyping[id]; delete dmUnread[id];
+  if (dmWith && dmWith.id === id && !$("dmModal").hidden) renderDm();
+}
+$("dmForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const text = $("dmIn").value.trim().slice(0, 200);
+  if (!text || !dmWith || !PRES.client || !PRES.client.connected || !PRES.list[dmWith.id]) return;
+  PRES.client.publish(PRES_ROOT + "inbox/" + dmWith.id, JSON.stringify({ type: "dm", from: { id: prof.id, name: prof.name, av: prof.av }, text, t: Date.now() }), { qos: 1 });
+  (DMS[dmWith.id] = DMS[dmWith.id] || []).push({ me: true, text, t: Date.now() });
+  $("dmIn").value = ""; dmTypingSent = 0; renderDm();
+});
+$("dmIn").addEventListener("input", () => {
+  if (!dmWith || !$("dmIn").value.trim() || Date.now() - dmTypingSent < 1500 || !PRES.client || !PRES.client.connected) return;
+  dmTypingSent = Date.now();
+  PRES.client.publish(PRES_ROOT + "inbox/" + dmWith.id, JSON.stringify({ type: "dmtyping", from: { id: prof.id } }), { qos: 0 });
+});
+$("dmClose").onclick = () => { $("dmModal").hidden = true; dmWith = null; };
+$("dmToast").addEventListener("keydown", (e) => { if (e.key === "Enter") $("dmToast").click(); });
+setInterval(() => { if (dmWith && !$("dmModal").hidden) renderDm(); }, 1500);
+// אני יצאתי מהאפליקציה — כל השיחות נמחקות
+document.addEventListener("visibilitychange", () => { if (document.hidden) { DMS = {}; dmUnread = {}; dmTyping = {}; $("dmToast").hidden = true; if (dmWith) renderDm(); } });
 
 // ---------- בדוק אצל שופט ----------
 // אחרי כל תמונה נשמר מה אמרו, ולמה השופט החליט ככה. באונליין: מי שפותח — גם החבר רואה.
