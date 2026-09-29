@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790674811783"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790676811912"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -3000,7 +3000,7 @@ async function pickDaily(c) {
   // רשימה של כל התמונות הקשות (מעורבבת), ותמונה אחת מורידים רק כשצריך
   const list = (await (await fetch("data/daily/index.json")).json()).filter(([cat]) => CAT_BY_ID[cat]);
   if (!list.length) return null;
-  const used = await collectRetained(c, PRES_ROOT + "daily/used/#", 2000);
+  const used = await collectRetained(c, PRES_ROOT + "daily/used/#", 2500);
   const start = Math.floor(seeded(hashStr(prof.id + "|" + todayKey()))() * list.length);
   const at = async (k) => { const [cat, i] = list[(start + k) % list.length]; return { cat, i, it: await (await fetch("data/daily/" + cat + "-" + i + ".json")).json(), topic: PRES_ROOT + "daily/used/" + cat + "/" + i }; };
   for (let k = 0; k < list.length; k++) {
