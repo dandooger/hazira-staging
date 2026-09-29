@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790672812331"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790673617142"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -2775,30 +2775,27 @@ const seeded = (seed) => () => { seed |= 0; seed = (seed + 0x6D2B79F5) | 0; let 
 // כל ההודעות השמורות תחת נושא מסוים (למשל: אילו תמונות כבר נלקחו)
 function collectRetained(c, pattern, ms) {
   return new Promise((done) => {
-    const got = {}, pre = pattern.replace("+", "");
+    const got = {}, pre = pattern.replace(/[+#]$/, "");
     const on = (t, p) => { if (t.startsWith(pre) && p.length) got[t] = p.toString(); };
     c.on("message", on); c.subscribe(pattern, { qos: 1 });
     setTimeout(() => { c.removeListener("message", on); c.unsubscribe(pattern); done(got); }, ms);
   });
 }
 async function pickDaily(c) {
-  const rnd = seeded(hashStr(prof.id + "|" + todayKey()));
-  const cats = Object.values(CAT_BY_ID).filter((x) => !x.riddle && !x.sources && x.id !== "idioms");
-  for (let i = cats.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [cats[i], cats[j]] = [cats[j], cats[i]]; }
-  for (const cat of cats.slice(0, 8)) {
-    const d = await getCat(cat.id);
-    const pool = (d.levels.hard || []).map((it, i) => [it, i]).filter(([it]) => it.img && (LANG !== "en" || it.en));
-    if (!pool.length) continue;
-    const used = await collectRetained(c, PRES_ROOT + "daily/used/" + cat.id + "/+", 1500);
-    const start = Math.floor(rnd() * pool.length);
-    for (let k = 0; k < pool.length; k++) {
-      const [it, i] = pool[(start + k) % pool.length];
-      const t = PRES_ROOT + "daily/used/" + cat.id + "/" + i;
-      if (used[t]) { let m = null; try { m = JSON.parse(used[t]); } catch (e) {} if (!m || m.id !== prof.id) continue; }
-      return { cat: cat.id, i, it, topic: t };
-    }
+  // רשימה של כל התמונות הקשות (מעורבבת), ותמונה אחת מורידים רק כשצריך
+  const list = (await (await fetch("data/daily/index.json")).json()).filter(([cat]) => CAT_BY_ID[cat]);
+  if (!list.length) return null;
+  const used = await collectRetained(c, PRES_ROOT + "daily/used/#", 2000);
+  const start = Math.floor(seeded(hashStr(prof.id + "|" + todayKey()))() * list.length);
+  const at = async (k) => { const [cat, i] = list[(start + k) % list.length]; return { cat, i, it: await (await fetch("data/daily/" + cat + "-" + i + ".json")).json(), topic: PRES_ROOT + "daily/used/" + cat + "/" + i }; };
+  for (let k = 0; k < list.length; k++) {
+    const [cat, i] = list[(start + k) % list.length], t = PRES_ROOT + "daily/used/" + cat + "/" + i;
+    if (used[t]) { let m = null; try { m = JSON.parse(used[t]); } catch (e) {} if (!m || m.id !== prof.id) continue; } // כבר ניתנה למישהו אחר
+    const p = await at(k);
+    if (LANG === "en" && !p.it.en) continue;
+    return p;
   }
-  return null;
+  return at(0); // כל התמונות כבר נלקחו (אחרי הרבה מאוד ימים) — מתחילים מחדש
 }
 function paintDaily() {
   $("dailyBox").hidden = !IS_APP;
