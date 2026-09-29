@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790679923980"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790682906001"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -314,8 +314,16 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
 .chattoast{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 64px);z-index:11;max-width:min(520px,92vw);color:#fff;border-radius:12px;padding:8px 14px;font-size:16px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,.3);pointer-events:none}
 #chatBtn{position:relative}
 #chatBtn .dot{position:absolute;top:-3px;inset-inline-end:-3px;width:12px;height:12px;border-radius:50%;background:#FF3B4A;border:2px solid #1A1405}
-.readywait{position:absolute;inset:0;z-index:6;background:var(--stage);display:grid;place-items:center;align-content:center;gap:10px;padding:16px;text-align:center}
-.readywait b{font-family:var(--display);font-weight:400;font-size:26px}
+.readywait{position:absolute;inset:0;z-index:6;background:var(--stage);display:grid;grid-template-rows:auto 1fr auto;gap:8px;padding:10px;text-align:center}
+.readywait[hidden]{display:none}
+.readywait b{font-family:var(--display);font-weight:400;font-size:22px}
+#rwHead{display:grid;gap:4px;justify-items:center}
+.chatlog.big{max-height:none;min-height:0;background:var(--ground);border-radius:12px;padding:8px}
+.typingrow{display:flex;align-items:center;gap:6px}
+.typing{display:inline-flex;gap:4px;align-items:center;border-radius:14px;padding:9px 12px}
+.typing i{width:7px;height:7px;border-radius:50%;background:#fff;animation:tdot 1.1s infinite ease-in-out}
+.typing i:nth-child(2){animation-delay:.18s}.typing i:nth-child(3){animation-delay:.36s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:.55}30%{transform:translateY(-6px);opacity:1}}
 .rchips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .rchip{color:#fff;border-radius:999px;padding:4px 12px;font-weight:700}
 .howto{margin:0;padding-inline-start:22px;display:grid;gap:8px;font-size:18px;line-height:1.45}
@@ -461,6 +469,9 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
   <div style="max-width:640px;margin:0 auto;padding-block:18px 40px;display:flex;flex-direction:column;gap:16px">
     <div class="row" style="justify-content:space-between"><h2>⚙️ הגדרות</h2><button class="ghost" id="setBack">חזרה ←</button></div>
     <div class="lvlbar notr"><b>🌐 שפה · Language</b><div class="langrow"><button class="act" id="langHe" type="button">עברית</button><button class="act" id="langEn" type="button">English</button></div></div>
+    <div class="lvlbar"><b>🔊 צלילים</b>
+      <div class="row" style="gap:10px;align-items:center;flex-wrap:nowrap"><button class="act" id="sndOn" type="button" aria-pressed="true">🔊 פועל</button><input type="range" id="sndVol" min="0" max="100" step="5" aria-label="עוצמת הצלילים" style="flex:1;min-width:0"></div>
+    </div>
     <div class="lvlbar"><b id="setWho"></b><span class="note" id="setAcct"></span></div>
     <button class="go" id="setLogin">🔑 התחברות לחשבון אחר</button>
     <div class="lvlbar">
@@ -538,7 +549,11 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
   <div class="stage mirror" id="stage2" hidden aria-hidden="true"></div>
   <div class="stage hide" id="stage">
     <div class="pic" id="picWrap"><img id="pic" alt=""><div class="emo" id="emo" hidden></div></div>
-    <div class="readywait" id="readyWait" hidden></div>
+    <div class="readywait" id="readyWait" hidden>
+      <div id="rwHead"></div>
+      <div class="chatlog big" id="chatLog3"></div>
+      <form class="chatform" id="chatForm3" autocomplete="off"><input id="chatIn3" maxlength="120" placeholder="💬 כתוב הודעה…" autocomplete="off"><button class="act" type="submit">שלח</button></form>
+    </div>
     <div class="hintchip" id="hintchip" hidden></div>
     <div class="count" id="count"></div>
   </div>
@@ -788,6 +803,8 @@ const EN_DICT = {
   "👥 בחדר": "👥 In the room", "⏳ מחכים שמנהל החדר יתחיל את המשחק…": "⏳ Waiting for the room manager to start the game…", "▶ התחל את המשחק": "▶ Start the game", "⏳ מחכים שעוד שחקן ייכנס…": "⏳ Waiting for another player to join…", "💬 צ'אט": "💬 Chat", "כתוב הודעה…": "Write a message…", "🚪 יציאה מהחדר": "🚪 Leave the room", "שלחו לחברים את הקישור: לוחצים עליו ונכנסים ישר לחדר.": "Send your friends the link: they tap it and go straight into the room.", "📤 שלח קישור לחברים": "📤 Send the link to friends", "הקישור הועתק! הדבק אותו בוואטסאפ לחברים.": "Link copied! Paste it in WhatsApp for your friends.", "👑 מנהל החדר": "👑 Room manager", "⭐ זה אני": "⭐ That's me", "אין הודעות עדיין. כתבו משהו 🙂": "No messages yet. Say something 🙂", "מתחבר לחדר…": "Joining the room…", "יוצר חדר…": "Creating a room…", "🙈 סימנת שאתה לא יודע. מחכים לשאר…": "🙈 You marked that you don't know. Waiting for the others…", "✓ אתה מוכן!": "✓ You're ready!", "מחכים ל:": "Waiting for:", "כולם מוכנים! מתחילים…": "Everyone's ready! Starting…", "אף אחד לא ידע 🤷 אין נקודה.": "Nobody knew 🤷 No point.", "מי שענה יצא. אין נקודה.": "The player who answered left. No point.", "החדר מלא (6 שחקנים) 🙁": "The room is full (6 players) 🙁", "המשחק בחדר הזה כבר התחיל 🙁": "The game in this room already started 🙁", " אמר: \"": " said: \"", " מחליט…": " decides…", "השופט לא בטוח — ": "The judge isn't sure — ", " · ירדה נקודה ": " · lost a point: ", " ענה": " answered",
   // מוכן/שופט בין תמונות, בונוס יומי, איך משחקים
   "✋ מוכן": "✋ Ready", "✋ מוכנים": "✋ Ready", "🙈 לא יודע": "🙈 Don't know", "🏠 חזרה למסך הבית": "🏠 Back to home", "🔁 עוד משחק (באותו חדר)": "🔁 Play again (same room)", "ראה פחות": "See less", "🐆 איך משחקים?": "🐆 How do you play?", "מופיעה תמונה.": "A picture appears.", "מי שלוחץ ראשון על הכפתור — עונה (אומר במיקרופון 🎤 או כותב).": "Whoever presses the button first answers (say it 🎤 or type it).", "צודק? מקבל נקודה ⭐ טעית? אפשר לנסות שוב עד שהזמן נגמר.": "Right? You get a point ⭐ Wrong? Try again until time runs out.", "מי שמגיע ראשון ליעד — מנצח! 🏆": "First to reach the target wins! 🏆", "אפשר לשחק לבד, ביחד על טלפון אחד, או אונליין עם חברים.": "Play solo, together on one phone, or online with friends.", "יאללה, מתחילים!": "Let's go!", "+10 נקודות!": "+10 points!", "כל יום שנכנסים לצ'יטה מקבלים 10 נקודות ⭐ בחצות זה מתאפס, ומחר אפשר לקבל שוב.": "Every day you open The Cheetah you get 10 points ⭐ It resets at midnight, so come back tomorrow for more.", "איזה כיף! 🎉": "Awesome! 🎉", "👋 מנהל החדר כבר לא בחדר": "👋 The room manager isn't in the room anymore",
+  // צלילים, חזרה לחדר, צ'אט
+  "🔊 צלילים": "🔊 Sounds", "🔊 פועל": "🔊 On", "🔇 כבוי": "🔇 Off", "חוזר לחדר שלך…": "Back to your room…", "⏳ מנהל החדר יצא לרגע… מחכים שיחזור": "⏳ The room manager stepped out… waiting for them to come back", "👋 מנהל החדר יצא, אז החדר נסגר": "👋 The room manager left, so the room closed", "💬 כתוב הודעה…": "💬 Write a message…",
 };
 // משפטים עם מספרים/שמות בסדר אחר באנגלית
 const EN_RULES = [
@@ -843,8 +860,12 @@ const show = (id) => { for (const s of ["home", "loading", "lobby", "game", "ove
 
 // ---------- צלילים ----------
 let ac;
+// הגדרות צלילים (נשמר בטלפון): פועל/כבוי ועוצמה
+const SND = (() => { const d = { on: true, vol: 70 }; try { return { ...d, ...JSON.parse(localStorage.getItem("hazira-sound-v1") || "{}") }; } catch (e) { return d; } })();
+const sndSave = () => { try { localStorage.setItem("hazira-sound-v1", JSON.stringify(SND)); } catch (e) {} };
 function beep(freq, dur = .15, type = "sine", vol = .25, when = 0) {
-  if (document.hidden) return; // האפליקציה ברקע או שהמסך כבוי — שקט
+  if (document.hidden || !SND.on || !SND.vol) return; // האפליקציה ברקע, המסך כבוי, או שהצלילים כבויים — שקט
+  vol = vol * SND.vol / 70;
   try {
     ac = ac || new (window.AudioContext || window.webkitAudioContext)();
     if (ac.state === "suspended") ac.resume();
@@ -864,8 +885,10 @@ const sfx = {
 };
 const buzzVibrate = () => { try { navigator.vibrate && navigator.vibrate(60); } catch (e) {} };
 // יוצאים מהאפליקציה או מכבים מסך — הצלילים והמיקרופון נעצרים. חוזרים — המיקרופון חוזר אם באמצע תשובה
+const hush = () => { try { ac && ac.suspend(); } catch (e) {} };
+addEventListener("pagehide", hush); document.addEventListener("freeze", hush);
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden) { try { ac && ac.suspend(); } catch (e) {} stopListening(); }
+  if (document.hidden) { hush(); stopListening(); }
   else if (onAnswer && SR && IS_APP) { listenWanted = true; listenRestarts = 0; startListening(); }
 });
 
@@ -1028,7 +1051,7 @@ function buildBuzzers(keys) {
 function setPanels(m, keys) {
   G.mode = m; G.players = keys || []; G.daily = false; G.roundTexts = null;
   JLOG.length = 0; $("jlogBtn").hidden = $("jlogBtn2").hidden = true;
-  $("chatBtn").hidden = m !== "online"; $("chatPanel").hidden = true; $("chatToast").hidden = true; $("readyWait").hidden = true;
+  $("chatBtn").hidden = true; $("chatPanel").hidden = true; $("chatToast").hidden = true; $("readyWait").hidden = true;
   buildBuzzers(G.players);
   $("buzzers").hidden = m === "solo"; $("soloBar").hidden = m !== "solo"; $("ansBox").hidden = true;
 }
@@ -1748,11 +1771,11 @@ async function claudeJudge(said) {
 // עד 6 שחקנים בחדר, דרך שרת הודעות חינמי (MQTT). מי שיוצר את החדר הוא "מנהל החדר": הוא מחליט מתי מתחילים ומנהל את המשחק.
 const BROKERS = ["wss://broker.emqx.io:8084/mqtt", "wss://test.mosquitto.org:8081"];
 const NET = { client: null, topic: "", role: null, code: "", me: Math.random().toString(36).slice(2, 8) };
-const O = { players: [], chat: [] };
+const O = { players: [], chat: [], typing: {} };
 const MAX_ROOM = 6;
 const COLORS = PLAYERS.map((p) => p.k);
 const CHAT_BG = { blue: "#2F7BFF", red: "#E8323F", green: "#1A9E50", yellow: "#C98F00", purple: "#8A4BF0", pink: "#E83E90" };
-function resetO(extra) { for (const k of Object.keys(O)) delete O[k]; Object.assign(O, { players: [], chat: [], ready: {}, dunno: {}, score: {} }, extra || {}); }
+function resetO(extra) { for (const k of Object.keys(O)) delete O[k]; Object.assign(O, { players: [], chat: [], ready: {}, dunno: {}, score: {}, typing: {} }, extra || {}); }
 function loadMqtt() {
   if (window.mqtt) return Promise.resolve();
   return new Promise((ok, bad) => {
@@ -1775,6 +1798,10 @@ async function netOpen(code, brokerIdx) {
   NET.code = code; NET.topic = "hazira-dg/stg/" + code;
   NET.client = await netConnect(brokerIdx, NET.topic);
   NET.client.subscribe(NET.topic, { qos: 1 });
+  NET.client.on("connect", () => {
+    if (!NET.client || O.started) return;
+    if (isHost()) sendLobby(); else if (NET.role === "guest") send("join", { name: prof.name, pid: prof.id, av: prof.av | 0 });
+  });
   NET.client.on("message", (topic, payload) => {
     let m; try { m = JSON.parse(payload.toString()); } catch (e) { return; }
     if (m.from === NET.me) return;
@@ -1782,9 +1809,26 @@ async function netOpen(code, brokerIdx) {
   });
 }
 function send(type, data) { if (NET.client) NET.client.publish(NET.topic, JSON.stringify({ type, from: NET.me, ...data }), { qos: 1 }); }
-function netLeave() { try { send("bye", { name: prof.name }); NET.client && NET.client.end(true); } catch (e) {} NET.client = null; NET.role = null; clearTimers(); $("chatPanel").hidden = true; }
+function netLeave() { try { send("bye", { name: prof.name }); NET.client && NET.client.end(true); } catch (e) {} NET.client = null; NET.role = null; clearTimers(); $("chatPanel").hidden = true; roomClear(); }
+// החדר נשמר בטלפון, כדי שאם יוצאים לוואטסאפ והטלפון סוגר את האפליקציה — חוזרים ישר לאותו חדר
+const roomKey = () => PROF_KEY.replace("profile", "room");
+function roomSave(role) { try { localStorage.setItem(roomKey(), JSON.stringify({ code: NET.code, role, cat: O.cat ? O.cat.id : null, level: O.level || level, target: O.target || target, t: Date.now() })); } catch (e) {} }
+function roomClear() { try { localStorage.removeItem(roomKey()); } catch (e) {} }
+async function tryRestoreRoom() {
+  let r = null; try { r = JSON.parse(localStorage.getItem(roomKey()) || "null"); } catch (e) {}
+  if (!r) return false;
+  if (!IS_APP || !prof.name || !prof.hash || NET.client || !r.code || Date.now() - r.t > 20 * 60000) { roomClear(); return false; }
+  mode = "online"; paintMode();
+  if (r.role !== "host") { joinRoom(r.code); return true; }
+  for (let i = 0; i < 30 && !CAT_BY_ID[r.cat]; i++) await new Promise((ok) => setTimeout(ok, 200));
+  const c = CAT_BY_ID[r.cat]; if (!c) { roomClear(); return false; }
+  level = r.level || level; setTarget(r.target || target);
+  hostRoom(c, r.code);
+  return true;
+}
 // החדר נסגר (מנהל החדר יצא / נשאר רק שחקן אחד): חוזרים למסך הבית עם הודעה
 function roomClosed(text) {
+  roomClear(); clearTimeout(O.hostAwayT);
   clearTimers(); stopAnswerTimer(); stopListening(); onAnswer = null; G.phase = "idle";
   try { NET.client && NET.client.end(true); } catch (e) {} NET.client = null; NET.role = null;
   $("chatPanel").hidden = true;
@@ -1803,25 +1847,30 @@ const others = () => O.players.filter((p) => p.id !== NET.me);
 const friend = () => { const o = others(); return o.length === 1 ? o[0].name : "השחקנים"; };
 
 // ---- יצירת חדר / הצטרפות ----
-async function hostRoom(c) {
-  $("loadMsg").textContent = "יוצר חדר…"; show("loading");
+// fixedCode: פותחים מחדש את אותו חדר (למשל אחרי שהטלפון סגר את האפליקציה ברקע)
+async function hostRoom(c, fixedCode) {
+  $("loadMsg").textContent = fixedCode ? "חוזר לחדר שלך…" : "יוצר חדר…"; show("loading");
   try {
-    let idx = 0, ok = false;
-    for (; idx < BROKERS.length && !ok; idx++) {
-      try { await loadMqtt(); NET.client = await netConnect(idx); ok = true; } catch (e) {}
-    }
-    if (!ok) throw new Error();
-    idx--;
-    const code = String(idx + 1) + String(Math.floor(1000 + Math.random() * 9000));
-    NET.client.end(true);
+    let idx = 0, code = fixedCode;
+    if (!code) {
+      let ok = false;
+      for (; idx < BROKERS.length && !ok; idx++) {
+        try { await loadMqtt(); NET.client = await netConnect(idx); ok = true; } catch (e) {}
+      }
+      if (!ok) throw new Error();
+      idx--;
+      code = String(idx + 1) + String(Math.floor(1000 + Math.random() * 9000));
+      NET.client.end(true);
+    } else idx = +code[0] - 1;
     await netOpen(code, idx);
     NET.role = "host";
     const deck = await buildDeck(c);
-    resetO({ cat: c, level, target, deck, started: false, hostId: NET.me,
+    resetO({ cat: c, level, target, deck, started: false, hostId: NET.me, typing: {},
       title: c.icon + " " + catName(c) + " · " + LEVEL_NAME[level] + T(" · עד ", " · to ") + target,
       players: [{ id: NET.me, name: prof.name || "?", pid: prof.id, av: prof.av | 0, color: "blue" }] });
     $("lobbyCode").textContent = code;
-    renderChat(); paintLobby(); show("lobby");
+    renderChat(); paintLobby(); show("lobby"); roomSave("host");
+    if (fixedCode) sendLobby();
   } catch (e) {
     show("home"); $("hErr").textContent = "לא הצלחתי ליצור חדר. בדקו שיש אינטרנט ונסו שוב."; $("hErr").hidden = false;
   }
@@ -1839,7 +1888,7 @@ async function joinRoom(code) {
   if (code.length !== 5 || !BROKERS[+code[0] - 1]) { $("joinErr").textContent = "הקוד צריך להיות 5 ספרות."; $("joinErr").hidden = false; return; }
   const t0 = gameLoading("מתחבר לחדר…");
   try {
-    resetO({ started: false, joinT0: t0 });
+    resetO({ started: false, joinT0: t0, typing: {} });
     await netOpen(code, +code[0] - 1);
     NET.role = "guest";
     O.joinTimer = setTimeout(() => { if (!O.players.length) { netLeave(); show("home"); $("joinErr").textContent = "לא מצאתי חדר עם הקוד הזה. בדקו אותו ונסו שוב."; $("joinErr").hidden = false; } }, 12000);
@@ -1893,23 +1942,28 @@ function hostGotJoin(m) {
   sendLobby();
 }
 async function onLobby(m) {
-  clearTimeout(O.joinTimer);
+  clearTimeout(O.joinTimer); clearTimeout(O.hostAwayT); O.hostAwayT = null;
+  $("lobbyWait").textContent = "⏳ מחכים שמנהל החדר יתחיל את המשחק…";
   const first = !O.players.length;
+  // מנהל החדר חזר (אחרי שיצא לרגע) ואני לא ברשימה — נכנסים שוב
+  if (!first && !O.started && m.players && !m.players.some((p) => p.id === NET.me) && Date.now() - (O.rejoinAt || 0) > 3000) {
+    O.rejoinAt = Date.now(); send("join", { name: prof.name, pid: prof.id, av: prof.av | 0 });
+  }
   O.players = m.players || []; O.title = m.title; O.target = m.target; O.hostId = m.hostId;
   if (first && m.chat && !O.chat.length) O.chat = m.chat.slice();
-  if (first) { await waitMin(O.joinT0 || 0); if (O.started || !NET.client) return; renderChat(); show("lobby"); }
+  if (first) { await waitMin(O.joinT0 || 0); if (O.started || !NET.client) return; renderChat(); show("lobby"); roomSave("guest"); }
   paintLobby();
 }
 function onNo(m) {
-  netLeave(); show("home");
+  netLeave(); roomClear(); show("home");
   $("joinErr").textContent = m.why === "full" ? "החדר מלא (6 שחקנים) 🙁" : "המשחק בחדר הזה כבר התחיל 🙁";
   $("joinErr").hidden = false;
 }
 function onlineAgain() {
   if (!NET.client) { show("home"); return; }
-  if (isHost()) { show("lobby"); sendLobby(); renderChat(); return; }
+  if (isHost()) { show("lobby"); sendLobby(); renderChat(); roomSave("host"); return; }
   O.players = []; O.joinT0 = 0; clearTimeout(O.joinTimer);
-  paintLobby(); renderChat(); show("lobby");
+  paintLobby(); renderChat(); show("lobby"); roomSave("guest");
   O.joinTimer = setTimeout(() => { if (!O.players.length) roomClosed("👋 מנהל החדר כבר לא בחדר"); }, 12000);
   send("join", { name: prof.name, pid: prof.id, av: prof.av | 0 });
 }
@@ -1922,14 +1976,15 @@ function chatAdd(m) {
   O.chat.push({ sys: !!m.sys, text: String(m.text || "").slice(0, 120), name: String(m.name || "").slice(0, 20), color: m.color || "blue", t: m.t || Date.now() });
   if (O.chat.length > 60) O.chat.shift();
   renderChat();
-  if (!$("game").hidden && $("chatPanel").hidden && m.from !== NET.me && !m.sys) {
+  if (m.from) delete O.typing[m.from];
+  if (!$("game").hidden && $("chatPanel").hidden && $("readyWait").hidden && m.from !== NET.me && !m.sys) {
     chatUnread++; $("chatBtn").querySelector(".dot").hidden = false;
     const t = $("chatToast"); t.textContent = (m.name ? m.name + ": " : "") + m.text; t.style.background = CHAT_BG[m.color] || "#333"; t.hidden = false;
     clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 3500);
   }
 }
 function renderChat() {
-  for (const id of ["chatLog", "chatLog2"]) {
+  for (const id of ["chatLog", "chatLog2", "chatLog3"]) {
     const box = $(id); box.innerHTML = "";
     if (!O.chat.length) box.innerHTML = '<div class="cmsg sys">אין הודעות עדיין. כתבו משהו 🙂</div>';
     for (const m of O.chat) {
@@ -1938,18 +1993,40 @@ function renderChat() {
       const s = document.createElement("span"); if (!m.sys) s.className = "notr"; s.textContent = m.text; d.append(s);
       box.append(d);
     }
+    // מי שכותב עכשיו: התמונה שלו + שלוש נקודות קופצות (כמו בוואטסאפ)
+    for (const [id, t] of Object.entries(O.typing || {})) {
+      if (id === NET.me || t.until < Date.now()) continue;
+      const row = document.createElement("div"); row.className = "typingrow";
+      row.append(avEl(t.av | 0, 28, t.pid === prof.id ? prof.photo : photoOf(t.pid)));
+      const bub = document.createElement("span"); bub.className = "typing"; bub.style.background = CHAT_BG[t.color] || "#333"; bub.setAttribute("aria-label", (t.name || "") + " כותב…");
+      bub.innerHTML = "<i></i><i></i><i></i>"; row.append(bub); box.append(row);
+    }
     box.scrollTop = box.scrollHeight;
   }
 }
+let typingSentAt = 0;
+function typingPing() {
+  if (!NET.client || Date.now() - typingSentAt < 1500) return;
+  typingSentAt = Date.now();
+  send("typing", { name: prof.name, pid: prof.id, av: prof.av | 0, color: myColor() });
+}
+setInterval(() => {
+  if (!O.typing) return;
+  let changed = false;
+  for (const [id, t] of Object.entries(O.typing)) if (t.until < Date.now()) { delete O.typing[id]; changed = true; }
+  if (changed) renderChat();
+}, 1000);
 function chatSend(inp) {
   const text = inp.value.trim().slice(0, 120);
   if (!text || !NET.client || Date.now() - chatLast < 700) return;
-  chatLast = Date.now(); inp.value = "";
+  chatLast = Date.now(); inp.value = ""; typingSentAt = 0;
   const m = { text, name: prof.name, color: myColor(), t: Date.now() };
   send("chat", m); chatAdd({ ...m, from: NET.me });
 }
 $("chatForm").addEventListener("submit", (e) => { e.preventDefault(); chatSend($("chatIn")); });
 $("chatForm2").addEventListener("submit", (e) => { e.preventDefault(); chatSend($("chatIn2")); });
+$("chatForm3").addEventListener("submit", (e) => { e.preventDefault(); chatSend($("chatIn3")); });
+for (const id of ["chatIn", "chatIn2", "chatIn3"]) $(id).addEventListener("input", () => { if ($(id).value.trim()) typingPing(); });
 $("chatBtn").onclick = () => { const open = $("chatPanel").hidden; $("chatPanel").hidden = !open; if (open) { chatUnread = 0; $("chatBtn").querySelector(".dot").hidden = true; $("chatToast").hidden = true; renderChat(); } };
 $("chatClose").onclick = () => { $("chatPanel").hidden = true; };
 
@@ -1979,7 +2056,7 @@ async function itemFromRef(ref) {
 
 // ---- מנהל החדר מנהל את המשחק ----
 function hostStart() {
-  O.started = true;
+  O.started = true; roomClear();
   O.score = Object.fromEntries(O.players.map((p) => [p.id, 0])); O.n = 0; O.gameTitle = O.deck.icon + " " + O.deck.name + " · " + O.deck.levelName;
   O.queue = deckOrder(O.deck.items, O.deck.reserve); O.reserve = [];
   send("start", { title: O.gameTitle, target: O.target, score: O.score, players: O.players });
@@ -2171,11 +2248,14 @@ function readyActs() {
   const me = !!O.ready[NET.me], wait = O.players.filter((p) => !O.ready[p.id]);
   acts(`<span style="flex-basis:100%">${O.resultLine}</span>
     <button class="act big ${me ? "good" : ""}" data-a="ready">${me ? "✓ אני מוכן (לחץ לביטול)" : "✋ מוכן"}</button><button class="act" data-a="jlog">⚖️ שופט</button>`);
-  const w = $("readyWait");
+  const w = $("readyWait"), wasHidden = w.hidden;
   w.hidden = !me;
   if (!me) return;
-  w.innerHTML = `<b>✓ אתה מוכן!</b><div class="note">${wait.length ? "מחכים ל:" : "כולם מוכנים! מתחילים…"}</div><div class="rchips"></div>`;
-  for (const p of wait) { const c = document.createElement("span"); c.className = "rchip notr"; c.style.background = CHAT_BG[p.color]; c.textContent = p.name; w.querySelector(".rchips").append(c); }
+  // מי שמוכן: במקום התמונה — מי עוד לא מוכן + הצ'אט
+  const h = $("rwHead");
+  h.innerHTML = `<b>✓ אתה מוכן!</b><div class="note">${wait.length ? "מחכים ל:" : "כולם מוכנים! מתחילים…"}</div><div class="rchips"></div>`;
+  for (const p of wait) { const c = document.createElement("span"); c.className = "rchip notr"; c.style.background = CHAT_BG[p.color]; c.textContent = p.name; h.querySelector(".rchips").append(c); }
+  if (wasHidden) { renderChat(); $("chatToast").hidden = true; }
 }
 function onlineReady() {
   if (G.phase !== "ready") return;
@@ -2197,10 +2277,20 @@ function onlineOver(w) {
 function onNet(m) {
   // לכולם
   if (m.type === "chat") return chatAdd(m);
+  if (m.type === "typing") { if (!O.typing) O.typing = {}; O.typing[m.from] = { name: m.name, pid: m.pid, av: m.av, color: m.color, until: Date.now() + 3500 }; renderChat(); return; }
   if (m.type === "jlog") return openJlog(m.name || "");
   if (m.type === "bye") {
     if (!pOf(m.from)) return;
-    if (m.from === O.hostId && !isHost()) return roomClosed("👋 מנהל החדר (" + pName(m.from) + ") יצא, אז המשחק נגמר");
+    if (m.from === O.hostId && !isHost()) {
+      // בחדר ההמתנה מחכים שמנהל החדר יחזור (אולי הוא רק שלח קישור בוואטסאפ). באמצע משחק — המשחק נגמר
+      if (!O.started) {
+        clearTimeout(O.hostAwayT);
+        O.hostAwayT = setTimeout(() => roomClosed("👋 מנהל החדר יצא, אז החדר נסגר"), 120000);
+        $("lobbyWait").textContent = "⏳ מנהל החדר יצא לרגע… מחכים שיחזור";
+        return;
+      }
+      return roomClosed("👋 מנהל החדר (" + pName(m.from) + ") יצא, אז המשחק נגמר");
+    }
     if (isHost()) hostDrop(m.from);
     return;
   }
@@ -2217,7 +2307,7 @@ function onNet(m) {
   if (m.to && m.to !== NET.me) return;
   if (m.type === "lobby") onLobby(m);
   else if (m.type === "no") onNo(m);
-  else if (m.type === "start") { O.started = true; clearTimeout(O.joinTimer); O.gameTitle = m.title; O.target = m.target; O.score = m.score; O.players = m.players || O.players; startOnlineScreen(); }
+  else if (m.type === "start") { O.started = true; clearTimeout(O.joinTimer); roomClear(); O.gameTitle = m.title; O.target = m.target; O.score = m.score; O.players = m.players || O.players; startOnlineScreen(); }
   else if (m.type === "left") { O.players = m.players || O.players; paintOnline(); readyActs(); }
   else if (m.type === "end") roomClosed(m.text || "👋 המשחק נגמר");
   else if (m.type === "round") playRound(m);
@@ -2510,12 +2600,19 @@ $("gearBtn").onclick = (e) => { e.stopPropagation(); show("settings"); paintSett
 // "שינוי שם משתמש" / "שינוי סיסמה": השדות מופיעים רק אחרי שלוחצים על הכפתור
 for (const [b, f] of [["nameOpen", "nameForm"], ["passOpen", "passForm"]]) $(b).onclick = () => { const open = $(f).hidden; $(f).hidden = !open; $(b).setAttribute("aria-expanded", String(open)); if (open) $(f).querySelector("input:not([hidden])").focus(); };
 $("setBack").onclick = () => show("home");
+function paintSound() {
+  $("sndOn").setAttribute("aria-pressed", String(SND.on)); $("sndOn").textContent = SND.on ? "🔊 פועל" : "🔇 כבוי";
+  $("sndVol").value = SND.vol; $("sndVol").disabled = !SND.on;
+}
+$("sndOn").onclick = () => { SND.on = !SND.on; sndSave(); paintSound(); if (SND.on) sfx.go(); };
+$("sndVol").addEventListener("input", () => { SND.vol = +$("sndVol").value; sndSave(); });
+$("sndVol").addEventListener("change", () => sfx.go());
 function paintSettings() {
   $("setWho").textContent = "מחובר כ: " + (prof.name || "—");
   $("setAcct").textContent = IS_APP ? (prof.hash ? "החשבון שמור. אפשר להיכנס אליו מכל טלפון עם השם והסיסמה." : "לחשבון עוד אין סיסמה.") : "חשבונות וסיסמאות עובדים רק באפליקציה.";
   $("setLogin").hidden = !IS_APP; $("passForm").parentElement.hidden = $("nameForm").parentElement.hidden = !IS_APP;
   $("passUser").value = prof.name; $("passMsg").hidden = true;
-  $("fbBox").hidden = !IS_APP; paintAdminBtn();
+  $("fbBox").hidden = !IS_APP; paintAdminBtn(); paintSound();
   $("nameForm").hidden = $("passForm").hidden = true; $("nameOpen").setAttribute("aria-expanded", "false"); $("passOpen").setAttribute("aria-expanded", "false");
 }
 $("setLogin").onclick = () => { W.canCancel = true; $("wName").value = ""; $("wPass").value = ""; show("home"); askName("", "login"); };
@@ -3140,7 +3237,7 @@ $("dailyGo").onclick = async () => {
   paintSolo(); show("game"); keepAwake(); soloNext();
 };
 paintDaily();
-setTimeout(tryPendingJoin, 300);
+setTimeout(() => { if (!tryPendingJoin()) tryRestoreRoom(); }, 300);
 
 // ---------- בונוס כניסה יומי: כל יום שנכנסים = 10 נקודות (מתאפס בחצות) ----------
 const LOGIN_BONUS = 10;
@@ -3256,8 +3353,9 @@ function stopConfetti() { cancelAnimationFrame(confRaf); }
       const r = await fetch("version.json?t=" + Date.now(), { cache: "no-store" });
       const { v } = await r.json();
       if (v && v !== window.HAZIRA_VERSION) {
-        // לא מפריעים באמצע משחק
-        const busy = document.getElementById("game") && !document.getElementById("game").hidden;
+        // מתעדכנים רק במסך הבית (לא באמצע משחק, לא בחדר ההמתנה)
+        const home = document.getElementById("home");
+        const busy = !home || home.hidden;
         if (busy) { window.HAZIRA_UPDATE_PENDING = true; return; }
         const reg = await navigator.serviceWorker?.getRegistration();
         if (reg) await reg.update().catch(() => {});
@@ -3267,7 +3365,7 @@ function stopConfetti() { cancelAnimationFrame(confRaf); }
   }
   if ("serviceWorker" in navigator) {
     addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
-    navigator.serviceWorker.addEventListener("controllerchange", () => { if (window.HAZIRA_UPDATE_PENDING || reloading) reloadNow(); });
+    navigator.serviceWorker.addEventListener("controllerchange", () => { const home = document.getElementById("home"); if (reloading || (window.HAZIRA_UPDATE_PENDING && home && !home.hidden)) reloadNow(); });
   }
   addEventListener("load", check);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });
