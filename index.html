@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790676811912"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790679923980"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -318,6 +318,9 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
 .readywait b{font-family:var(--display);font-weight:400;font-size:26px}
 .rchips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .rchip{color:#fff;border-radius:999px;padding:4px 12px;font-weight:700}
+.howto{margin:0;padding-inline-start:22px;display:grid;gap:8px;font-size:18px;line-height:1.45}
+.tile[data-f]{cursor:pointer}
+.tile[data-f]:hover,.tile[data-f]:focus-visible{border-color:var(--ink)}
 .fbrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 #fbText{font:inherit;font-size:18px;color:var(--ink);background:var(--ground);border:1px solid var(--line);border-radius:10px;padding:12px;width:100%;resize:vertical;min-height:120px}
 .gearbtn .dot{position:absolute;top:-3px;inset-inline-end:-3px;width:14px;height:14px;border-radius:50%;background:var(--red,#FF3B4A);border:2px solid #1A1405}
@@ -417,7 +420,7 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
   <div class="homebox" id="boardBox" hidden>
     <h2>🏆 טבלת המובילים</h2>
     <div id="boardList" style="display:grid;gap:6px"></div>
-    <button class="act" id="boardMore" type="button">ראה עוד</button>
+    <div class="row" style="gap:8px"><button class="act" id="boardMore" type="button">ראה עוד</button><button class="act" id="boardLess" type="button" hidden>ראה פחות</button></div>
   </div>
 
   <div class="pc-only note">✨ <b>קטגוריה משלכם</b> (שClaude ממציא) עובדת רק בגרסה של המחשב, כי שם אפשר להביא תמונות מהאינטרנט.</div>
@@ -491,6 +494,7 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
   <div class="atabs" role="tablist"><button class="act" id="admTabStats" type="button">📊 סטטיסטיקות</button><button class="act" id="admTabPlayers" type="button">👥 שחקנים</button><button class="act" id="admTabMsgs" type="button">📬 הודעות</button></div>
   <div id="admStats" style="display:grid;gap:14px"></div>
   <div id="admPlayers" style="display:grid;gap:10px" hidden>
+    <div class="row" id="admFilter" hidden style="gap:8px"><b id="admFilterT"></b><button class="act" id="admFilterX" type="button">✕ הצג את כולם</button></div>
     <input class="psearch" id="admSearch" type="search" placeholder="🔍 חפש שחקן לפי שם" autocomplete="off">
     <div class="note" id="admCount"></div>
     <div class="plist" id="admList" style="width:100%"></div>
@@ -619,6 +623,30 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
 </div>
 <div class="chattoast notr" id="chatToast" hidden></div>
 
+<!-- איך משחקים (לחשבון חדש) -->
+<div class="modal" id="howto" hidden>
+  <div class="card" role="dialog" aria-labelledby="htH">
+    <h3 id="htH">🐆 איך משחקים?</h3>
+    <ol class="howto">
+      <li>מופיעה תמונה.</li>
+      <li>מי שלוחץ ראשון על הכפתור — עונה (אומר במיקרופון 🎤 או כותב).</li>
+      <li>צודק? מקבל נקודה ⭐ טעית? אפשר לנסות שוב עד שהזמן נגמר.</li>
+      <li>מי שמגיע ראשון ליעד — מנצח! 🏆</li>
+    </ol>
+    <div class="note">אפשר לשחק לבד, ביחד על טלפון אחד, או אונליין עם חברים.</div>
+    <button class="go" id="htOk" type="button">יאללה, מתחילים!</button>
+  </div>
+</div>
+<!-- בונוס כניסה יומי -->
+<div class="modal" id="bonus" hidden>
+  <div class="card" role="dialog" aria-labelledby="bnH" style="text-align:center;justify-items:center">
+    <div style="font-size:64px;line-height:1">🎁</div>
+    <h3 id="bnH">+10 נקודות!</h3>
+    <div class="note">כל יום שנכנסים לצ'יטה מקבלים 10 נקודות ⭐ בחצות זה מתאפס, ומחר אפשר לקבל שוב.</div>
+    <button class="go" id="bonusOk" type="button">איזה כיף! 🎉</button>
+  </div>
+</div>
+
 <!-- בדוק אצל שופט: למה כל תשובה נחשבה או לא -->
 <div class="modal" id="jlogModal" hidden>
   <div class="card" role="dialog" aria-labelledby="jlH" style="max-height:88vh;overflow:auto">
@@ -675,7 +703,7 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
   <div style="position:relative">
     <h2 id="winTxt"></h2>
     <div class="final" id="final"></div>
-    <div class="row" style="justify-content:center"><button class="go" id="again">עוד משחק</button><button class="ghost" id="toMenu">קטגוריה אחרת</button><button class="ghost" id="jlogBtn2" type="button" hidden>⚖️ בדוק אצל שופט</button><button class="ghost langbtn notr" type="button" aria-label="Language / שפה">🌐</button></div>
+    <div class="row" style="justify-content:center"><button class="go" id="overHome" type="button" hidden>🏠 חזרה למסך הבית</button><button class="go" id="again">עוד משחק</button><button class="ghost" id="toMenu">קטגוריה אחרת</button><button class="ghost" id="jlogBtn2" type="button" hidden>⚖️ בדוק אצל שופט</button><button class="ghost langbtn notr" type="button" aria-label="Language / שפה">🌐</button></div>
   </div>
 </section>
 
@@ -758,6 +786,8 @@ const EN_DICT = {
   "🧩 חידה יומית": "🧩 Daily riddle", "חידה יומית": "Daily riddle", "🧩 לחידה היומית": "🧩 Play the daily riddle", "תמונה קשה מקטגוריה סודית. יש 15 שניות וניסיון אחד ביום. מי שצודק מקבל 50 נקודות ⭐": "A hard picture from a secret category. 15 seconds, one try a day. Get it right for 50 points ⭐", "🧩 מכין את החידה היומית…": "🧩 Getting the daily riddle ready…", "🧩 חידה יומית · 15 שניות": "🧩 Daily riddle · 15 seconds", "לא הצלחתי להכין את החידה. בדקו שיש אינטרנט ונסו שוב.": "Couldn't get the riddle ready. Check the internet and try again.", "לא הפעם 🙁 חידה חדשה מחר": "Not this time 🙁 A new riddle tomorrow", "🏆 טבלת המובילים": "🏆 Leaderboard", "ראה עוד": "See more", "טוען את הטבלה…": "Loading the table…", "⚠️ אי אפשר לצאת מהמשחק באמצע!": "⚠️ You can't leave in the middle of a game!", "אם יוצאים מהאפליקציה, המשחק נגמר. כדי לצאת, לוחצים על \"יציאה\".": "If you leave the app, the game ends. To leave, tap \"Exit\".", "⚠️ באמצע המשחק אי אפשר לצאת מהאפליקציה. יוצאים רק עם \"יציאה\".": "⚠️ During a game you can't leave the app. Leave only with \"Exit\".", "👋 יצאת מהאפליקציה באמצע המשחק, אז המשחק נגמר. כדי לצאת ממשחק לוחצים על \"יציאה\".": "👋 You left the app in the middle of the game, so the game ended. To leave a game, tap \"Exit\".", "⚖️ שופט": "⚖️ Judge", "⚖️ בדוק אצל שופט": "⚖️ Ask the judge", "כל מה שנאמר בכל תמונה, ולמה זה נחשב או לא.": "Everything that was said for each picture, and why it counted or not.", "עוד אין תשובות במשחק הזה.": "No answers in this game yet.", "לא נאמרה תשובה (נגמר הזמן, \"לא יודע\" או שאף אחד לא לחץ).": "No answer was given (time ran out, \"don't know\", or nobody pressed).", " פתח את השופט, אז גם אתה רואה 🙂": " opened the judge, so you see it too 🙂", " · התשובה: ": " · Answer: ", "ענה: ": "Answered: ", "פתרת את החידה היומית! +": "You solved the daily riddle! +", "התשובה: ": "The answer: ",
   // אונליין עד 6 שחקנים, חדר המתנה, צ'אט
   "👥 בחדר": "👥 In the room", "⏳ מחכים שמנהל החדר יתחיל את המשחק…": "⏳ Waiting for the room manager to start the game…", "▶ התחל את המשחק": "▶ Start the game", "⏳ מחכים שעוד שחקן ייכנס…": "⏳ Waiting for another player to join…", "💬 צ'אט": "💬 Chat", "כתוב הודעה…": "Write a message…", "🚪 יציאה מהחדר": "🚪 Leave the room", "שלחו לחברים את הקישור: לוחצים עליו ונכנסים ישר לחדר.": "Send your friends the link: they tap it and go straight into the room.", "📤 שלח קישור לחברים": "📤 Send the link to friends", "הקישור הועתק! הדבק אותו בוואטסאפ לחברים.": "Link copied! Paste it in WhatsApp for your friends.", "👑 מנהל החדר": "👑 Room manager", "⭐ זה אני": "⭐ That's me", "אין הודעות עדיין. כתבו משהו 🙂": "No messages yet. Say something 🙂", "מתחבר לחדר…": "Joining the room…", "יוצר חדר…": "Creating a room…", "🙈 סימנת שאתה לא יודע. מחכים לשאר…": "🙈 You marked that you don't know. Waiting for the others…", "✓ אתה מוכן!": "✓ You're ready!", "מחכים ל:": "Waiting for:", "כולם מוכנים! מתחילים…": "Everyone's ready! Starting…", "אף אחד לא ידע 🤷 אין נקודה.": "Nobody knew 🤷 No point.", "מי שענה יצא. אין נקודה.": "The player who answered left. No point.", "החדר מלא (6 שחקנים) 🙁": "The room is full (6 players) 🙁", "המשחק בחדר הזה כבר התחיל 🙁": "The game in this room already started 🙁", " אמר: \"": " said: \"", " מחליט…": " decides…", "השופט לא בטוח — ": "The judge isn't sure — ", " · ירדה נקודה ": " · lost a point: ", " ענה": " answered",
+  // מוכן/שופט בין תמונות, בונוס יומי, איך משחקים
+  "✋ מוכן": "✋ Ready", "✋ מוכנים": "✋ Ready", "🙈 לא יודע": "🙈 Don't know", "🏠 חזרה למסך הבית": "🏠 Back to home", "🔁 עוד משחק (באותו חדר)": "🔁 Play again (same room)", "ראה פחות": "See less", "🐆 איך משחקים?": "🐆 How do you play?", "מופיעה תמונה.": "A picture appears.", "מי שלוחץ ראשון על הכפתור — עונה (אומר במיקרופון 🎤 או כותב).": "Whoever presses the button first answers (say it 🎤 or type it).", "צודק? מקבל נקודה ⭐ טעית? אפשר לנסות שוב עד שהזמן נגמר.": "Right? You get a point ⭐ Wrong? Try again until time runs out.", "מי שמגיע ראשון ליעד — מנצח! 🏆": "First to reach the target wins! 🏆", "אפשר לשחק לבד, ביחד על טלפון אחד, או אונליין עם חברים.": "Play solo, together on one phone, or online with friends.", "יאללה, מתחילים!": "Let's go!", "+10 נקודות!": "+10 points!", "כל יום שנכנסים לצ'יטה מקבלים 10 נקודות ⭐ בחצות זה מתאפס, ומחר אפשר לקבל שוב.": "Every day you open The Cheetah you get 10 points ⭐ It resets at midnight, so come back tomorrow for more.", "איזה כיף! 🎉": "Awesome! 🎉", "👋 מנהל החדר כבר לא בחדר": "👋 The room manager isn't in the room anymore",
 };
 // משפטים עם מספרים/שמות בסדר אחר באנגלית
 const EN_RULES = [
@@ -1221,7 +1251,7 @@ function openPicture() {
   $("stage").classList.remove("hide");
   layoutPic();
   sfx.go();
-  acts(`מי יודע? לוחצים על הכפתור שלכם! <button class="act" data-a="reveal">אף אחד לא יודע</button>`);
+  acts(`מי יודע? לוחצים על הכפתור שלכם! <button class="act" data-a="reveal">🙈 לא יודע</button>`);
 }
 
 // 10 שניות לענות. אם לא לחצו "תראו תשובה" עד אז — התשובה נפתחת לבד
@@ -1287,7 +1317,7 @@ function reveal(timeUp) {
       <button class="act judge" data-a="judge">⚖️ שופט</button>`);
   } else {
     G.phase = "nobody";
-    acts(`אף אחד לא ידע, אין נקודה. <button class="act big" data-a="next">לתמונה הבאה ←</button>`);
+    acts(`אף אחד לא ידע, אין נקודה. <button class="act big good" data-a="next">✋ מוכנים</button><button class="act" data-a="jlog">⚖️ שופט</button>`);
   }
 }
 
@@ -1307,8 +1337,9 @@ function score(correct) {
   const L_ = T("ל", "");
   acts(winner ? `נקודה <span class="${cls[winner]}">${L_}${pname[winner]}</span>!`
     : lost ? `<span class="${cls[loser]}">${L_}${pname[loser]}</span> יורדת נקודה.` : `אין נקודה <span class="${cls[loser]}">${L_}${pname[loser]}</span>.`);
-  if (winner && G.score[winner] >= target) later(() => gameOver(winner), 1300);
-  else later(nextRound, 1500);
+  if (winner && G.score[winner] >= target) return later(() => gameOver(winner), 1300);
+  G.phase = "between";
+  $("acts").insertAdjacentHTML("beforeend", ` <button class="act big good" data-a="next">✋ מוכנים</button><button class="act" data-a="jlog">⚖️ שופט</button>`);
 }
 
 // כפתורי הלחיצה נבנים ב-buildBuzzers (עם pointerdown, כדי שזה יהיה הכי מהר שאפשר)
@@ -1316,6 +1347,8 @@ $("acts").addEventListener("click", (e) => {
   const b = e.target.closest("[data-a]"); if (!b) return;
   const a = b.dataset.a;
   if (a === "soloSkip") return soloAnswer("");
+  if (a === "soloReady") { if (G.phase === "between") soloNext(); return; }
+  if (a === "jlog") return jlogOpen();
   if (a === "dunno") return onlineDunno();
   if (a === "ready") return onlineReady();
   if (a === "decideYes") return onlineDecide(true);
@@ -1324,7 +1357,7 @@ $("acts").addEventListener("click", (e) => {
   else if (a === "good") score(true);
   else if (a === "bad") score(false);
   else if (a === "judge") openJudge();
-  else if (a === "next") nextRound();
+  else if (a === "next" && (G.phase === "between" || G.phase === "nobody")) nextRound();
 });
 // גם מקלדת עובדת (טאבלט עם מקלדת / מחשב): ד=S, ף=;, רווח, נ=B, ט=Y, ח=J
 document.addEventListener("keydown", (e) => {
@@ -1332,7 +1365,7 @@ document.addEventListener("keydown", (e) => {
   if ($("game").hidden || e.repeat || G.mode !== "duo") return;
   const k = { KeyS: "blue", Semicolon: "red" }[e.code] || { "ד": "blue", "ף": "red" }[e.key];
   if (k) { e.preventDefault(); return buzz(k); }
-  if (e.code === "Space" || e.key === " ") { if (G.phase === "nobody") { e.preventDefault(); nextRound(); } else if (G.phase === "open") { e.preventDefault(); reveal(); } }
+  if (e.code === "Space" || e.key === " ") { if (G.phase === "nobody" || G.phase === "between") { e.preventDefault(); nextRound(); } else if (G.phase === "open") { e.preventDefault(); reveal(); } }
 });
 
 // ---------- שופט (Claude) ----------
@@ -1368,7 +1401,19 @@ const FILLERS = new Set(["זה", "זאת", "זו", "של", "את", "זהו", "ז
 const jWords = (s) => String(s || "").toLowerCase()
   .replace(/[\u0591-\u05C7]/g, "").replace(/[ךםןףץ]/g, (c) => FINALS[c])
   .replace(/[״"'׳`’\-–_.,!?():;]/g, " ").split(/\s+/)
-  .filter((w) => w && !FILLERS.has(w)).map((w) => w.replace(/^ה(?=.{3,})/, ""));
+  .filter((w) => w && !FILLERS.has(w)).map((w) => (JKEEP ? w : w.replace(/^ה(?=.{3,})/, "")));
+// JKEEP: בסיבוב השני של השופט לא מורידים "ה" מההתחלה (כדי ש"האלנד" לא יהפוך ל"אלנד")
+let JKEEP = false;
+// כמה אותיות צריך לשנות, כשהחלפה של שתי אותיות צמודות נחשבת שינוי אחד (גלסט ↔ גלטס)
+function dlev(a, b) {
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) {
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+  }
+  return d[a.length][b.length];
+}
 const jFlat = (s) => jWords(s).join("");
 const jSkel = (s) => jFlat(s).replace(/(?!^)[אויע]/g, "").replace(/(.)\1+/g, "$1");
 function lev(a, b) {
@@ -1411,16 +1456,27 @@ function otherAnswers() {
   return othersCache.map;
 }
 function localJudge(said, cands) {
+  const r = judgeCore(said, cands, false);
+  // סיבוב שני רק כשאמרו מילה שמתחילה ב-ה (כמו "האלנד"), אחרת זה סתם מקבל יותר מדי
+  if (!r || r.ok === true || r.other || !/^s*ה/.test(String(said))) return r;
+  const r2 = judgeCore(said, cands, true);
+  return r2 && r2.ok === true ? r2 : r;
+}
+function judgeCore(said, cands, keep) {
+  JKEEP = keep;
+  try { return judgePass(said, cands, keep); } finally { JKEEP = false; }
+}
+function judgePass(said, cands, keep) {
   const A = jFlat(said), SA = jSkel(said), wa = jWords(said), PA = jPhon(said);
   if (!A) return null;
-  const others = otherAnswers();
-  if (others && others.has(A) && !cands.some((c) => jFlat(c) === A)) return { ok: false, reason: `"${others.get(A)}" זו תשובה אחרת. התשובה: "${(LANG === "en" && cands.find((c) => /^[ -~]+$/.test(c))) || cands[0]}".` };
+  const others = keep ? null : otherAnswers();
+  if (others && others.has(A) && !cands.some((c) => jFlat(c) === A)) return { other: true, ok: false, reason: `"${others.get(A)}" זו תשובה אחרת. התשובה: "${(LANG === "en" && cands.find((c) => /^[ -~]+$/.test(c))) || cands[0]}".` };
   let maybe = null;
   for (const c of cands) {
     const B = jFlat(c), SB = jSkel(c), wb = jWords(c);
     if (!B) continue;
     if (A === B) return { ok: true, reason: "זה בדיוק אחד מהשמות שנחשבים נכון." };
-    if (lev(A, B) <= tol(B.length)) return { ok: true, reason: `רק שגיאת כתיב קטנה. התשובה: "${c}".` };
+    if (dlev(A, B) <= tol(B.length)) return { ok: true, reason: `רק שגיאת כתיב קטנה. התשובה: "${c}".` };
     if (B.length >= 4 && SA === SB) return { ok: true, reason: `אותה מילה בכתיב קצת אחר. התשובה: "${c}".` };
     if (B.length >= 3 && A.includes(B)) return { ok: true, reason: `אמרתם את התשובה ("${c}") עם עוד כמה מילים.` };
     const PB = jPhon(c);
@@ -1498,6 +1554,11 @@ $("jSaid").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preve
 // ---------- תשובה במיקרופון / בהקלדה ----------
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let rec = null, onAnswer = null, heard = [], liveItem = null, listenWanted = false, listenRestarts = 0, warmDirty = false;
+// בשדה התשובה רואים תמיד את סוף המשפט (מה שאמרת עכשיו), לא רק את ההתחלה
+function showEnd(i) {
+  try { i.setSelectionRange(i.value.length, i.value.length); } catch (e) {}
+  i.scrollLeft = getComputedStyle(i).direction === "rtl" ? -i.scrollWidth : i.scrollWidth;
+}
 function warmMic() {
   if (!SR || !IS_APP || rec || onAnswer || document.hidden || G.phase === "idle" || G.phase === "over") return;
   listenWanted = true; listenRestarts = 0; warmDirty = false; startListening();
@@ -1549,7 +1610,7 @@ function startListening() {
       const r = e.results[e.results.length - 1];
       const texts = [...r].map((x) => x.transcript.trim()).filter(Boolean);
       if (!texts.length) return;
-      $("ansIn").value = texts[0];
+      $("ansIn").value = texts[0]; showEnd($("ansIn"));
       if (saidRight(texts)) { heard = heard.concat(texts); return submitAnswer(); }
       if (r.isFinal) {
         heard = heard.concat(texts);
@@ -1563,7 +1624,7 @@ function startListening() {
       if (rec !== r0) return;
       rec = null; $("micBtn").classList.remove("on");
       // היה שקט? ממשיכים להקשיב עד שהזמן נגמר
-      if (onAnswer && listenWanted && listenRestarts++ < 40) setTimeout(() => { if (onAnswer && listenWanted) startListening(); }, 30);
+      if (onAnswer && listenWanted) { listenRestarts++; setTimeout(() => { if (onAnswer && listenWanted) startListening(); }, listenRestarts > 200 ? 400 : 30); }
     };
     r0.start(); if (onAnswer) $("micBtn").classList.add("on");
   } catch (e) { rec = null; }
@@ -1646,8 +1707,11 @@ function soloResult(ok, text) {
   if (ok) { s.ok++; awardPoints(G.daily ? DAILY_POINTS : POINTS_PER_CORRECT); if (G.daily) { prof.dailyRes = "won"; saveProf(); } } else s.no++;
   paintSolo();
   flash(ok, ok ? "✓ נכון!" : text ? "✗ טעות" : "⏰ לא ענית");
-  acts(ok ? "יפה! ✓" : text ? `אמרת: "${escapeHtml(text)}"` : "");
-  later(soloNext, ok ? 1500 : 2300);
+  const line = ok ? "יפה! ✓" : text ? `אמרת: "${escapeHtml(text)}"` : "";
+  // נגמר המשחק (או החידה היומית) — ממשיכים לבד למסך הסיום
+  if (G.daily || s.ok >= s.need || s.no >= s.maxWrong || !G.queue.length) { acts(line); later(soloNext, ok ? 1500 : 2300); return; }
+  G.phase = "between";
+  acts(`<span style="flex-basis:100%">${line}</span><button class="act big good" data-a="soloReady">✋ מוכן</button><button class="act" data-a="jlog">⚖️ שופט</button>`);
 }
 $("acts").addEventListener("click", (e) => {
   const b = e.target.closest("[data-a]"); if (!b || G.phase !== "decide") return;
@@ -1663,6 +1727,7 @@ function soloOver(won) {
     $("final").textContent = T("התשובה: ", "The answer: ") + ansOf(G.item); $("final").classList.add("notr");
   } else $("final").classList.remove("notr");
   $("jlogBtn2").hidden = !JLOG.length;
+  overButtons();
   paintDaily();
   show("over");
   if (won) { sfx.win(); confetti("blue"); } else sfx.bad();
@@ -1839,6 +1904,14 @@ function onNo(m) {
   netLeave(); show("home");
   $("joinErr").textContent = m.why === "full" ? "החדר מלא (6 שחקנים) 🙁" : "המשחק בחדר הזה כבר התחיל 🙁";
   $("joinErr").hidden = false;
+}
+function onlineAgain() {
+  if (!NET.client) { show("home"); return; }
+  if (isHost()) { show("lobby"); sendLobby(); renderChat(); return; }
+  O.players = []; O.joinT0 = 0; clearTimeout(O.joinTimer);
+  paintLobby(); renderChat(); show("lobby");
+  O.joinTimer = setTimeout(() => { if (!O.players.length) roomClosed("👋 מנהל החדר כבר לא בחדר"); }, 12000);
+  send("join", { name: prof.name, pid: prof.id, av: prof.av | 0 });
 }
 $("startGame").onclick = () => { if (isHost() && !O.started && O.players.length >= 2) hostStart(); };
 
@@ -2097,7 +2170,7 @@ function readyActs() {
   if (G.phase !== "ready") return;
   const me = !!O.ready[NET.me], wait = O.players.filter((p) => !O.ready[p.id]);
   acts(`<span style="flex-basis:100%">${O.resultLine}</span>
-    <button class="act big ${me ? "good" : ""}" data-a="ready">${me ? "✓ אני מוכן (לחץ לביטול)" : "✋ מוכן"}</button>`);
+    <button class="act big ${me ? "good" : ""}" data-a="ready">${me ? "✓ אני מוכן (לחץ לביטול)" : "✋ מוכן"}</button><button class="act" data-a="jlog">⚖️ שופט</button>`);
   const w = $("readyWait");
   w.hidden = !me;
   if (!me) return;
@@ -2111,12 +2184,15 @@ function onlineReady() {
   if (isHost()) hostGotReady(NET.me, on, O.n); else send("ready", { n: O.n, on });
 }
 function onlineOver(w) {
-  clearTimers(); G.phase = "over"; $("readyWait").hidden = true;
+  clearTimers(); G.phase = "over"; $("readyWait").hidden = true; overButtons(); $("jlogBtn2").hidden = !JLOG.length;
+  // אפשר לשחק שוב באותו חדר: מי שלוחץ "עוד משחק" חוזר לחדר ההמתנה
+  O.started = false;
   const iWon = w === NET.me;
   $("winTxt").textContent = iWon ? "ניצחת! 🏆" : pName(w) + " ניצח! 🏆";
   $("final").innerHTML = [...O.players].sort((a, b) => (O.score[b.id] | 0) - (O.score[a.id] | 0))
     .map((p) => `<span class="${cls[p.color]} notr">${escapeHtml(p.name)} ${O.score[p.id] | 0}</span>`).join(" · ");
   show("over"); if (iWon) { sfx.win(); confetti(myColor()); }
+  if (isHost()) O.players = O.players.filter((p) => p.id === NET.me); // מי שילחץ "עוד משחק" יחזור לחדר
 }
 function onNet(m) {
   // לכולם
@@ -2296,8 +2372,8 @@ function fillAvGrid(grid, pick) {
   });
 }
 // נקודות על תשובה נכונה (לבד, ביחד — הכחול הוא אני — ובאונליין)
-function awardPoints(n) {
-  statCorrect();
+function awardPoints(n, noStat) {
+  if (!noStat) statCorrect();
   const before = levelInfo(prof.points).lvl;
   prof.points += n; saveProf();
   const p = document.createElement("div"); p.className = "plus"; p.textContent = "+" + n + " ⭐"; document.body.append(p); setTimeout(() => p.remove(), 1400);
@@ -2382,7 +2458,7 @@ $("wForm").addEventListener("submit", async (e) => {
     if (!rec || !rec.hash) return wFail("לא מצאתי משתמש בשם \"" + name + "\".");
     if ((await hashPass(pass, rec.salt)) !== rec.hash) return wFail("הסיסמה לא נכונה 🙁");
     presenceGone();
-    prof = { id: rec.id, name: rec.name, av: rec.av | 0, fav: rec.fav || null, daily: rec.daily || null, dailyRes: rec.dres || null, photo: rec.photo || null, points: rec.points | 0, pv: 2, salt: rec.salt, hash: rec.hash, t: rec.t || 0 };
+    prof = { id: rec.id, name: rec.name, av: rec.av | 0, fav: rec.fav || null, daily: rec.daily || null, dailyRes: rec.dres || null, bonusDay: rec.bday || null, photo: rec.photo || null, points: rec.points | 0, pv: 2, salt: rec.salt, hash: rec.hash, t: rec.t || 0 };
     try { localStorage.setItem(PROF_KEY, JSON.stringify(prof)); } catch (x) {}
     storeCred(name, pass);
     location.reload(); // נכנסים מחדש עם החשבון
@@ -2399,13 +2475,15 @@ $("wForm").addEventListener("submit", async (e) => {
   saveProf(); acctPut();
   $("welcome").hidden = true; W.canCancel = false; $("wGo").disabled = false; $("wPass").value = "";
   paintProf(); presenceSay();
-  tryPendingJoin();
+  if (W.mode === "new") { $("howto").hidden = false; return; }
+  if (!tryPendingJoin()) checkDailyBonus();
 });
+$("htOk").onclick = () => { $("howto").hidden = true; if (!tryPendingJoin()) checkDailyBonus(); else checkDailyBonus(true); };
 // ---------- החשבון ברשת ----------
 function acctPut() {
   if (!IS_APP || !prof.hash || !prof.name || !PRES.client || !PRES.client.connected) return;
   prof.t = Date.now(); try { localStorage.setItem(PROF_KEY, JSON.stringify(prof)); } catch (e) {}
-  PRES.client.publish(PRES_ROOT + "acct/" + nameKey(prof.name), JSON.stringify({ v: 1, id: prof.id, name: prof.name, av: prof.av, fav: prof.fav || null, points: prof.points, pv: 2, photo: myThumb || null, salt: prof.salt, hash: prof.hash, t: prof.t, daily: prof.daily || null, dres: prof.dailyRes || null }), { retain: true, qos: 1 });
+  PRES.client.publish(PRES_ROOT + "acct/" + nameKey(prof.name), JSON.stringify({ v: 1, id: prof.id, name: prof.name, av: prof.av, fav: prof.fav || null, points: prof.points, pv: 2, photo: myThumb || null, salt: prof.salt, hash: prof.hash, t: prof.t, daily: prof.daily || null, dres: prof.dailyRes || null, bday: prof.bonusDay || null }), { retain: true, qos: 1 });
   statSave(); boardPut();
 }
 let acctTimer = 0;
@@ -2419,11 +2497,13 @@ async function acctSync() {
   if (rec && rec.id === prof.id) {
     prof.points = Math.max(prof.points | 0, rec.points | 0);
     if ((rec.daily || "") > (prof.daily || "")) { prof.daily = rec.daily; prof.dailyRes = rec.dres || null; }
+    if ((rec.bday || "") > (prof.bonusDay || "")) prof.bonusDay = rec.bday;
     if ((rec.t || 0) > (prof.t || 0)) { prof.av = rec.av | 0; prof.fav = rec.fav || null; paintFavSel(); }
     try { localStorage.setItem(PROF_KEY, JSON.stringify(prof)); } catch (e) {}
     paintProf();
   }
   acctPut();
+  setTimeout(checkDailyBonus, Math.max(300, 5600 - performance.now())); // אחרי הפתיחה עם הצ'יטה
 }
 // ---------- הגדרות ----------
 $("gearBtn").onclick = (e) => { e.stopPropagation(); show("settings"); paintSettings(); };
@@ -2815,23 +2895,18 @@ function paintAdmin() {
     const merge = (f) => { const o = {}; for (const p of all) for (const [k, v] of Object.entries(f(p) || {})) o[k] = (o[k] | 0) + (v | 0); return o; };
     const count = (f) => { const o = {}; for (const p of all) { const k = f(p); if (k) o[k] = (o[k] | 0) + 1; } return o; };
     const tiles = [
-      [all.length, "👥 משתמשים בסך הכול"],
-      [all.filter((p) => p.inst).length, "📲 התקינו את האפליקציה"],
-      [all.filter((p) => p.online).length, "🟢 מחוברים עכשיו"],
-      [all.filter((p) => p.st === "playing").length, "🎮 באמצע משחק עכשיו"],
-      [all.filter((p) => p.last && new Date(p.last).toDateString() === today).length, "☀️ נכנסו היום"],
-      [all.filter((p) => p.last && now - p.last < 7 * DAY).length, "📅 נכנסו השבוע"],
-      [all.filter((p) => p.first && now - p.first < 7 * DAY).length, "🆕 הצטרפו השבוע"],
+      [all.length, "👥 משתמשים בסך הכול", "all"],
+      ...Object.entries(ADM_F).map(([k, [label, fn]]) => [all.filter(fn).length, label, k]),
       [sum((p) => p.games), "🕹️ משחקים ששוחקו"],
       [sum((p) => p.correct), "✅ תשובות נכונות"],
       [sum((p) => p.pts), "⭐ נקודות של כולם"],
-      [Object.keys(ADM.msgs).length, "📬 הודעות מהשחקנים"],
+      [Object.keys(ADM.msgs).length, "📬 הודעות מהשחקנים", "msgs"],
     ];
     const top = [...all].sort((a, b) => b.pts - a.pts).slice(0, 5);
     const joins = {}; for (let i = 6; i >= 0; i--) joins[new Date(now - i * DAY).toLocaleDateString("he-IL", { weekday: "short", day: "numeric", month: "numeric" })] = 0;
     for (const p of all) if (p.first && now - p.first < 7 * DAY) { const k = new Date(p.first).toLocaleDateString("he-IL", { weekday: "short", day: "numeric", month: "numeric" }); if (k in joins) joins[k]++; }
     const joinTop = Math.max(1, ...Object.values(joins));
-    $("admStats").innerHTML = `<div class="tiles">${tiles.map(([v, l]) => `<div class="tile"><b>${v}</b><span>${l}</span></div>`).join("")}</div>
+    $("admStats").innerHTML = `<div class="tiles">${tiles.map(([v, l, k]) => `<div class="tile"${k ? ` data-f="${k}" role="button" tabindex="0"` : ""}><b>${v}</b><span>${l}</span></div>`).join("")}</div>
       <div class="abox"><h3>🏆 הכי הרבה נקודות</h3>${top.map((p, i) => `<div class="hbar"><span class="notr">${i + 1}. ${escapeHtml(p.name)}</span><i style="width:${Math.max(2, Math.round(p.pts / Math.max(1, top[0].pts) * 100))}%"></i><em>${p.pts} ⭐</em></div>`).join("")}</div>
       <div class="abox"><h3>🆕 הצטרפו בשבוע האחרון</h3>${Object.entries(joins).map(([k, v]) => `<div class="hbar"><span>${k}</span><i style="width:${Math.max(2, Math.round(v / joinTop * 100))}%"></i><em>${v}</em></div>`).join("")}</div>
       <div class="abox"><h3>🎲 מצבי משחק</h3>${bars(merge((p) => p.modes), (k) => MODE_NAME[k] || k)}</div>
@@ -2843,7 +2918,9 @@ function paintAdmin() {
   }
   if (ADM.tab === "players") {
     const k = qNorm($("admSearch").value);
-    const list = all.filter((p) => !k || qNorm(p.name).includes(k)).sort((a, b) => (b.online | 0) - (a.online | 0) || (b.last || 0) - (a.last || 0));
+    const pf = ADM.pf && ADM_F[ADM.pf];
+    $("admFilter").hidden = !pf; if (pf) $("admFilterT").textContent = "מסונן: " + pf[0];
+    const list = all.filter((p) => (!pf || pf[1](p)) && (!k || qNorm(p.name).includes(k))).sort((a, b) => (b.online | 0) - (a.online | 0) || (b.last || 0) - (a.last || 0));
     $("admCount").textContent = all.length + " שחקנים ששיחקו אי פעם · " + all.filter((p) => p.online).length + " מחוברים עכשיו" + (k ? " · נמצאו " + list.length : "");
     const box = $("admList"); box.innerHTML = "";
     if (!list.length) box.innerHTML = '<div class="note">לא מצאתי שחקן בשם הזה.</div>';
@@ -2878,6 +2955,23 @@ function paintAdmin() {
     }
   }
 }
+// רשימות שאפשר לפתוח מהמספרים בסטטיסטיקות
+const DAYMS = 86400000;
+const ADM_F = {
+  inst: ["📲 התקינו את האפליקציה", (p) => p.inst],
+  online: ["🟢 מחוברים עכשיו", (p) => p.online],
+  playing: ["🎮 באמצע משחק עכשיו", (p) => p.st === "playing"],
+  today: ["☀️ נכנסו היום", (p) => p.last && new Date(p.last).toDateString() === new Date().toDateString()],
+  week: ["📅 נכנסו השבוע", (p) => p.last && Date.now() - p.last < 7 * DAYMS],
+  newweek: ["🆕 הצטרפו השבוע", (p) => p.first && Date.now() - p.first < 7 * DAYMS],
+};
+$("admStats").addEventListener("click", (e) => {
+  const t = e.target.closest("[data-f]"); if (!t) return;
+  const k = t.dataset.f;
+  if (k === "msgs") ADM.tab = "msgs"; else { ADM.tab = "players"; ADM.pf = k === "all" ? null : k; }
+  paintAdmin();
+});
+$("admStats").addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && e.target.closest("[data-f]")) { e.preventDefault(); e.target.click(); } });
 function paintPvAdmin(p) {
   const box = $("pvAdm");
   box.hidden = !isAdmin() || $("admin").hidden;
@@ -2899,7 +2993,8 @@ function paintPvAdmin(p) {
 $("adminBtn").onclick = () => { if (!isAdmin()) return; adminSub(); ADM.tab = "stats"; show("admin"); paintAdmin(); };
 $("admBack").onclick = () => { show("settings"); paintSettings(); };
 $("admTabStats").onclick = () => { ADM.tab = "stats"; paintAdmin(); };
-$("admTabPlayers").onclick = () => { ADM.tab = "players"; paintAdmin(); };
+$("admTabPlayers").onclick = () => { ADM.tab = "players"; ADM.pf = null; paintAdmin(); };
+$("admFilterX").onclick = () => { ADM.pf = null; paintAdmin(); };
 $("admTabMsgs").onclick = () => { ADM.tab = "msgs"; paintAdmin(); };
 $("admSearch").addEventListener("input", paintAdmin);
 document.querySelectorAll("#admMsgs [data-f]").forEach((b) => (b.onclick = () => { ADM.filt = b.dataset.f; paintAdmin(); }));
@@ -2974,9 +3069,11 @@ function paintBoard() {
     box.append(b);
   });
   $("boardMore").hidden = boardLimit >= 100 || rows.length <= boardLimit;
+  $("boardLess").hidden = boardLimit <= 5;
 }
 // "ראה עוד": 5 → 30 → 100
 $("boardMore").onclick = () => { boardLimit = boardLimit < 30 ? 30 : 100; paintBoard(); };
+$("boardLess").onclick = () => { boardLimit = 5; paintBoard(); $("boardBox").scrollIntoView({ block: "nearest" }); };
 paintBoard();
 
 // ---------- חידה יומית ----------
@@ -3045,6 +3142,22 @@ $("dailyGo").onclick = async () => {
 paintDaily();
 setTimeout(tryPendingJoin, 300);
 
+// ---------- בונוס כניסה יומי: כל יום שנכנסים = 10 נקודות (מתאפס בחצות) ----------
+const LOGIN_BONUS = 10;
+// quiet: נותנים את הנקודות בלי החלון (למשל כשנכנסים ישר לחדר מקישור) — החלון יופיע כשחוזרים למסך הבית
+var bonusShowLater = false;
+function checkDailyBonus(quiet) {
+  if (!IS_APP || !prof.name || !prof.hash || !$("welcome").hidden || !$("howto").hidden) return;
+  if (prof.bonusDay !== todayKey()) {
+    prof.bonusDay = todayKey(); awardPoints(LOGIN_BONUS, true); saveProf();
+    bonusShowLater = true;
+  }
+  if (bonusShowLater && !quiet && !$("home").hidden) { bonusShowLater = false; $("bonus").hidden = false; }
+}
+$("bonusOk").onclick = () => { $("bonus").hidden = true; };
+document.addEventListener("visibilitychange", () => { if (!document.hidden) setTimeout(checkDailyBonus, 800); });
+new MutationObserver(() => { if (!$("home").hidden) setTimeout(checkDailyBonus, 400); }).observe($("home"), { attributes: true, attributeFilter: ["hidden"] });
+
 // ---------- בדוק אצל שופט ----------
 // אחרי כל תמונה נשמר מה אמרו, ולמה השופט החליט ככה. באונליין: מי שפותח — גם החבר רואה.
 var JLOG = [];
@@ -3087,13 +3200,21 @@ $("jlClose").onclick = () => { $("jlogModal").hidden = true; };
 
 // ---------- ניצחון ----------
 function gameOver(w) {
-  clearTimers(); stopAnswerTimer(); G.phase = "over";
+  clearTimers(); stopAnswerTimer(); G.phase = "over"; overButtons(); $("jlogBtn2").hidden = !JLOG.length;
   $("winTxt").innerHTML = `<span class="${cls[w]}">${heb[w]}</span> ניצח! 🏆`;
   $("final").innerHTML = G.players.map((k) => `<span class="${cls[k]}">${G.score[k]}</span>`).join(" : ");
   show("over"); sfx.win(); confetti(w);
 }
-$("again").onclick = () => { stopConfetti(); if (G.daily) { show("home"); paintDaily(); return; } if (G.mode === "solo") startSolo(G.deck); else if (G.mode === "online") { netLeave(); show("home"); } else startGame(G.deck); };
-$("toMenu").onclick = () => { stopConfetti(); show("home"); };
+$("again").onclick = () => { stopConfetti(); if (G.daily) { show("home"); paintDaily(); return; } if (G.mode === "solo") startSolo(G.deck); else if (G.mode === "online") onlineAgain(); else startGame(G.deck); };
+$("toMenu").onclick = () => { stopConfetti(); if (G.mode === "online") netLeave(); show("home"); };
+$("overHome").onclick = () => { stopConfetti(); show("home"); paintDaily(); };
+// בחידה היומית יש רק "חזרה למסך הבית". באונליין "עוד משחק" = חוזרים לאותו חדר
+function overButtons() {
+  const d = !!G.daily;
+  $("overHome").hidden = !d; $("again").hidden = $("toMenu").hidden = d;
+  $("over").querySelectorAll(".langbtn").forEach((b) => (b.hidden = d));
+  $("again").textContent = G.mode === "online" ? "🔁 עוד משחק (באותו חדר)" : "עוד משחק";
+}
 $("quit").onclick = () => { clearTimers(); stopAnswerTimer(); stopListening(); G.phase = "idle"; if (G.mode === "online") netLeave(); show("home"); };
 
 let confRaf;
