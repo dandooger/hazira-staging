@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790687800146"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790786268730"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -338,6 +338,9 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
 .cmsg.me{background:#2F7BFF;justify-self:end;max-width:85%}
 .cmsg.them{background:#5A4712;justify-self:start;max-width:85%}
 .dmtoast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:12;max-width:min(520px,92vw);background:#1A1405;color:#FFC400;border:2px solid #FFC400;border-radius:14px;padding:10px 16px;font-size:16px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.35);cursor:pointer}
+.ctlrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ctlrow .act{min-height:40px;padding:6px 12px}
+#ctlAmt{font:inherit;font-size:17px;width:120px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--ground);color:var(--ink)}
 .fbrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 #fbText{font:inherit;font-size:18px;color:var(--ink);background:var(--ground);border:1px solid var(--line);border-radius:10px;padding:12px;width:100%;resize:vertical;min-height:120px}
 .gearbtn .dot{position:absolute;top:-3px;inset-inline-end:-3px;width:14px;height:14px;border-radius:50%;background:var(--red,#FF3B4A);border:2px solid #1A1405}
@@ -617,6 +620,12 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
     <div class="favline" id="pvFav" hidden></div>
     <div class="lvlbar" style="width:100%"><b id="pvLvl"></b><div class="bar"><i id="pvBar"></i></div><span class="note" id="pvSt"></span></div>
     <div class="lvlbar" id="pvAdm" style="width:100%;text-align:start" hidden></div>
+    <div class="lvlbar" id="pvCtl" style="width:100%;text-align:start" hidden>
+      <b>👑 שליטה — רק ליוצר המשחק</b>
+      <div class="ctlrow"><button class="act" type="button" data-d="10">+10</button><button class="act" type="button" data-d="50">+50</button><button class="act" type="button" data-d="100">+100</button><button class="act" type="button" data-d="-10">−10</button><button class="act" type="button" data-d="-50">−50</button></div>
+      <div class="ctlrow"><input id="ctlAmt" type="number" inputmode="numeric" min="1" max="100000" placeholder="כמה נקודות?"><button class="act" id="ctlAdd" type="button">➕ הוסף</button><button class="act" id="ctlSub" type="button">➖ הורד</button></div>
+      <div class="note" id="ctlMsg" hidden></div>
+    </div>
     <div class="row" style="justify-content:center"><button class="go" id="pvInvite" hidden>🎮 הזמן לשחק</button><button class="go" id="pvDm" type="button" hidden>💬 שליחת הודעה</button><button class="ghost" id="pvClose">סגור</button></div>
   </div>
 </div>
@@ -827,6 +836,8 @@ const EN_DICT = {
   "🔊 צלילים": "🔊 Sounds", "🔊 פועל": "🔊 On", "🔇 כבוי": "🔇 Off", "חוזר לחדר שלך…": "Back to your room…", "⏳ מנהל החדר יצא לרגע… מחכים שיחזור": "⏳ The room manager stepped out… waiting for them to come back", "👋 מנהל החדר יצא, אז החדר נסגר": "👋 The room manager left, so the room closed", "💬 כתוב הודעה…": "💬 Write a message…",
   // הודעות פרטיות, נקודה לכל השאר
   "💬 שליחת הודעה": "💬 Send a message", "השיחה נמחקת כשאחד מכם יוצא מהאפליקציה.": "The chat is deleted when one of you leaves the app.", "עוד אין הודעות. כתוב משהו 🙂": "No messages yet. Say something 🙂", " לא מחובר עכשיו, אז השיחה נמחקה.": " isn't online now, so the chat was deleted.", "נקודה לכל השאר!": "A point for everyone else!", " · נקודה לכל השאר": " · a point for everyone else", " (גם לך! 🎉)": " (you too! 🎉)", "התשובה:": "Answer:", "✓ אתה מוכן · ": "✓ You're ready · ", " מנהל החדר עכשיו": " is the room manager now",
+  // נקודות מיוצר המשחק
+  "👑 יוצר המשחק הוריד לך ": "👑 The game creator took away ", "👑 יוצר המשחק נתן לך ": "👑 The game creator gave you ",
 };
 // משפטים עם מספרים/שמות בסדר אחר באנגלית
 const EN_RULES = [
@@ -2594,7 +2605,7 @@ $("wForm").addEventListener("submit", async (e) => {
     if (!rec || !rec.hash) return wFail("לא מצאתי משתמש בשם \"" + name + "\".");
     if ((await hashPass(pass, rec.salt)) !== rec.hash) return wFail("הסיסמה לא נכונה 🙁");
     presenceGone();
-    prof = { id: rec.id, name: rec.name, av: rec.av | 0, fav: rec.fav || null, daily: rec.daily || null, dailyRes: rec.dres || null, bonusDay: rec.bday || null, photo: rec.photo || null, points: rec.points | 0, pv: 2, salt: rec.salt, hash: rec.hash, t: rec.t || 0 };
+    prof = { id: rec.id, name: rec.name, av: rec.av | 0, fav: rec.fav || null, daily: rec.daily || null, dailyRes: rec.dres || null, bonusDay: rec.bday || null, pfix: rec.pfix || 0, photo: rec.photo || null, points: rec.points | 0, pv: 2, salt: rec.salt, hash: rec.hash, t: rec.t || 0 };
     try { localStorage.setItem(PROF_KEY, JSON.stringify(prof)); } catch (x) {}
     storeCred(name, pass);
     location.reload(); // נכנסים מחדש עם החשבון
@@ -2619,7 +2630,7 @@ $("htOk").onclick = () => { $("howto").hidden = true; if (!tryPendingJoin()) che
 function acctPut() {
   if (!IS_APP || !prof.hash || !prof.name || !PRES.client || !PRES.client.connected) return;
   prof.t = Date.now(); try { localStorage.setItem(PROF_KEY, JSON.stringify(prof)); } catch (e) {}
-  PRES.client.publish(PRES_ROOT + "acct/" + nameKey(prof.name), JSON.stringify({ v: 1, id: prof.id, name: prof.name, av: prof.av, fav: prof.fav || null, points: prof.points, pv: 2, photo: myThumb || null, salt: prof.salt, hash: prof.hash, t: prof.t, daily: prof.daily || null, dres: prof.dailyRes || null, bday: prof.bonusDay || null }), { retain: true, qos: 1 });
+  PRES.client.publish(PRES_ROOT + "acct/" + nameKey(prof.name), JSON.stringify({ v: 1, id: prof.id, name: prof.name, av: prof.av, fav: prof.fav || null, points: prof.points, pv: 2, photo: myThumb || null, salt: prof.salt, hash: prof.hash, t: prof.t, daily: prof.daily || null, dres: prof.dailyRes || null, bday: prof.bonusDay || null, pfix: prof.pfix || 0 }), { retain: true, qos: 1 });
   statSave(); boardPut();
 }
 let acctTimer = 0;
@@ -2631,7 +2642,8 @@ async function acctSync() {
   const rec = await getRetained("acct/" + nameKey(prof.name));
   if (rec && rec.id === prof.id && rec.hash !== prof.hash) { W.canCancel = false; $("wName").value = prof.name; askName("הסיסמה של החשבון שונתה בטלפון אחר. תיכנס שוב עם הסיסמה החדשה.", "login"); return; }
   if (rec && rec.id === prof.id) {
-    prof.points = Math.max(prof.points | 0, rec.points | 0);
+    if ((rec.pfix || 0) > (prof.pfix || 0)) { prof.points = rec.points | 0; prof.pfix = rec.pfix; }
+    else prof.points = Math.max(prof.points | 0, rec.points | 0);
     if ((rec.daily || "") > (prof.daily || "")) { prof.daily = rec.daily; prof.dailyRes = rec.dres || null; }
     if ((rec.bday || "") > (prof.bonusDay || "")) prof.bonusDay = rec.bday;
     if ((rec.t || 0) > (prof.t || 0)) { prof.av = rec.av | 0; prof.fav = rec.fav || null; paintFavSel(); }
@@ -2768,7 +2780,7 @@ function presenceConnect() {
       will: { topic: PRES_ROOT + "presence/" + prof.id, payload: "", retain: true, qos: 1 } });
     PRES.client = c;
     c.on("error", () => {});
-    c.on("connect", () => { c.subscribe([PRES_ROOT + "presence/+", PRES_ROOT + "photo/+", PRES_ROOT + "inbox/" + prof.id, PRES_ROOT + "board/+"], { qos: 1 }); presenceSay(); photoSay(); });
+    c.on("connect", () => { c.subscribe([PRES_ROOT + "presence/+", PRES_ROOT + "photo/+", PRES_ROOT + "inbox/" + prof.id, PRES_ROOT + "board/+", PRES_ROOT + "adj/" + prof.id + "/+"], { qos: 1 }); presenceSay(); photoSay(); });
     c.on("message", onPresenceMsg);
     clearInterval(PRES.timer);
     let beat = 0;
@@ -2793,6 +2805,7 @@ async function presenceStart() {
 }
 function onPresenceMsg(topic, payload) {
   const s = payload.toString();
+  if (topic.startsWith(PRES_ROOT + "adj/")) { if (s) applyAdj(topic, s); return; }
   if (topic.startsWith(PRES_ROOT + "board/")) {
     const id = topic.split("/").pop(); let m = null; try { m = s ? JSON.parse(s) : null; } catch (e) {}
     if (m && m.name) BOARD[id] = { ...m, id }; else delete BOARD[id];
@@ -2968,6 +2981,9 @@ $("fbSend").onclick = async () => {
 // ---------- מנהלים ----------
 // "המנהל" ו"יוצר המשחק" (עם הסיסמה שלהם) רואים את כל השחקנים, סטטיסטיקות וכל ההודעות.
 const ADMIN_NAMES = ["המנהל", "יוצר המשחק"];
+// "יוצר המשחק" — רק הוא יכול לשנות נקודות של שחקנים
+const CREATOR_NAME = "יוצר המשחק";
+const isCreator = () => IS_APP && !!prof.hash && !!prof.name && (nameKey(prof.name) === nameKey(CREATOR_NAME) || (window.HAZIRA_ENV === "staging" && /^qa-\w+-adm$/.test(prof.name)));
 const isAdmin = () => IS_APP && !!prof.hash && !!prof.name && (ADMIN_NAMES.some((n) => nameKey(n) === nameKey(prof.name)) || (window.HAZIRA_ENV === "staging" && /^qa-\w+-adm$/.test(prof.name)));
 var ADM = { on: false, accts: {}, acctKey: {}, stats: {}, msgs: {}, tab: "stats", filt: "all", paintT: 0 };
 var readMsgs = {}; try { readMsgs = JSON.parse(localStorage.getItem(READ_KEY) || "{}") || {}; } catch (e) {}
@@ -3122,6 +3138,9 @@ $("admStats").addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.k
 function paintPvAdmin(p) {
   const box = $("pvAdm");
   box.hidden = !isAdmin() || $("admin").hidden;
+  $("pvCtl").hidden = box.hidden || !isCreator();
+  $("ctlMsg").hidden = true; $("ctlAmt").value = "";
+  CTL.p = p;
   if (box.hidden) return;
   const line = (a, b) => `<div class="hbar" style="grid-template-columns:auto 1fr"><span>${a}</span><b style="text-align:end">${b}</b></div>`;
   box.innerHTML = [
@@ -3137,6 +3156,29 @@ function paintPvAdmin(p) {
     p.modes ? line("🎲 מצבים", Object.entries(p.modes).map(([k, v]) => (MODE_NAME[k] || k) + " " + v).join(" · ")) : "",
   ].join("");
 }
+// יוצר המשחק מוסיף / מוריד נקודות. זה נשמר בשרת עד שהאפליקציה של השחקן מקבלת את זה (גם אם הוא לא מחובר עכשיו)
+const CTL = { p: null };
+function ctlSend(delta) {
+  const p = CTL.p, msg = $("ctlMsg");
+  if (!p || !isCreator() || !delta || !PRES.client || !PRES.client.connected) return;
+  delta = Math.max(-100000, Math.min(100000, Math.round(delta)));
+  const t = Date.now();
+  PRES.client.publish(PRES_ROOT + "adj/" + p.id + "/" + t, JSON.stringify({ by: prof.id, byName: prof.name, delta, t }), { retain: true, qos: 1 });
+  // בטבלה ובמסך המנהלים זה מתעדכן מיד
+  const pts = Math.max(0, (p.pts | 0) + delta);
+  p.pts = pts;
+  const b = BOARD[p.id]; if (b) { BOARD[p.id] = { ...b, pts }; PRES.client.publish(PRES_ROOT + "board/" + p.id, JSON.stringify({ ...b, id: undefined, pts, t }), { retain: true, qos: 1 }); }
+  if (ADM.accts[p.id]) ADM.accts[p.id].pts = pts;
+  if (ADM.stats[p.id]) ADM.stats[p.id].pts = pts;
+  const L = levelInfo(pts);
+  $("pvLvl").textContent = "דרגה " + L.lvl + " · " + pts + " נקודות ⭐"; $("pvBar").style.width = Math.round(L.pct * 100) + "%";
+  msg.textContent = (delta > 0 ? "✓ נוספו " + delta : "✓ הורדו " + (-delta)) + " נקודות ל" + p.name + ". אצלו זה מתעדכן כשהוא באפליקציה.";
+  msg.hidden = false;
+  paintBoard(); if (!$("admin").hidden) paintAdmin();
+}
+$("pvCtl").addEventListener("click", (e) => { const b = e.target.closest("[data-d]"); if (b) ctlSend(+b.dataset.d); });
+$("ctlAdd").onclick = () => { const n = Math.abs(parseInt($("ctlAmt").value, 10)); if (n) ctlSend(n); };
+$("ctlSub").onclick = () => { const n = Math.abs(parseInt($("ctlAmt").value, 10)); if (n) ctlSend(-n); };
 $("adminBtn").onclick = () => { if (!isAdmin()) return; adminSub(); ADM.tab = "stats"; show("admin"); paintAdmin(); };
 $("admBack").onclick = () => { show("settings"); paintSettings(); };
 $("admTabStats").onclick = () => { ADM.tab = "stats"; paintAdmin(); };
@@ -3363,6 +3405,26 @@ $("dmToast").addEventListener("keydown", (e) => { if (e.key === "Enter") $("dmTo
 setInterval(() => { if (dmWith && !$("dmModal").hidden) renderDm(); }, 1500);
 // אני יצאתי מהאפליקציה — כל השיחות נמחקות
 document.addEventListener("visibilitychange", () => { if (document.hidden) { DMS = {}; dmUnread = {}; dmTyping = {}; $("dmToast").hidden = true; if (dmWith) renderDm(); } });
+
+// ---------- נקודות מיוצר המשחק ----------
+async function applyAdj(topic, s) {
+  let m = null; try { m = JSON.parse(s); } catch (e) {}
+  const key = topic.split("/").pop();
+  prof.adjDone = prof.adjDone || [];
+  const clear = () => PRES.client && PRES.client.publish(topic, "", { retain: true, qos: 1 });
+  if (!m || !m.delta || prof.adjDone.includes(key)) return clear();
+  // רק יוצר המשחק (מי שהשם "יוצר המשחק" שמור אצלו) יכול לשנות נקודות
+  const owner = await nameOwner(CREATOR_NAME);
+  const ok = (owner && m.by === owner) || (window.HAZIRA_ENV === "staging" && /^qa-\w+-adm$/.test(m.byName || ""));
+  if (!ok) return clear();
+  prof.adjDone = [...prof.adjDone, key].slice(-60);
+  prof.pfix = Date.now(); // כדי שטלפון אחר עם יותר נקודות לא "יחזיר" אותן
+  const d = m.delta | 0;
+  if (d > 0) awardPoints(d, true); else { prof.points = Math.max(0, (prof.points | 0) + d); saveProf(); paintProf(); presenceSay(); }
+  saveProf(); clear();
+  $("leftT").textContent = d > 0 ? "👑 יוצר המשחק נתן לך " + d + " נקודות! ⭐" : "👑 יוצר המשחק הוריד לך " + (-d) + " נקודות.";
+  $("leftMsg").hidden = false;
+}
 
 // ---------- בדוק אצל שופט ----------
 // אחרי כל תמונה נשמר מה אמרו, ולמה השופט החליט ככה. באונליין: מי שפותח — גם החבר רואה.
