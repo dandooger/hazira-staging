@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790787566728"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790789079672"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -2783,7 +2783,7 @@ function presenceConnect() {
       will: { topic: PRES_ROOT + "presence/" + prof.id, payload: "", retain: true, qos: 1 } });
     PRES.client = c;
     c.on("error", () => {});
-    c.on("connect", () => { c.subscribe([PRES_ROOT + "presence/+", PRES_ROOT + "photo/+", PRES_ROOT + "inbox/" + prof.id, PRES_ROOT + "board/+", PRES_ROOT + "adj/" + prof.id + "/+"], { qos: 1 }); presenceSay(); photoSay(); });
+    c.on("connect", () => { c.subscribe([PRES_ROOT + "presence/+", PRES_ROOT + "photo/+", PRES_ROOT + "inbox/" + prof.id, PRES_ROOT + "board/+", PRES_ROOT + "adj/" + prof.id + "/+", PRES_ROOT + "acct/+", PRES_ROOT + "names/+", PRES_ROOT + "stats/+"], { qos: 1 }); presenceSay(); photoSay(); });
     c.on("message", onPresenceMsg);
     clearInterval(PRES.timer);
     let beat = 0;
@@ -2808,6 +2808,8 @@ async function presenceStart() {
 }
 function onPresenceMsg(topic, payload) {
   const s = payload.toString();
+  const kind = topic.slice(PRES_ROOT.length).split("/")[0];
+  if (KEEP_KINDS.has(kind)) { keepSeen(topic, s); if (kind !== "board") return; }
   if (topic.startsWith(PRES_ROOT + "adj/")) { if (s) applyAdj(topic, s); return; }
   if (topic.startsWith(PRES_ROOT + "board/")) {
     const id = topic.split("/").pop(); let m = null; try { m = s ? JSON.parse(s) : null; } catch (e) {}
@@ -2995,9 +2997,24 @@ const isAdmin = () => IS_APP && !!prof.hash && !!prof.name && (ADMIN_NAMES.some(
 var ADM = { on: false, accts: {}, acctKey: {}, stats: {}, msgs: {}, tab: "stats", filt: "all", paintT: 0 };
 var readMsgs = {}; try { readMsgs = JSON.parse(localStorage.getItem(READ_KEY) || "{}") || {}; } catch (e) {}
 const saveRead = () => { try { localStorage.setItem(READ_KEY, JSON.stringify(readMsgs)); } catch (e) {} };
+// מסך המנהלים זוכר (בטלפון של המנהל) את כל מי שהוא ראה אי פעם — גם אם השרת כבר שכח אותו
+const ADMC_KEY = () => PROF_KEY.replace("profile", "admcache");
+function admCacheLoad() { try { ADM.cache = JSON.parse(localStorage.getItem(ADMC_KEY()) || "{}") || {}; } catch (e) { ADM.cache = {}; } }
+function admCacheSave() {
+  clearTimeout(ADM.cT);
+  ADM.cT = setTimeout(() => {
+    const c = ADM.cache || {};
+    const put = (id, o) => { c[id] = { ...(c[id] || {}), ...Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined && v !== null)) }; };
+    for (const [id, b] of Object.entries(BOARD)) put(id, { name: b.name, av: b.av, pts: b.pts, fav: b.fav });
+    for (const a of Object.values(ADM.accts)) put(a.id, { name: a.name, av: a.av, pts: a.pts, fav: a.fav, acctT: a.t });
+    for (const [id, st] of Object.entries(ADM.stats)) put(id, { name: st.name, av: st.av, pts: st.pts, fav: st.fav, first: st.first, last: st.last, inst: st.inst, plat: st.plat, cc: st.cc, lang: st.lang, games: st.games, correct: st.correct, days: st.days, modes: st.modes, cats: st.cats });
+    ADM.cache = c;
+    try { localStorage.setItem(ADMC_KEY(), JSON.stringify(c)); } catch (e) {}
+  }, 1500);
+}
 function adminSub() {
   if (ADM.on || !PRES.client || !isAdmin()) return;
-  ADM.on = true;
+  ADM.on = true; admCacheLoad();
   PRES.client.on("message", onAdminMsg);
   PRES.client.subscribe([PRES_ROOT + "acct/+", PRES_ROOT + "stats/+", PRES_ROOT + "msgs/+"], { qos: 1 });
 }
@@ -3016,6 +3033,7 @@ function onAdminMsg(topic, payload) {
     }
   } else if (kind === "stats") { if (m && m.id) ADM.stats[key] = m; else delete ADM.stats[key]; }
   else { if (m && m.text) ADM.msgs[key] = { ...m, mid: key }; else delete ADM.msgs[key]; }
+  if (kind !== "msgs") admCacheSave();
   clearTimeout(ADM.paintT); ADM.paintT = setTimeout(() => { paintAdminBtn(); if (!$("admin").hidden) paintAdmin(); }, 250);
 }
 const unreadCount = () => Object.keys(ADM.msgs).filter((k) => !readMsgs[k]).length;
@@ -3042,6 +3060,9 @@ const MODE_NAME = { solo: "🧍 לבד", duo: "👫 ביחד", online: "🌐 א�
 function allPlayers() {
   const out = {};
   const add = (id, o) => { out[id] = { ...(out[id] || { id }), ...Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined && v !== null)) }; };
+  // קודם מה שהטלפון של המנהל זוכר, אחר כך טבלת המובילים, ומעל הכול — מה שיש בשרת עכשיו
+  for (const [id, c] of Object.entries(ADM.cache || {})) add(id, c);
+  for (const [id, b] of Object.entries(BOARD)) add(id, { name: b.name, av: b.av, fav: b.fav, pts: b.pts });
   for (const [id, s] of Object.entries(ADM.stats)) add(id, { name: s.name, av: s.av, fav: s.fav, cc: s.cc, pts: s.pts, first: s.first, last: s.last, inst: s.inst, plat: s.plat, lang: s.lang, games: s.games, correct: s.correct, modes: s.modes, cats: s.cats, days: s.days, ver: s.ver });
   for (const a of Object.values(ADM.accts)) add(a.id, { name: a.name, av: a.av, fav: a.fav, pts: Math.max(a.pts, (out[a.id] && out[a.id].pts) | 0), acctT: a.t });
   for (const p of Object.values(PRES.list)) add(p.id, { name: p.name, av: p.av, fav: p.fav, pts: p.pts, st: p.st, online: true, last: Date.now() });
@@ -3429,6 +3450,30 @@ async function applyAdj(topic, s) {
   // בשקט: הנקודות פשוט משתנות, בלי הודעה לשחקן
   prof.points = Math.max(0, (prof.points | 0) + (m.delta | 0));
   saveProf(); paintProf(); presenceSay(); clear();
+}
+
+// ---------- שומר: השרת החינמי זוכר כל מידע רק 24 שעות ----------
+// כל טלפון שפותח את האפליקציה מרענן מידע (חשבונות, שמות, טבלת מובילים, סטטיסטיקות) שלא התעדכן 12 שעות.
+// ככה, כל עוד מישהו נכנס לאפליקציה פעם ביום — המידע של כולם נשמר לתמיד.
+const KEEP_KINDS = new Set(["acct", "names", "board", "stats"]);
+const KEEP_AGE = 12 * 3600000;
+var KEEP = {};
+function keepSeen(topic, s) {
+  const prev = KEEP[topic];
+  if (!s) { if (prev) clearTimeout(prev.timer); delete KEEP[topic]; return; }
+  let m = null; try { m = JSON.parse(s); } catch (e) {}
+  if (!m || typeof m !== "object" || Array.isArray(m)) return;
+  KEEP[topic] = { m, timer: prev && prev.timer };
+  if (Date.now() - (m.kt || m.t || 0) < KEEP_AGE || KEEP[topic].timer) return;
+  // מחכים זמן אקראי, כדי שלא כל הטלפונים ירעננו את אותו דבר ביחד
+  const wait = 1500 + Math.random() * (window.HAZIRA_ENV === "staging" ? 6000 : 60000);
+  KEEP[topic].timer = setTimeout(() => {
+    const k = KEEP[topic]; if (!k) return;
+    k.timer = null;
+    if (Date.now() - (k.m.kt || k.m.t || 0) < KEEP_AGE) return; // מישהו אחר כבר רענן
+    if (!PRES.client || !PRES.client.connected) return;
+    PRES.client.publish(topic, JSON.stringify({ ...k.m, kt: Date.now() }), { retain: true, qos: 1 });
+  }, wait);
 }
 
 // ---------- בדוק אצל שופט ----------
