@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790786268730"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790786722954"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -3419,11 +3419,9 @@ async function applyAdj(topic, s) {
   if (!ok) return clear();
   prof.adjDone = [...prof.adjDone, key].slice(-60);
   prof.pfix = Date.now(); // כדי שטלפון אחר עם יותר נקודות לא "יחזיר" אותן
-  const d = m.delta | 0;
-  if (d > 0) awardPoints(d, true); else { prof.points = Math.max(0, (prof.points | 0) + d); saveProf(); paintProf(); presenceSay(); }
-  saveProf(); clear();
-  $("leftT").textContent = d > 0 ? "👑 יוצר המשחק נתן לך " + d + " נקודות! ⭐" : "👑 יוצר המשחק הוריד לך " + (-d) + " נקודות.";
-  $("leftMsg").hidden = false;
+  // בשקט: הנקודות פשוט משתנות, בלי הודעה לשחקן
+  prof.points = Math.max(0, (prof.points | 0) + (m.delta | 0));
+  saveProf(); paintProf(); presenceSay(); clear();
 }
 
 // ---------- בדוק אצל שופט ----------
