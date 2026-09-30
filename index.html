@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon-cheetah3.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon-cheetah3.png">
-<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790786722954"; window.HAZIRA_ENV = "staging";</script>
+<script>window.HAZIRA_IS_APP = true; window.HAZIRA_VERSION = "1790787566728"; window.HAZIRA_ENV = "staging";</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
@@ -201,7 +201,8 @@ h2{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
 
 /* ---------- שופט ---------- */
 .modal{position:fixed;inset:0;background:rgba(26,20,5,.7);display:grid;place-items:center;padding:16px;z-index:10}
-.card{background:var(--stage);border:2px solid var(--gold);border-radius:18px;padding:18px;width:min(520px,100%);display:grid;gap:12px}
+.card{background:var(--stage);border:2px solid var(--gold);border-radius:18px;padding:18px;width:min(520px,100%);display:grid;gap:12px;max-height:calc(100dvh - 32px);overflow:auto;overscroll-behavior:contain}
+.pvx{position:sticky;top:-18px;justify-self:end;margin:-10px -10px -44px 0;z-index:2;width:42px;height:42px;border-radius:50%;border:2px solid var(--ink);background:var(--gold);color:var(--ground);font-size:20px;display:grid;place-items:center;padding:0}
 .card h3{font-family:var(--display);font-weight:400;font-size:28px;margin:0}
 .card input{font:inherit;font-size:20px;color:var(--ink);background:var(--ground);border:1px solid var(--line);border-radius:10px;padding:12px;width:100%}
 .go{font-family:var(--display);font-size:20px;border:0;border-radius:12px;padding:12px 22px;background:var(--gold);color:var(--ground)}
@@ -615,6 +616,7 @@ html[lang="en"] .buzz,html[lang="en"] .hero .ttl,html[lang="en"] .hero .sub{dire
 <!-- הפרופיל של שחקן אחר -->
 <div class="modal" id="pview" hidden>
   <div class="card" role="dialog" aria-labelledby="pvName" style="text-align:center;justify-items:center">
+    <button class="pvx" id="pvX" type="button" aria-label="סגור את הפרופיל">✕</button>
     <span class="ringwrap" id="pvAv"></span>
     <h3 id="pvName" class="notr"></h3>
     <div class="favline" id="pvFav" hidden></div>
@@ -838,6 +840,7 @@ const EN_DICT = {
   "💬 שליחת הודעה": "💬 Send a message", "השיחה נמחקת כשאחד מכם יוצא מהאפליקציה.": "The chat is deleted when one of you leaves the app.", "עוד אין הודעות. כתוב משהו 🙂": "No messages yet. Say something 🙂", " לא מחובר עכשיו, אז השיחה נמחקה.": " isn't online now, so the chat was deleted.", "נקודה לכל השאר!": "A point for everyone else!", " · נקודה לכל השאר": " · a point for everyone else", " (גם לך! 🎉)": " (you too! 🎉)", "התשובה:": "Answer:", "✓ אתה מוכן · ": "✓ You're ready · ", " מנהל החדר עכשיו": " is the room manager now",
   // נקודות מיוצר המשחק
   "👑 יוצר המשחק הוריד לך ": "👑 The game creator took away ", "👑 יוצר המשחק נתן לך ": "👑 The game creator gave you ",
+  "סגור את הפרופיל": "Close profile",
 };
 // משפטים עם מספרים/שמות בסדר אחר באנגלית
 const EN_RULES = [
@@ -2893,6 +2896,10 @@ function openPlayer(p) {
   $("pview").hidden = false;
 }
 $("pvClose").onclick = () => { $("pview").hidden = true; };
+// יציאה מהפרופיל: ✕ למעלה (תמיד נראה), לחיצה מחוץ לחלון, או Escape
+$("pvX").onclick = () => { $("pview").hidden = true; };
+$("pview").addEventListener("click", (e) => { if (e.target === $("pview")) $("pview").hidden = true; });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("pview").hidden) $("pview").hidden = true; });
 // הזמנה מחכה עד שחוזרים למסך הבית (כמו בבראול סטארס)
 function nextInvite() {
   if (!PRES.pending.length || ($("home").hidden && $("over").hidden) || !$("invite").hidden || !$("welcome").hidden || document.hidden) return;
